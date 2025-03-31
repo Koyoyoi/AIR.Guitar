@@ -1,1 +1,1 @@
-#[AIR Guitar](https://github.com/koyoyoi.git) 
+#[AIR Guitar](https://koyoyoi.github.io/AIR.Guitar/) 
