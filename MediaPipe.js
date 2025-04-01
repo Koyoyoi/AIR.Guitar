@@ -109,6 +109,7 @@ async function detect() {
     for (let p of posePoints){
         p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
         poseData.push(p);
+        console.log(p)
     }
 
     // Left Hand
@@ -142,7 +143,7 @@ async function detect() {
         prevPluck = pluck.slice();
     }
 
-    console.log(posePoints);
+    console.log(poseData);
     // clear hand data
     handData['Left'] = [];
     handData['Right'] = [];
