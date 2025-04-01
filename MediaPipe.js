@@ -107,7 +107,7 @@ async function detect() {
         handData[left_or_right] = points;
     }
     for (let p of posePoints){
-        p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
+        //p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
         poseData.push(p);
         console.log(p)
     }
