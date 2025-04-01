@@ -84,6 +84,7 @@ async function detect() {
         }
     }
     // 如果偵測到身體標誌點，則繪製標記
+    /*
     if (pose.landmarks) {
         for (const landmarks of pose.landmarks) {
             // 畫出身體關節連線
@@ -91,7 +92,7 @@ async function detect() {
             // 畫出身體關鍵點
             drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
         }
-    }
+    }*/
 
     const handPoints = hand.landmarks;
     const handednesses = hand.handednesses;
@@ -142,7 +143,6 @@ async function detect() {
         prevPluck = pluck.slice();
     }
 
-    console.log(poseData);
     // clear hand data
     handData['Left'] = [];
     handData['Right'] = [];
