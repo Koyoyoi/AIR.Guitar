@@ -107,7 +107,7 @@ async function detect() {
         handData[left_or_right] = points;
     }
     for (let p of posePoints){
-        console.log(p.x)
+        console.log(p[0])
     }
 
     // Left Hand
