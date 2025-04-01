@@ -4,7 +4,8 @@ import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
 
 // 宣告全域變數
-let video, canvas, ctx, handLandmarker, drawingUtils;
+let video, canvas, ctx;
+let handLandmarker, poseLandmarker ,drawingUtils;
 let handData = { "Left": [], "Right": [] };
 let gesture = '', prevGesture = '';
 let pluck = [], prevPluck = [];
@@ -65,29 +66,40 @@ function setupCanvas() {
 
 // 偵測手部並繪製標記
 async function detectHands() {
-    if (!handLandmarker) return;
+    if (!handLandmarker && !poseLandmarker) return;
 
-    let results = handLandmarker.detectForVideo(video, performance.now());
+    let hand = handLandmarker.detectForVideo(video, performance.now());
+    let pose = poseLandmarker.detectForVideo(video, performance.now());
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // 如果偵測到手部標誌點，則繪製標記
-    if (results.landmarks) {
-        for (const landmarks of results.landmarks) {
+    if (hand.landmarks) {
+        for (const landmarks of hand.landmarks) {
             // 畫出手部關節連線
             drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "green", lineWidth: 3 });
             // 畫出手指關鍵點
             drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
         }
     }
+    // 如果偵測到身體標誌點，則繪製標記
+    if (pose.landmarks) {
+        for (const landmarks of pose.landmarks) {
+            // 畫出身體關節連線
+            drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "green", lineWidth: 3 });
+            // 畫出身體關鍵點
+            drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
+        }
+    }
 
-    const landmarks = results.landmarks;
-    const handednesses = results.handednesses;
+    const handPoints = hand.landmarks;
+    const handednesses = hand.handednesses;
 
     for (let i = 0; i < handednesses.length; i++) {
         let points = [];
         let left_or_right = String(handednesses[i][0].categoryName);
-        for (let p of landmarks[i]) {
+        for (let p of handPoints[i]) {
             p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
             points.push(p);
         }
