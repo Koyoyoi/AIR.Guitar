@@ -96,8 +96,6 @@ async function detect() {
     const handPoints = hand.landmarks;
     const handednesses = hand.handednesses;
     const posePoints = pose.landmarks;
-    
-    console.log(posePoints[0])
 
     for (let i = 0; i < handednesses.length; i++) {
         let points = [];
@@ -108,7 +106,7 @@ async function detect() {
         }
         handData[left_or_right] = points;
     }
-    for (let p of posePoints[0]){
+    for (let p of posePoints){
         p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
         poseData.push(p)
     }
