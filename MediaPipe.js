@@ -96,7 +96,8 @@ async function detect() {
     const handPoints = hand.landmarks;
     const handednesses = hand.handednesses;
     const posePoints = pose.landmarks;
-
+    
+    console.log(posePoints)
     for (let i = 0; i < handednesses.length; i++) {
         let points = [];
         let left_or_right = String(handednesses[i][0].categoryName);
