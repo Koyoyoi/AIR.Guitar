@@ -6,7 +6,7 @@ import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
 // 宣告全域變數
 let video, canvas, ctx;
 let handLandmarker, poseLandmarker, drawingUtils;
-let handData = { "Left": [], "Right": [] };
+let handData = { "Left": [], "Right": [] }, poseData = [];
 let gesture = '', prevGesture = '';
 let pluck = [], prevPluck = [];
 let capo = 0;
@@ -28,7 +28,7 @@ async function setupCamera() {
     });
 }
 
-// 設置 HandLandmarker 手部偵測模型
+// 設置 MediaPipe
 async function setupMediaPipe() {
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -65,7 +65,7 @@ function setupCanvas() {
 }
 
 // 偵測手部並繪製標記
-async function detectHands() {
+async function detect() {
     if (!handLandmarker && !poseLandmarker) return;
 
     let hand = handLandmarker.detectForVideo(video, performance.now());
@@ -95,6 +95,7 @@ async function detectHands() {
 
     const handPoints = hand.landmarks;
     const handednesses = hand.handednesses;
+    const posePoints = pose.landmarks;
 
     for (let i = 0; i < handednesses.length; i++) {
         let points = [];
@@ -104,6 +105,10 @@ async function detectHands() {
             points.push(p);
         }
         handData[left_or_right] = points;
+    }
+    for (let p of posePoints){
+        p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
+        poseData.push(p);
     }
 
     // Left Hand
@@ -138,11 +143,13 @@ async function detectHands() {
         prevPluck = pluck.slice();
     }
 
+    console.log(poseData);
     // clear hand data
     handData['Left'] = [];
     handData['Right'] = [];
+    poseData = [];
 
-    requestAnimationFrame(detectHands);
+    requestAnimationFrame(detect);
 }
 
 // 主函式，負責初始化所有功能
@@ -153,7 +160,7 @@ async function main() {
     await initMIDI();
     buildGuitarChord('C');
     setupCanvas(); // 設置畫布
-    detectHands(); // 啟動手部偵測
+    detect(); // 啟動手部偵測
 }
 
 // 執行程式
