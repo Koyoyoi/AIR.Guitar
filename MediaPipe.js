@@ -1,4 +1,4 @@
-import { HandLandmarker, FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
+import { HandLandmarker, PoseLandmarker ,FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"; 
 import { compute, fingerPlay } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
@@ -28,7 +28,7 @@ async function setupCamera() {
 }
 
 // 設置 HandLandmarker 手部偵測模型
-async function setupHandLandmarker() {
+async function setupMediaPipe() {
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
     );
@@ -40,6 +40,15 @@ async function setupHandLandmarker() {
         },
         runningMode: "VIDEO",
         numHands: 2
+    });
+
+    const poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy.task",
+            delegate: "GPU",
+        },
+        runningMode: "VIDEO",
+        numPoses: 1
     });
 }
 
@@ -118,17 +127,17 @@ async function detectHands() {
     }
 
     // clear hand data
-    handData['Left'].length = 0;
-    handData['Right'].length = 0;
+    handData['Left'] = [];
+    handData['Right'] = [];
 
     requestAnimationFrame(detectHands);
 }
 
 // 主函式，負責初始化所有功能
 async function main() {
-    await setupHandLandmarker(); // 載入手部偵測模型
+    await load_SVM_Model(); // 載入Ptyhon WASM 
+    await setupMediaPipe(); // 載入手部偵測模型
     await setupCamera(); // 啟動攝影機
-    await load_SVM_Model();
     await initMIDI();
     buildGuitarChord('C');
     setupCanvas(); // 設置畫布
