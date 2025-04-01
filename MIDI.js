@@ -41,7 +41,7 @@ export function initMIDI() {
         });
 }
 
-// Build the guitar chord based on gesture (e.g., "C", "Cm", etc.)
+// Build the guitar chord based on gesture
 export function buildGuitarChord(gesture) {
     const root = gesture[0];
     const chordType = gesture.slice(1);
@@ -75,7 +75,6 @@ export function buildGuitarChord(gesture) {
     pluckNotes.push(guitarChord[guitarChord.length - 1])
 
     console.log(guitarChord);
-    console.log(pluckNotes)
 }
 
 // 發送 MIDI 訊號

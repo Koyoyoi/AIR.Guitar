@@ -1,11 +1,11 @@
-import { HandLandmarker, PoseLandmarker ,FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"; 
+import { HandLandmarker, PoseLandmarker, FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { compute, fingerPlay } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
 
 // 宣告全域變數
 let video, canvas, ctx;
-let handLandmarker, poseLandmarker ,drawingUtils;
+let handLandmarker, poseLandmarker, drawingUtils;
 let handData = { "Left": [], "Right": [] };
 let gesture = '', prevGesture = '';
 let pluck = [], prevPluck = [];
@@ -105,7 +105,7 @@ async function detectHands() {
         }
         handData[left_or_right] = points;
     }
-    
+
     // Left Hand
     if (handData['Left'].length !== 0) {
         let parameters = compute(handData['Left']);
@@ -120,7 +120,7 @@ async function detectHands() {
     }
     // Right Hand
     if (handData['Right'].length !== 0) {
-       pluck = await fingerPlay(handData['Right']);
+        pluck = await fingerPlay(handData['Right']);
     }
 
 
@@ -129,11 +129,11 @@ async function detectHands() {
         let diffPluck = [...pluck, ...prevPluck].filter(
             x => !(prevPluck.includes(x))
         );
-    
+
         if (diffPluck.length > 0) {
             plucking(diffPluck, capo)
         }
-    
+
         // 更新 prevPluck 為 pluck 的快照
         prevPluck = pluck.slice();
     }
