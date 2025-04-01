@@ -128,7 +128,6 @@ async function detect() {
         pluck = await fingerPlay(handData['Right']);
     }
 
-
     // Pluck controll
     if (!pluck.includes(4)) {
         let diffPluck = [...pluck, ...prevPluck].filter(
@@ -143,7 +142,7 @@ async function detect() {
         prevPluck = pluck.slice();
     }
 
-    console.log(poseData);
+    console.log(posePoints);
     // clear hand data
     handData['Left'] = [];
     handData['Right'] = [];
