@@ -43,7 +43,7 @@ async function setupMediaPipe() {
         numHands: 2
     });
 
-    const poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+    poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
         baseOptions: {
             modelAssetPath: "./models/MediaPipe/pose_landmarker_lite.task",
             delegate: "GPU",
