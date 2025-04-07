@@ -1,5 +1,5 @@
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { compute, fingerPlay } from "./handCompute.js";
+import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
@@ -45,8 +45,9 @@ async function detect() {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     await detectHand(video);
-    await detectPose(video)
+    await detectPose(video);
 
+    
     // Left Hand
     if (handData['Left'].length !== 0) {
         let parameters = compute(handData['Left']);
@@ -76,6 +77,11 @@ async function detect() {
 
         // 更新 prevPluck 為 pluck 的快照
         prevPluck = pluck.slice();
+    }
+    
+    if (poseData != undefined){
+        let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
+        
     }
 
     // clear hand data

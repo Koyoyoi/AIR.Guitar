@@ -101,7 +101,6 @@ export async function plucking(pluck, capo, duration = 0.5) {
     }, duration * 2000);  // 持續時間轉換為毫秒
 }
 
-
 // strumming function
 function strumming(direction, capo, duration = 0.1) {
 

@@ -22,7 +22,7 @@ export function compute(landmarks) {
     return parameters;
 }
 
-function vectorAngle(v1, v2) {
+export function vectorAngle(v1, v2) {
     let dotProduct = v1[0] * v2[0] + v1[1] * v2[1];
     let mag1 = Math.hypot(v1[0], v1[1]);
     let mag2 = Math.hypot(v2[0], v2[1]);
@@ -33,7 +33,7 @@ function vectorAngle(v1, v2) {
     return angle;
 }
 
-function vectorCompute(p1, p2) {
+export function vectorCompute(p1, p2) {
     return [p1[0] - p2[0], p1[1] - p2[1]];
 }
 
