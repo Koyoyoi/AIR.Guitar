@@ -1,3 +1,5 @@
+import { video } from "./main.js";
+
 export function compute(landmarks) {
     let parameters = [];
     let refp1 = [landmarks[7][0], landmarks[7][1]];
@@ -34,8 +36,13 @@ export function vectorAngle(v1, v2) {
 }
 
 export function vectorCompute(p1, p2) {
+    if (!Array.isArray(p1) || !Array.isArray(p2) || p1.length < 2 || p2.length < 2) {
+        console.warn("Invalid input to vectorCompute, returning [0, 0]:", { p1, p2 });
+        return [0, 0];
+    }
     return [p1[0] - p2[0], p1[1] - p2[1]];
 }
+
 
 function fingerAngle(hand) {
     return [
@@ -56,4 +63,10 @@ export function fingerPlay(hand) {
     if (angles[3] > 25) pick.push(3);
     if (angles[4] > 50) pick.push(4);
     return pick;
+}
+
+// 檢查點是否在畫面內
+export function isInCanvas(point) {
+    console.log(point)
+    return point[0] >= 0 && point[0] <= video.videoWidth && point[1] >= 0 && point[1] <= video.videoHeight;
 }

@@ -1,5 +1,6 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { drawingUtils, handData, poseData } from './main.js'
+import { video } from "./main.js";
 
 let handLandmarker, poseLandmarker;
 
@@ -29,7 +30,7 @@ export async function setupMediaPipe() {
 
 }
 
-export async function detectHand(video) {
+export async function detectHand() {
     if (!handLandmarker) return;
 
     let data = handLandmarker.detectForVideo(video, performance.now())
@@ -59,7 +60,7 @@ export async function detectHand(video) {
 
 }
 
-export async function detectPose(video) {
+export async function detectPose() {
     if (!poseLandmarker) return;
 
     let data = poseLandmarker.detectForVideo(video, performance.now());
@@ -74,7 +75,6 @@ export async function detectPose(video) {
             drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
         }
     }*/
-
 
     const posePoints = data.landmarks;
 

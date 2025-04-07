@@ -1,21 +1,18 @@
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
+import { compute, fingerPlay, vectorAngle, vectorCompute, isInCanvas } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
 
 // 宣告全域變數
-export let drawingUtils;
+export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
-
-let video, canvas, ctx;
 
 let armAngles = [];
 let gesture = '', prevGesture = '';
 let pluck = [], prevPluck = [];
 let action = '', prevAction = '';
 let capo = 0;
-
 
 // 設置攝影機並取得影像流
 async function setupCamera() {
@@ -43,14 +40,13 @@ async function setupCamera() {
     });
 }
 
-
 async function detect() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    await detectHand(video);
-    await detectPose(video);
+    await detectHand();
+    await detectPose();
 
     // Left Hand
     if (handData['Left'].length != 0) {
@@ -83,7 +79,8 @@ async function detect() {
         prevPluck = pluck.slice();
     }
     // Strumming controll
-    if (poseData != undefined) {
+    
+    if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
         armAngles.push(Math.round(angle));
 
@@ -95,21 +92,23 @@ async function detect() {
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
 
-            if (diffAngle > 10) {
+            console.log(armAngles)
+
+            if (diffAngle > 9) {
                 action = 'Down';
             }
-            else if (diffAngle < -10) {
+            else if (diffAngle < -9) {
                 action = 'Up';
             }
             else {
                 action = 'Stop';
+                prevAction = 'Stop';
             }
 
             if (action != prevAction && action != 'stop') {
-                console.log(action);
+                strumming(action, capo)
                 prevAction = action;
             }
-
             armAngles.shift();
         }
     }
