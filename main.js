@@ -1,12 +1,13 @@
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
-import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
+import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
 
 // 宣告全域變數
 export let drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
+
 let video, canvas, ctx;
 
 let armAngles = [];

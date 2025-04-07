@@ -102,7 +102,7 @@ export async function plucking(pluck, capo, duration = 0.5) {
 }
 
 // strumming function
-function strumming(direction, capo, duration = 0.1) {
+export async function strumming(direction, capo, duration = 0.1) {
 
     console.log(direction);
     let swapOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
