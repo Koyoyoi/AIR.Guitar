@@ -26,7 +26,7 @@ export async function setupMediaPipe() {
         runningMode: "VIDEO",
         numPoses: 1
     });
-   
+
 }
 
 export async function detectHand(video) {
@@ -65,21 +65,21 @@ export async function detectPose(video) {
     let data = poseLandmarker.detectForVideo(video, performance.now());
 
     // 如果偵測到身體標誌點，則繪製標記
-        /*
-        if (data.landmarks) {
-            for (const landmarks of data.landmarks) {
-                // 畫出身體關節連線
-                drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "green", lineWidth: 3 });
-                // 畫出身體關鍵點
-                drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
-            }
-        }*/
-    
-    
+    /*
+    if (data.landmarks) {
+        for (const landmarks of data.landmarks) {
+            // 畫出身體關節連線
+            drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "green", lineWidth: 3 });
+            // 畫出身體關鍵點
+            drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
+        }
+    }*/
+
+
     const posePoints = data.landmarks;
-    
-    if(posePoints[0] != undefined){
-        for (let p of posePoints[0]){
+
+    if (posePoints[0] != undefined) {
+        for (let p of posePoints[0]) {
             p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
             poseData.push(p)
         }

@@ -8,9 +8,13 @@ import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-visi
 export let drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 let video, canvas, ctx;
+
+let armAngles = [];
 let gesture = '', prevGesture = '';
 let pluck = [], prevPluck = [];
+let action = '', prevAction = '';
 let capo = 0;
+
 
 // 設置攝影機並取得影像流
 async function setupCamera() {
@@ -40,16 +44,15 @@ async function setupCamera() {
 
 
 async function detect() {
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     await detectHand(video);
     await detectPose(video);
 
-    
     // Left Hand
-    if (handData['Left'].length !== 0) {
+    if (handData['Left'].length != 0) {
         let parameters = compute(handData['Left']);
         // 手勢預測
         gesture = await predict(parameters)
@@ -61,27 +64,53 @@ async function detect() {
 
     }
     // Right Hand
-    if (handData['Right'].length !== 0) {
-        pluck = await fingerPlay(handData['Right']);
+    if (handData['Right'].length != 0) {
+        pluck = fingerPlay(handData['Right']);
     }
 
-    // Pluck controll
+    // Plucking controll
     if (!pluck.includes(4)) {
         let diffPluck = [...pluck, ...prevPluck].filter(
             x => !(prevPluck.includes(x))
         );
 
         if (diffPluck.length > 0) {
-            plucking(diffPluck, capo)
+            plucking(diffPluck, capo);
         }
 
         // 更新 prevPluck 為 pluck 的快照
         prevPluck = pluck.slice();
     }
-    
-    if (poseData != undefined){
+    // Strumming controll
+    if (poseData != undefined) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
-        
+        armAngles.push(Math.round(angle));
+
+        if (armAngles.length >= 5) { // every 5 frames
+            let diffs = [];
+            for (let i = 1; i < 5; i++) {
+                diffs.push(armAngles[i] - armAngles[i - 1]);
+            }
+
+            let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
+
+            if (diffAngle > 10) {
+                action = 'Down';
+            }
+            else if (diffAngle < -10) {
+                action = 'Up';
+            }
+            else {
+                action = 'Stop';
+            }
+
+            if (action != prevAction && action != 'stop') {
+                console.log(action);
+                prevAction = action;
+            }
+
+            armAngles.shift();
+        }
     }
 
     // clear hand data
@@ -99,7 +128,7 @@ async function main() {
     await setupCamera(); // 啟動攝影機
     await initMIDI();
     buildGuitarChord('C');
-    detect(); // 啟動手部偵測
+    detect(); // 啟動偵測
 }
 
 // 執行程式
