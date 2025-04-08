@@ -94,10 +94,10 @@ async function detect() {
 
             console.log(armAngles)
 
-            if (diffAngle > 9) {
+            if (diffAngle > 8) {
                 action = 'Down';
             }
-            else if (diffAngle < -9) {
+            else if (diffAngle < -8) {
                 action = 'Up';
             }
             else {
