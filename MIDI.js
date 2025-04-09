@@ -15,7 +15,7 @@ let outport = null;
 let guitarChord = [], pluckNotes = []
 
 // 初始化 MIDI
-export function initMIDI() {
+export async function initMIDI() {
     return navigator.requestMIDIAccess()
         .then((midiAccess) => {
             // 確認 MIDI 訪問權限
@@ -78,6 +78,11 @@ export function buildGuitarChord(gesture) {
     console.log(pluckNotes)
 }
 
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // 發送 MIDI 訊號
 // Plucking (playing notes) function
 export async function plucking(pluck, capo, duration = 0.5) {
@@ -102,22 +107,19 @@ export async function plucking(pluck, capo, duration = 0.5) {
     }, duration * 2000);  // 持續時間轉換為毫秒
 }
 
-
-// Swapping (strumming) function
-function strumming(direction, capo, duration = 0.1) {
-
+// strumming function
+export async function strumming(direction, capo, duration = 0.1) {
     console.log(direction);
-    let swapOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
-        
-    // note_on
-    swapOrder.forEach(n => {
-        outport.send([0x90, n + capo, 127]);
-        setTimeout(() => {}, 75);  // Sleep for 75ms between notes
-    });
-        
-    // note_off
-    swapOrder.forEach(n => {
-        outport.send([0x80, n + capo, 0]);
-        setTimeout(() => {}, 200);  // Sleep for 200ms between notes
-    });
+    let sturmOrder = direction == 'Up' ? guitarChord.slice().reverse() : guitarChord;
+    // note_on with delay
+    for (let n of sturmOrder) {
+        outport.send([0x90, n + capo, 127]); // note_on
+        await sleep(75); // 等 75ms 再發送下一個
+    }
+
+    // note_off with delay
+    for (let n of sturmOrder) {
+        outport.send([0x80, n + capo, 0]); // note_off
+        await sleep(200); // 等 200ms 再發送下一個
+    }
 }
