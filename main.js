@@ -1,5 +1,5 @@
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { compute, fingerPlay, vectorAngle, vectorCompute, isInCanvas } from "./handCompute.js";
+import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
@@ -23,8 +23,17 @@ async function setupCamera() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
 
+    canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    ctx = canvas.getContext("2d");
+    drawingUtils = new DrawingUtils(ctx);
+
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
+            // 設定 canvas 大小，保證有正確尺寸
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
             video.play();
             resolve(video);
         };
