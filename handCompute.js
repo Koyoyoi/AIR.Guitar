@@ -24,13 +24,13 @@ export function compute(landmarks) {
     return parameters;
 }
 
-function vectorAngle(v1, v2) {
+export function vectorAngle(v1, v2) {
     let dotProduct = v1[0] * v2[0] + v1[1] * v2[1];
     let mag1 = Math.hypot(v1[0], v1[1]);
     let mag2 = Math.hypot(v2[0], v2[1]);
-    
+
     if (mag1 === 0 || mag2 === 0) return 180;
-    
+
     let angle = Math.acos(dotProduct / (mag1 * mag2)) * (180 / Math.PI);
     return angle;
 }
