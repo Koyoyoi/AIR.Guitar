@@ -10,12 +10,12 @@ const rootTab = {
     "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
 };
 
-const guitarStandard = [40, 45, 50, 55, 59, 64]; 
+const guitarStandard = [40, 45, 50, 55, 59, 64];
 let outport = null;
 let guitarChord = [], pluckNotes = []
 
 // 初始化 MIDI
-export function initMIDI() {
+export  async function initMIDI() {
     return navigator.requestMIDIAccess()
         .then((midiAccess) => {
             // 確認 MIDI 訪問權限
@@ -41,7 +41,7 @@ export function initMIDI() {
         });
 }
 
-// Build the guitar chord based on gesture (e.g., "C", "Cm", etc.)
+// Build the guitar chord based on gesture
 export function buildGuitarChord(gesture) {
     const root = gesture[0];
     const chordType = gesture.slice(1);
@@ -53,7 +53,7 @@ export function buildGuitarChord(gesture) {
     // Iterate over each note in guitar standard tuning
     for (let note of guitarStandard) {
         let n = note % 12;
-    
+
         // Calculate closest note to the current guitar string's note
         let closest = Math.min(...chord.map(i => {
             let diff = i - n;
@@ -75,13 +75,16 @@ export function buildGuitarChord(gesture) {
     pluckNotes.push(guitarChord[guitarChord.length - 1])
 
     console.log(guitarChord);
-    console.log(pluckNotes)
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // 發送 MIDI 訊號
 // Plucking (playing notes) function
 export async function plucking(pluck, capo, duration = 0.5) {
-    
+
     let notes = []
     console.log(pluck)
     pluck.forEach(p => {
@@ -95,29 +98,26 @@ export async function plucking(pluck, capo, duration = 0.5) {
 
     // 使用 setTimeout 模擬 sleep 時間，控制 note_off 時間
     setTimeout(() => {
-         // 發送 note_off 訊號
+        // 發送 note_off 訊號
         notes.forEach(n => {
             outport.send([0x80, n + capo, 0]);  // 0x80 表示 Note Off 訊號
         });
     }, duration * 2000);  // 持續時間轉換為毫秒
 }
 
-
-// Swapping (strumming) function
-function strumming(direction, capo, duration = 0.1) {
-
+// strumming function
+export async function strumming(direction, capo, duration = 0.1) {
     console.log(direction);
-    let swapOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
-        
-    // note_on
-    swapOrder.forEach(n => {
-        outport.send([0x90, n + capo, 127]);
-        setTimeout(() => {}, 75);  // Sleep for 75ms between notes
-    });
-        
-    // note_off
-    swapOrder.forEach(n => {
-        outport.send([0x80, n + capo, 0]);
-        setTimeout(() => {}, 200);  // Sleep for 200ms between notes
-    });
+    let sturmOrder = direction == 'Up' ? guitarChord.slice().reverse() : guitarChord;
+    // note_on with delay
+    for (let n of sturmOrder) {
+        outport.send([0x90, n + capo, 127]); // note_on
+        await sleep(75); // 等 75ms 再發送下一個
+    }
+
+    // note_off with delay
+    for (let n of sturmOrder) {
+        outport.send([0x80, n + capo, 0]); // note_off
+        await sleep(200); // 等 200ms 再發送下一個
+    }
 }
