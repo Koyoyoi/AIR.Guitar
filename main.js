@@ -1,7 +1,8 @@
-import { HandLandmarker, FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
+import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
+import { compute, fingerPlay, vectorAngle, vectorCompute, isInCanvas } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
-import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
+import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
+import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
 
 // 宣告全域變數
 export let video, canvas, ctx, drawingUtils;
