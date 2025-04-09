@@ -83,6 +83,7 @@ async function detect() {
     if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
         armAngles.push(Math.round(angle));
+        let position = posedata[16][0] - poseData[12][0]
 
         if (armAngles.length >= 5) { // every 5 frames
             let diffs = [];
@@ -92,12 +93,10 @@ async function detect() {
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
 
-            console.log(armAngles)
-
-            if (diffAngle > 9) {
+            if (diffAngle > 8 && position < -15) {
                 action = 'Down';
             }
-            else if (diffAngle < -9) {
+            else if (diffAngle < -8 && position > -5) {
                 action = 'Up';
             }
             else {
