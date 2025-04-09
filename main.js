@@ -1,13 +1,16 @@
 import { HandLandmarker, FilesetResolver, DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { compute, fingerPlay } from "./handCompute.js";
+import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, buildGuitarChord } from "./MIDI.js";
 
 // 宣告全域變數
-let video, canvas, ctx, handLandmarker, drawingUtils;
-let handData = { "Left": [], "Right": [] };
+export let video, canvas, ctx, drawingUtils;
+export let handData = { "Left": [], "Right": [] }, poseData = [];
+
+let armAngles = [];
 let gesture = '', prevGesture = '';
 let pluck = [], prevPluck = [];
+let action = '', prevAction = '';
 let capo = 0;
 
 // 設置攝影機並取得影像流
@@ -27,66 +30,16 @@ async function setupCamera() {
     });
 }
 
-// 設置 HandLandmarker 手部偵測模型
-async function setupHandLandmarker() {
-    const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
-    );
+async function detect() {
 
-    handLandmarker = await HandLandmarker.createFromOptions(vision, {
-        baseOptions: {
-            modelAssetPath: "./models/MediaPipe/hand_landmarker.task",
-            delegate: "GPU"
-        },
-        runningMode: "VIDEO",
-        numHands: 2
-    });
-}
-
-// 設置畫布（Canvas）以便繪製手部偵測結果
-function setupCanvas() {
-    canvas = document.createElement("canvas");
-    document.body.appendChild(canvas);
-    ctx = canvas.getContext("2d");
-    drawingUtils = new DrawingUtils(ctx);
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-}
-
-// 偵測手部並繪製標記
-async function detectHands() {
-    if (!handLandmarker) return;
-
-    let results = handLandmarker.detectForVideo(video, performance.now());
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // 如果偵測到手部標誌點，則繪製標記
-    if (results.landmarks) {
-        for (const landmarks of results.landmarks) {
-            // 畫出手部關節連線
-            drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "green", lineWidth: 3 });
-            // 畫出手指關鍵點
-            drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
-        }
-    }
+    await detectHand();
+    await detectPose();
 
-    const landmarks = results.landmarks;
-    const handednesses = results.handednesses;
-
-    for (let i = 0; i < handednesses.length; i++) {
-        let points = [];
-        let left_or_right = String(handednesses[i][0].categoryName);
-        for (let p of landmarks[i]) {
-            p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
-            points.push(p);
-        }
-        handData[left_or_right] = points;
-    }
-    
     // Left Hand
-    if (handData['Left'].length !== 0) {
+    if (handData['Left'].length != 0) {
         let parameters = compute(handData['Left']);
         // 手勢預測
         gesture = await predict(parameters)
@@ -98,41 +51,74 @@ async function detectHands() {
 
     }
     // Right Hand
-    if (handData['Right'].length !== 0) {
-       pluck = await fingerPlay(handData['Right']);
+    if (handData['Right'].length != 0) {
+        pluck = fingerPlay(handData['Right']);
     }
 
-
-    // Pluck controll
+    // Plucking controll
     if (!pluck.includes(4)) {
         let diffPluck = [...pluck, ...prevPluck].filter(
             x => !(prevPluck.includes(x))
         );
-    
+
         if (diffPluck.length > 0) {
-            plucking(diffPluck, capo)
+            plucking(diffPluck, capo);
         }
-    
+
         // 更新 prevPluck 為 pluck 的快照
         prevPluck = pluck.slice();
     }
+    // Strumming controll
+    
+    if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
+        let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
+        armAngles.push(Math.round(angle));
+
+        if (armAngles.length >= 5) { // every 5 frames
+            let diffs = [];
+            for (let i = 1; i < 5; i++) {
+                diffs.push(armAngles[i] - armAngles[i - 1]);
+            }
+
+            let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
+
+            console.log(armAngles)
+
+            if (diffAngle > 9) {
+                action = 'Down';
+            }
+            else if (diffAngle < -9) {
+                action = 'Up';
+            }
+            else {
+                action = 'Stop';
+                prevAction = 'Stop';
+            }
+
+            if (action != prevAction && action != 'stop') {
+                strumming(action, capo)
+                prevAction = action;
+            }
+            armAngles.shift();
+        }
+    }
 
     // clear hand data
-    handData['Left'].length = 0;
-    handData['Right'].length = 0;
+    handData['Left'] = [];
+    handData['Right'] = [];
+    poseData = [];
 
-    requestAnimationFrame(detectHands);
+    requestAnimationFrame(detect);
 }
 
 // 主函式，負責初始化所有功能
 async function main() {
-    await setupHandLandmarker(); // 載入手部偵測模型
+    await load_SVM_Model(); // 載入Ptyhon WASM 
+    await setupMediaPipe(); // 載入手部偵測模型
     await setupCamera(); // 啟動攝影機
-    await load_SVM_Model();
     await initMIDI();
     buildGuitarChord('C');
-    setupCanvas(); // 設置畫布
-    detectHands(); // 啟動手部偵測
+    detect(); // 啟動偵測
 }
 
 // 執行程式
