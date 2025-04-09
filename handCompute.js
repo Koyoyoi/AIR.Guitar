@@ -1,3 +1,5 @@
+import { video } from "./main.js";
+
 export function compute(landmarks) {
     let parameters = [];
     let refp1 = [landmarks[7][0], landmarks[7][1]];
@@ -33,7 +35,11 @@ function vectorAngle(v1, v2) {
     return angle;
 }
 
-function vectorCompute(p1, p2) {
+export function vectorCompute(p1, p2) {
+    if (!Array.isArray(p1) || !Array.isArray(p2) || p1.length < 2 || p2.length < 2) {
+        console.warn("Invalid input to vectorCompute, returning [0, 0]:", { p1, p2 });
+        return [0, 0];
+    }
     return [p1[0] - p2[0], p1[1] - p2[1]];
 }
 
