@@ -62,7 +62,7 @@ async function detect() {
     }
     // Right Hand
     if (handData['Right'].length != 0) {
-        pluck = fingerPlay(handData['Right']);
+        pluck = await fingerPlay(handData['Right']);
     }
 
     // Plucking controll
