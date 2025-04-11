@@ -114,7 +114,7 @@ async function detect() {
     }
 
     // Strumming Control
-    if (poseData[12] && poseData[14] && poseData[16]) {
+    if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
         armAngles.push(Math.round(angle));
         let position = poseData[16][0] - poseData[12][0];
