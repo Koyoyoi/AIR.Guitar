@@ -29,7 +29,7 @@ async function setupCamera() {
 
     // 顯示 Loading 動畫
     const loadingElement = document.getElementById('loading');
-    
+
     // 開始加載攝影機流
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
@@ -47,6 +47,10 @@ async function setupCamera() {
 
             // 隱藏 loading 畫面
             loading.classList.add("hidden");
+
+            // 更新標題為 AIR Guitar
+            const title = document.getElementById("title");
+            title.textContent = "AIR Guitar";  // 更改為你的標題
 
             video.play();  // 播放視頻
             resolve(video);
@@ -95,7 +99,7 @@ async function detect() {
         prevPluck = pluck.slice();
     }
     // Strumming controll
-    
+
     if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
         armAngles.push(Math.round(angle));
