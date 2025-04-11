@@ -16,9 +16,10 @@ let action = '', prevAction = '';
 let capo = 0;
 
 // 設置攝影機並取得影像流
+// 設置攝影機並取得影像流
 async function setupCamera() {
     video = document.createElement("video");
-    video.style.display = "none";
+    video.style.display = "none";  // 不顯示在頁面中
 
     // 動態調整大小
     video.style.width = "100%";   // 設定寬度為 100% 視窗寬度
@@ -26,6 +27,10 @@ async function setupCamera() {
 
     document.body.appendChild(video);
 
+    // 顯示 Loading 動畫
+    const loadingElement = document.getElementById('loading');
+    
+    // 開始加載攝影機流
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
 
@@ -40,11 +45,15 @@ async function setupCamera() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
-            video.play();
+            // 隱藏 loading 畫面
+            loading.classList.add("hidden");
+
+            video.play();  // 播放視頻
             resolve(video);
         };
     });
 }
+
 
 async function detect() {
 
