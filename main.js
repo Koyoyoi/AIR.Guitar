@@ -5,7 +5,7 @@ import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
 import { drawGesture } from "./draw.js";
 
-// 宣告全域變數
+// 全域變數
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 
@@ -15,15 +15,36 @@ let pluck = [], prevPluck = [];
 let action = '', prevAction = '';
 let capo = 0;
 
+// resize 函數
+function resizeCanvasAndVideo() {
+    const aspectRatio = video.videoWidth / video.videoHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let newWidth = windowWidth;
+    let newHeight = newWidth / aspectRatio;
+
+    if (newHeight > windowHeight) {
+        newHeight = windowHeight;
+        newWidth = newHeight * aspectRatio;
+    }
+
+    video.style.width = `${newWidth}px`;
+    video.style.height = `${newHeight}px`;
+
+    canvas.style.width = video.style.width;
+    canvas.style.height = video.style.height;
+}
+
 async function setupCamera() {
     video = document.createElement("video");
-    video.style.display = "none";  
+    video.style.display = "none";
     document.body.appendChild(video);
 
     const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-            width: { ideal: 1280, max: 1280 },  
-            height: { ideal: 720, max: 720 }
+            width: { ideal: 1280},
+            height: { ideal: 720}
         }
     });
 
@@ -40,21 +61,23 @@ async function setupCamera() {
             canvas.height = video.videoHeight;
             console.log("Video size:", video.videoWidth, video.videoHeight);
 
-            loading.classList.add("hidden");
-
             const title = document.getElementById("title");
             title.textContent = "AIR Guitar";
 
+            loading.classList.add("hidden");
             video.play();
+
+            // 加入 resize 控制
+            resizeCanvasAndVideo();
+            window.addEventListener("resize", resizeCanvasAndVideo);
+
             resolve(video);
         };
     });
 }
 
-
 async function detect() {
-
-    ctx.clearRect(0, 0, 1920, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     await detectHand();
@@ -63,7 +86,6 @@ async function detect() {
     // Left Hand
     if (handData['Left'].length != 0) {
         let parameters = compute(handData['Left']);
-        // 手勢預測
         gesture = await predict(parameters)
         if (prevGesture != gesture) {
             console.log(gesture);
@@ -71,34 +93,33 @@ async function detect() {
             buildGuitarChord(gesture);
         }
         drawGesture(gesture)
-
     }
+
     // Right Hand
     if (handData['Right'].length != 0) {
         pluck = await fingerPlay(handData['Right']);
     }
 
-    // Plucking controll
+    // Plucking Control
     if (!pluck.includes(4)) {
         let diffPluck = [...pluck, ...prevPluck].filter(
-            x => !(prevPluck.includes(x))
+            x => !prevPluck.includes(x)
         );
 
         if (diffPluck.length > 0) {
             plucking(diffPluck, capo);
         }
 
-        // 更新 prevPluck 為 pluck 的快照
         prevPluck = pluck.slice();
     }
-    // Strumming controll
 
-    if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
+    // Strumming Control
+    if (poseData[12] && poseData[14] && poseData[16]) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]))
         armAngles.push(Math.round(angle));
-        let position = poseData[16][0] - poseData[12][0]
+        let position = poseData[16][0] - poseData[12][0];
 
-        if (armAngles.length >= 5) { // every 5 frames
+        if (armAngles.length >= 5) {
             let diffs = [];
             for (let i = 1; i < 5; i++) {
                 diffs.push(armAngles[i] - armAngles[i - 1]);
@@ -108,24 +129,22 @@ async function detect() {
 
             if (diffAngle > 7 && position > 0) {
                 action = 'Down';
-            }
-            else if (diffAngle < -7 && position < -15) {
+            } else if (diffAngle < -7 && position < -15) {
                 action = 'Up';
-            }
-            else {
+            } else {
                 action = 'Stop';
                 prevAction = 'Stop';
             }
 
-            if (action != prevAction && action != 'stop') {
-                strumming(action, capo)
+            if (action != prevAction && action != 'Stop') {
+                strumming(action, capo);
                 prevAction = action;
             }
+
             armAngles.shift();
         }
     }
 
-    // clear hand data
     handData['Left'] = [];
     handData['Right'] = [];
     poseData = [];
@@ -133,15 +152,14 @@ async function detect() {
     requestAnimationFrame(detect);
 }
 
-// 主函式，負責初始化所有功能
+// 初始化主函式
 async function main() {
-    await load_SVM_Model(); // 載入Ptyhon WASM 
-    await setupMediaPipe(); // 載入手部偵測模型
-    await setupCamera(); // 啟動攝影機
+    await load_SVM_Model();
+    await setupMediaPipe();
+    await setupCamera();
     await initMIDI();
     buildGuitarChord('C');
-    detect(); // 啟動偵測
+    detect();
 }
 
-// 執行程式
 main();

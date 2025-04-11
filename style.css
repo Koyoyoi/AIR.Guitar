@@ -15,20 +15,22 @@ body {
     font-weight: bold;
     text-align: center;
     color: #434343;
-    margin-top: 100px;
+    margin-top: 20px;  /* 輕微減少頂部空間 */
     letter-spacing: 3px;
     font-family: 'Arial Black', sans-serif;
-    transition: all 1s ease-in-out;
-  }
+    position: fixed; /* 固定在頁面頂部 */
+    top: 0;
+    width: 100%;
+    z-index: 10;  /* 保證標題不被 canvas 覆蓋 */
+}
 
 canvas {
     position: absolute;
-    top: 50%;
+    top: 100px; /* 讓 canvas 從標題下方開始 */
     left: 50%;
-    transform: translate(-50%, -50%);
-    /* 讓畫布從中心點對齊 */
+    transform: translateX(-50%);
     background-color: #1c1c1c;
-    /* 可選：設定畫布背景色 */
+    z-index: 1; /* 保證 canvas 在標題下方 */
 }
 
 /* loading 樣式與動畫 */
