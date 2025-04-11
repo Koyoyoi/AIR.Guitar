@@ -3,6 +3,7 @@ import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.j
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
+import { drawGesture } from "./draw.js";
 
 // 宣告全域變數
 export let video, canvas, ctx, drawingUtils;
@@ -18,6 +19,11 @@ let capo = 0;
 async function setupCamera() {
     video = document.createElement("video");
     video.style.display = "none";
+
+    // 動態調整大小
+    video.style.width = "100%";   // 設定寬度為 100% 視窗寬度
+    video.style.height = "100%";  // 設定高度為 100% 視窗高度
+
     document.body.appendChild(video);
 
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -58,6 +64,7 @@ async function detect() {
             prevGesture = gesture;
             buildGuitarChord(gesture);
         }
+        drawGesture(gesture)
 
     }
     // Right Hand
