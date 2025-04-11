@@ -15,23 +15,18 @@ let pluck = [], prevPluck = [];
 let action = '', prevAction = '';
 let capo = 0;
 
-// 設置攝影機並取得影像流
-// 設置攝影機並取得影像流
 async function setupCamera() {
     video = document.createElement("video");
-    video.style.display = "none";  // 不顯示在頁面中
-
-    // 動態調整大小
-    video.style.width = "100%";   // 設定寬度為 100% 視窗寬度
-    video.style.height = "100%";  // 設定高度為 100% 視窗高度
-
+    video.style.display = "none";  
     document.body.appendChild(video);
 
-    // 顯示 Loading 動畫
-    const loadingElement = document.getElementById('loading');
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+            width: { ideal: 1280, max: 1280 },  
+            height: { ideal: 720, max: 720 }
+        }
+    });
 
-    // 開始加載攝影機流
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
 
     canvas = document.createElement("canvas");
@@ -41,18 +36,16 @@ async function setupCamera() {
 
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
-            // 設定 canvas 大小，保證有正確尺寸
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            console.log("Video size:", video.videoWidth, video.videoHeight);
 
-            // 隱藏 loading 畫面
             loading.classList.add("hidden");
 
-            // 更新標題為 AIR Guitar
             const title = document.getElementById("title");
-            title.textContent = "AIR Guitar";  // 更改為你的標題
+            title.textContent = "AIR Guitar";
 
-            video.play();  // 播放視頻
+            video.play();
             resolve(video);
         };
     });
@@ -61,7 +54,7 @@ async function setupCamera() {
 
 async function detect() {
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, 1920, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     await detectHand();
@@ -113,7 +106,7 @@ async function detect() {
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
 
-            if (diffAngle > 7 && position > -5) {
+            if (diffAngle > 7 && position > 0) {
                 action = 'Down';
             }
             else if (diffAngle < -7 && position < -15) {
