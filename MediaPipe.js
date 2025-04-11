@@ -39,9 +39,9 @@ export async function detectHand() {
     if (data.landmarks) {
         for (const landmarks of data.landmarks) {
             // 畫出手部關節連線
-            drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "green", lineWidth: 3 });
+            drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "#F8C3CD", lineWidth: 4 });
             // 畫出手指關鍵點
-            drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
+            drawingUtils.drawLandmarks(landmarks, { color: "#DB4D6D", radius: 4 });
         }
     }
 
