@@ -113,10 +113,10 @@ async function detect() {
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
 
-            if (diffAngle > 8 && position > -5) {
+            if (diffAngle > 7 && position > -5) {
                 action = 'Down';
             }
-            else if (diffAngle < -8 && position < -15) {
+            else if (diffAngle < -7 && position < -15) {
                 action = 'Up';
             }
             else {
