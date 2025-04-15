@@ -3,7 +3,7 @@ import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.j
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
-import { drawGesture } from "./draw.js";
+import { drawCapo, drawGesture } from "./draw.js";
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
@@ -156,6 +156,7 @@ async function detect() {
         timeCnt = 0;
     }
     timeCnt += 1;
+    drawCapo(capo);
 
     // 重置 handData 和 poseData
     handData['Left'] = [];

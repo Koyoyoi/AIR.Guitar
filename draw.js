@@ -1,4 +1,4 @@
-import { ctx } from "./main.js";
+import { ctx, canvas} from "./main.js";
 
 export function drawGesture(gesture) {
 
