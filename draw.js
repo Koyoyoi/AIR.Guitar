@@ -1,7 +1,7 @@
 import { ctx } from "./main.js";
 
-export function drawGesture(gesture) {
-    
+export function drawInfo(gesture, capo) {
+
     // 設定字型與顏色
     ctx.font = "100px Arial";
     ctx.fillStyle = "#00AA90";
@@ -10,4 +10,8 @@ export function drawGesture(gesture) {
 
     // 畫出手勢文字
     ctx.fillText(`${gesture}`, 50, 50);  // 位置設為左上角，距離 canvas 
+
+    // 畫出 capo 文字（右上角）
+    ctx.textAlign = "right";  // 設為右對齊
+    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);  // 顯示 capo，距離右邊 50px，並且在上方
 }
