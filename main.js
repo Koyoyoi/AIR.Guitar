@@ -157,8 +157,6 @@ async function detect() {
         } else if (poseData[15][1] < poseData[0][1]){
             capo = Math.max(-12, capo - 1);
         }
-
-        console.log("Capo:", capo);
         timeCnt = 0;
     }
     timeCnt += 1;
