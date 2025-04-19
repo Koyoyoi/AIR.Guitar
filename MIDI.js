@@ -120,7 +120,7 @@ export async function strumming(direction, capo, duration) {
     // note_off with delay
     for (let n of sturmOrder) {
         outport.send([0x80, n + capo, 0]); // note_off
-        await sleep(500); // 等 200ms 再發送下一個
+        await sleep(duration * 1.5); // 等 200ms 再發送下一個
     }
 }
 

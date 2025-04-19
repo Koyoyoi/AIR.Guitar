@@ -106,7 +106,7 @@ async function detect() {
             x => !prevPluck.includes(x)
         );
 
-        if (diffPluck.length > 0) {
+        if (diffPluck.length > 0 && action == 'Stop') {
             plucking(diffPluck, capo);
         }
         prevPluck = pluck.slice();
@@ -115,29 +115,30 @@ async function detect() {
     // Strumming Control
     if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]));
-        armAngles.push(Math.round(angle));
+        armAngles.push(angle);
         let position = poseData[16][0] - poseData[12][0];
 
-        if (armAngles.length >= 5) {
+        if (armAngles.length >= 8) {
             let diffs = [];
-            for (let i = 1; i < 5; i++) {
+            for (let i = 1; i < 8; i++) {
                 diffs.push(armAngles[i] - armAngles[i - 1]);
             }
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
             
-            if (diffAngle > 3 && position > 0) {
+            if (diffAngle > 2 && position > 0) {
                 action = 'Down';
-            } else if (diffAngle < -3 && position < -15) {
+            } else if (diffAngle < -2 && position < -15) {
                 action = 'Up';
             } else {
                 action = 'Stop';
                 prevAction = 'Stop';
+                armAngles = [];
             }
 
             if (action != prevAction && action != 'Stop' && pluck.includes(4)) {
-                console.log(diffAngle)
-                let duration = await mapRange(Math.abs(diffAngle), 3, 15, 100, 10);
+                console.log(armAngles)
+                let duration = await mapRange(Math.abs(diffAngle), 2, 13, 125, 10);
                 console.log(duration)
                 strumming(action, capo, duration);
                 prevAction = action;

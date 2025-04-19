@@ -16,6 +16,7 @@ export async function setupMediaPipe() {
             delegate: "GPU"
         },
         runningMode: "VIDEO",
+        min_hand_detection_confidence: 0.3,
         min_tracking_confidence: 0.3,
         numHands: 2
     });
@@ -26,6 +27,7 @@ export async function setupMediaPipe() {
             delegate: "GPU",
         },
         runningMode: "VIDEO",
+        min_pose_detection_confidence: 0.8,
         min_tracking_confidence: 0.7,
         numPoses: 1
     });
