@@ -150,11 +150,14 @@ async function detect() {
 
     // Capo control 每1秒執行一次
     if (poseData.length > 0 && timeCnt >= 30) { 
-        if (poseData[15][1] < poseData[0][1]) {
-            capo = Math.max(-12, capo - 1);
+        if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
+            capo = 0;
         } else if (poseData[16][1] < poseData[0][1]) {
             capo = Math.min(12, capo + 1);
+        } else if (poseData[15][1] < poseData[0][1]){
+            capo = Math.max(-12, capo - 1);
         }
+
         console.log("Capo:", capo);
         timeCnt = 0;
     }
