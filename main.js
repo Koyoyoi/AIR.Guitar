@@ -1,7 +1,7 @@
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
-import { initMIDI, plucking, strumming, buildGuitarChord } from "./MIDI.js";
+import { initMIDI, plucking, strumming, buildGuitarChord, mapRange } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
 import { drawCapo, drawGesture } from "./draw.js";
 
@@ -126,9 +126,9 @@ async function detect() {
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
             
-            if (diffAngle > 2 && position > 0) {
+            if (diffAngle > 3 && position > 0) {
                 action = 'Down';
-            } else if (diffAngle < -2 && position < -15) {
+            } else if (diffAngle < -3 && position < -15) {
                 action = 'Up';
             } else {
                 action = 'Stop';
@@ -136,7 +136,9 @@ async function detect() {
             }
 
             if (action != prevAction && action != 'Stop' && pluck.includes(4)) {
-                let duration = 1 / Math.abs(diffAngle / 3) * 100;
+                console.log(diffAngle)
+                let duration = await mapRange(Math.abs(diffAngle), 3, 15, 100, 10);
+                console.log(duration)
                 strumming(action, capo, duration);
                 prevAction = action;
             }
