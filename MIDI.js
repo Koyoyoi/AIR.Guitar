@@ -108,18 +108,18 @@ export async function plucking(pluck, capo, duration = 0.5) {
 }
 
 // strumming function
-export async function strumming(direction, capo, duration = 0.1) {
+export async function strumming(direction, capo, duration) {
     console.log(direction);
     let sturmOrder = direction == 'Up' ? guitarChord.slice().reverse() : guitarChord;
     // note_on with delay
     for (let n of sturmOrder) {
         outport.send([0x90, n + capo, 127]); // note_on
-        await sleep(75); // 等 75ms 再發送下一個
+        await sleep(duration); // 等 75ms 再發送下一個
     }
 
     // note_off with delay
     for (let n of sturmOrder) {
         outport.send([0x80, n + capo, 0]); // note_off
-        await sleep(200); // 等 200ms 再發送下一個
+        await sleep(duration * 2); // 等 200ms 再發送下一個
     }
 }

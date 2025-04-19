@@ -125,18 +125,19 @@ async function detect() {
             }
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
-
-            if (diffAngle > 7 && position > 0) {
+            
+            if (diffAngle > 2 && position > 0) {
                 action = 'Down';
-            } else if (diffAngle < -7 && position < -15) {
+            } else if (diffAngle < -2 && position < -15) {
                 action = 'Up';
             } else {
                 action = 'Stop';
                 prevAction = 'Stop';
             }
 
-            if (action != prevAction && action != 'Stop') {
-                strumming(action, capo);
+            if (action != prevAction && action != 'Stop' && pluck.includes(4)) {
+                let duration = 1 / Math.abs(diffAngle / 3) * 100;
+                strumming(action, capo, duration);
                 prevAction = action;
             }
 
@@ -144,7 +145,6 @@ async function detect() {
         }
     }
     else{
-        armAngles.push(0)
         armAngles.shift();
     }
 
