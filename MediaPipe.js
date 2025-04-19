@@ -16,6 +16,7 @@ export async function setupMediaPipe() {
             delegate: "GPU"
         },
         runningMode: "VIDEO",
+        min_tracking_confidence: 0.3,
         numHands: 2
     });
 
@@ -25,6 +26,7 @@ export async function setupMediaPipe() {
             delegate: "GPU",
         },
         runningMode: "VIDEO",
+        min_tracking_confidence: 0.7,
         numPoses: 1
     });
 
@@ -66,7 +68,7 @@ export async function detectPose() {
     let data = poseLandmarker.detectForVideo(video, performance.now());
 
     // 如果偵測到身體標誌點，則繪製標記
-    /*
+    
     if (data.landmarks) {
         for (const landmarks of data.landmarks) {
             // 畫出身體關節連線
@@ -74,7 +76,7 @@ export async function detectPose() {
             // 畫出身體關鍵點
             drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
         }
-    }*/
+    }
 
     const posePoints = data.landmarks;
 
