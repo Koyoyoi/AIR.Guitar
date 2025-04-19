@@ -109,7 +109,6 @@ async function detect() {
         if (diffPluck.length > 0) {
             plucking(diffPluck, capo);
         }
-
         prevPluck = pluck.slice();
     }
 
@@ -143,6 +142,10 @@ async function detect() {
 
             armAngles.shift();
         }
+    }
+    else{
+        armAngles.push(0)
+        armAngles.shift();
     }
 
     // Capo control 每1秒執行一次
