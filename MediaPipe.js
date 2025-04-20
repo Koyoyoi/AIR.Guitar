@@ -56,7 +56,7 @@ export async function detectHand() {
         let points = [];
         let left_or_right = String(handednesses[i][0].categoryName);
         for (let p of handPoints[i]) {
-            p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
+            p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z * 10];
             points.push(p);
         }
         handData[left_or_right] = points;
@@ -84,7 +84,7 @@ export async function detectPose() {
 
     if (posePoints[0] != undefined) {
         for (let p of posePoints[0]) {
-            p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z];
+            p = [p.x * video.videoWidth, p.y * video.videoHeight, p.z * 10];
             poseData.push(p)
         }
     }
