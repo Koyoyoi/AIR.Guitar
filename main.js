@@ -137,7 +137,7 @@ async function detect() {
                 armAngles = [];
             }
 
-            if (action != prevAction && action != 'Stop') {
+            if (action != prevAction && action == 'Stop') {
                 let duration = await mapRange(Math.abs(diffAngle), 3, 12, 125, 1);
                 strumming(action, capo, duration);
                 prevAction = action;
