@@ -105,9 +105,6 @@ async function detect() {
         let diffPluck = [...pluck, ...prevPluck].filter(
             x => !prevPluck.includes(x)
         );
-        let velocities = diffPluck.map(fingerIndex =>
-            Math.floor(mapRange(pluckAngle[fingerIndex], 30, 180, 30, 127))
-        );
 
         if (diffPluck.length > 0) {
             console.log(velocities)
