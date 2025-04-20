@@ -110,7 +110,9 @@ export async function plucking(pluck, capo, duration = 0.5) {
 // strumming function
 export async function strumming(direction, capo, duration) {
     let sturmOrder = direction == 'Up' ? guitarChord.slice().reverse() : guitarChord;
+    duration = Math.floor(duration) * 4 / sturmOrder.length
     console.log(direction, duration,"ms");
+
     // note_on with delay
     for (let n of sturmOrder) {
         outport.send([0x90, n + capo, 127]); // note_on
