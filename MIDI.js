@@ -1,4 +1,3 @@
-
 const chordTab = {
     "": [0, 4, 7],   // Major
     "m": [0, 3, 7],  // minor
