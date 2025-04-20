@@ -97,7 +97,7 @@ async function detect() {
 
     // Right Hand
     if (handData['Right'].length != 0) {
-        pluck, pluckAngle = await fingerPlay(handData['Right'])
+        [pluck, pluckAngle] = await fingerPlay(handData['Right'])
         console.log(pluck);
     }
 
