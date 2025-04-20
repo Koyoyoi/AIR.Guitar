@@ -1,3 +1,4 @@
+
 const chordTab = {
     "": [0, 4, 7],   // Major
     "m": [0, 3, 7],  // minor
@@ -9,7 +10,7 @@ const rootTab = {
     "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
 };
 
-const guitarStandard = [40, 45, 50, 55, 59, 64]; 
+const guitarStandard = [40, 45, 50, 55, 59, 64];
 let outport = null;
 let guitarChord = [], pluckNotes = []
 
@@ -52,7 +53,7 @@ export function buildGuitarChord(gesture) {
     // Iterate over each note in guitar standard tuning
     for (let note of guitarStandard) {
         let n = note % 12;
-    
+
         // Calculate closest note to the current guitar string's note
         let closest = Math.min(...chord.map(i => {
             let diff = i - n;
@@ -84,22 +85,22 @@ function sleep(ms) {
 
 // 發送 MIDI 訊號
 // Plucking (playing notes) function
-export async function plucking(pluck, capo, duration = 0.5) {
-    
-    let notes = []
-    console.log(pluck)
-    pluck.forEach(p => {
-        notes.push(pluckNotes[p])
-    })
+export async function plucking(pluck, capo, velocities, duration = 0.5) {
+    let notes = [];
+    console.log(pluck);
+    pluck.forEach((p, i) => {
+        notes.push([pluckNotes[p], velocities[i]]);
+    });
+
 
     // 發送 note_on 訊號
-    notes.forEach(n => {
-        outport.send([0x90, n + capo, 127]);  // 0x90 表示 Note On 訊號，127 是音量
+    notes.forEach(([note, velocity]) => {
+        outport.send([0x90, note + capo, velocity]);
     });
 
     // 使用 setTimeout 模擬 sleep 時間，控制 note_off 時間
     setTimeout(() => {
-         // 發送 note_off 訊號
+        // 發送 note_off 訊號
         notes.forEach(n => {
             outport.send([0x80, n + capo, 0]);  // 0x80 表示 Note Off 訊號
         });
@@ -109,8 +110,8 @@ export async function plucking(pluck, capo, duration = 0.5) {
 // strumming function
 export async function strumming(direction, capo, duration) {
     let sturmOrder = direction == 'Up' ? guitarChord.slice().reverse() : guitarChord;
+    console.log(direction, duration, "ms");
     duration = Math.floor(duration) * 4 / sturmOrder.length
-    console.log(direction, duration,"ms");
 
     // note_on with delay
     for (let n of sturmOrder) {
@@ -128,6 +129,6 @@ export async function strumming(direction, capo, duration) {
 export function mapRange(value, inMin, inMax, outMin, outMax) {
     value = Math.max(inMin, Math.min(value, inMax)); // 限制在範圍內
 
-    const ratio = (value - inMin) / (inMax - inMin); 
+    const ratio = (value - inMin) / (inMax - inMin);
     return outMin + (outMax - outMin) * ratio;
 }
