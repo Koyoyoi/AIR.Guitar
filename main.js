@@ -113,33 +113,32 @@ async function detect() {
     }
 
     // Strumming Control
-    if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined) {
+    if ( poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined ) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]));
         armAngles.push(angle);
         let position = poseData[16][0] - poseData[12][0];
 
-        if (armAngles.length >= 8) {
+        if (armAngles.length >= 6) {
             let diffs = [];
-            for (let i = 1; i < 8; i++) {
+            for (let i = 1; i < 6; i++) {
                 diffs.push(armAngles[i] - armAngles[i - 1]);
             }
 
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
-            
-            if (diffAngle > 2 && position > 0) {
+
+            if (diffAngle > 3 && position > 5) {
                 action = 'Down';
-            } else if (diffAngle < -2 && position < -15) {
+            } else if (diffAngle < -3 && position < -15) {
                 action = 'Up';
+
             } else {
                 action = 'Stop';
                 prevAction = 'Stop';
                 armAngles = [];
             }
 
-            if (action != prevAction && action != 'Stop' && pluck.includes(4)) {
-                console.log(armAngles)
-                let duration = await mapRange(Math.abs(diffAngle), 2, 13, 125, 10);
-                console.log(duration)
+            if (action != prevAction && action != 'Stop') {
+                let duration = await mapRange(Math.abs(diffAngle), 3, 12, 125, 1);
                 strumming(action, capo, duration);
                 prevAction = action;
             }
@@ -147,17 +146,14 @@ async function detect() {
             armAngles.shift();
         }
     }
-    else{
-        armAngles.shift();
-    }
 
     // Capo control 每1秒執行一次
-    if (poseData.length > 0 && timeCnt >= 30) { 
+    if (poseData.length > 0 && timeCnt >= 30) {
         if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
             capo = 0;
         } else if (poseData[16][1] < poseData[0][1]) {
             capo = Math.min(12, capo + 1);
-        } else if (poseData[15][1] < poseData[0][1]){
+        } else if (poseData[15][1] < poseData[0][1]) {
             capo = Math.max(-12, capo - 1);
         }
         timeCnt = 0;
