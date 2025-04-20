@@ -1,4 +1,4 @@
-import { mapRange } from "./MIDI";
+import { mapRange } from "./MIDI.js";
 
 export function compute(landmarks) {
     let parameters = [];
