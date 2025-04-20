@@ -108,7 +108,7 @@ async function detect() {
 
         if (diffPluck.length > 0) {
             console.log(velocities)
-            plucking(diffPluck, capo);
+            plucking(diffPluck, capo, velocities);
         }
         prevPluck = pluck.slice();
     }
