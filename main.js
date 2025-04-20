@@ -11,7 +11,7 @@ export let handData = { "Left": [], "Right": [] }, poseData = [];
 
 let armAngles = [];
 let gesture = '', prevGesture = '';
-let pluck = [], prevPluck = [], pluckAngle = [];
+let pluck = [], prevPluck = [], velocities = [];
 let action = '', prevAction = '';
 let capo = 0, timeCnt = 0;
 
@@ -97,8 +97,7 @@ async function detect() {
 
     // Right Hand
     if (handData['Right'].length != 0) {
-        [pluck, pluckAngle] = await fingerPlay(handData['Right'])
-            ;
+        [pluck, velocities] = await fingerPlay(handData['Right']);
     }
 
     // Plucking Control
@@ -111,7 +110,6 @@ async function detect() {
         );
 
         if (diffPluck.length > 0) {
-            console.log(pluckAngle)
             console.log(velocities)
             plucking(diffPluck, capo);
         }
