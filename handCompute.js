@@ -57,7 +57,7 @@ export async function fingerPlay(hand) {
     let angles = fingerAngle(hand);
     let pick = [], velocities = [];
     if (angles[0] > 15) {pick.push(0), velocities.push(mapRange(angles[0], 30, 60, 40, 127))};
-    if (angles[1] > 15) {pick.push(1), velocities.push(mapRange(angles[1], 10, 170, 40, 127))};
+    if (angles[1] > 25) {pick.push(1), velocities.push(mapRange(angles[1], 40, 180, 40, 127))};
     if (angles[2] > 15) {pick.push(2), velocities.push(mapRange(angles[2], 20, 160, 40, 127))};
     if (angles[3] > 15) {pick.push(3), velocities.push(mapRange(angles[3], 20, 150, 40, 127))};
     if (angles[4] > 150) {pick.push(4), velocities.push(0)};
