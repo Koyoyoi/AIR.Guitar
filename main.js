@@ -98,7 +98,7 @@ async function detect() {
     // Right Hand
     if (handData['Right'].length != 0) {
         [pluck, pluckAngle] = await fingerPlay(handData['Right'])
-        console.log(pluck);
+            ;
     }
 
     // Plucking Control
@@ -106,16 +106,20 @@ async function detect() {
         let diffPluck = [...pluck, ...prevPluck].filter(
             x => !prevPluck.includes(x)
         );
+        let velocities = diffPluck.map(fingerIndex =>
+            Math.floor(mapRange(pluckAngle[fingerIndex], 30, 180, 30, 127))
+        );
 
         if (diffPluck.length > 0) {
-            
+            console.log(pluckAngle)
+            console.log(velocities)
             plucking(diffPluck, capo);
         }
         prevPluck = pluck.slice();
     }
 
     // Strumming Control
-    if ( poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined && poseData[16][1] < video.videoHeight) {
+    if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined && poseData[16][1] < video.videoHeight) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]));
         armAngles.push(angle);
         let position = poseData[16][0] - poseData[12][0];
@@ -174,8 +178,8 @@ async function detect() {
 
 // 初始化主函式
 async function main() {
-    await load_SVM_Model();
     await setupMediaPipe();
+    await load_SVM_Model();
     await setupCamera();
     await initMIDI();
     buildGuitarChord('C');
