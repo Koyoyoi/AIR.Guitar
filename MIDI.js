@@ -98,12 +98,13 @@ export async function plucking(pluck, capo, velocities) {
         outport.send([0x90, note + capo, velocity]);
     });
 
-    await sleep(1000);
-    // 發送 note_off 訊號
-    notes.forEach(([note]) => {
-        outport.send([0x90, note + capo, 0]);
-    });
-
+    // 使用 setTimeout 模擬 sleep 時間，控制 note_off 時間
+    setTimeout(() => {
+        // 發送 note_off 訊號
+        notes.forEach(([note]) => {
+            outport.send([0x90, note + capo,0]);
+        });
+    }, 1000);  // 持續時間轉換為毫秒
 }
 
 // strumming function
@@ -115,7 +116,7 @@ export async function strumming(direction, capo, duration) {
     // note_on with delay
     for (let n of sturmOrder) {
         outport.send([0x90, n + capo, 127]); // note_on
-        await sleep(duration);
+        await sleep(duration); 
     }
 
     // note_off with delay
