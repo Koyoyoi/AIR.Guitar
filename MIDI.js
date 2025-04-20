@@ -85,7 +85,7 @@ function sleep(ms) {
 
 // 發送 MIDI 訊號
 // Plucking (playing notes) function
-export async function plucking(pluck, capo, velocities, duration = 0.5) {
+export async function plucking(pluck, capo, velocities) {
     let notes = [];
     console.log(pluck);
     pluck.forEach((p, i) => {
@@ -98,13 +98,12 @@ export async function plucking(pluck, capo, velocities, duration = 0.5) {
         outport.send([0x90, note + capo, velocity]);
     });
 
-    // 使用 setTimeout 模擬 sleep 時間，控制 note_off 時間
-    setTimeout(() => {
-        // 發送 note_off 訊號
-        notes.forEach(n => {
-            outport.send([0x80, n + capo, 0]);  // 0x80 表示 Note Off 訊號
-        });
-    }, duration * 2000);  // 持續時間轉換為毫秒
+    await sleep(1000);
+    // 發送 note_off 訊號
+    notes.forEach(([note]) => {
+        outport.send([0x90, note + capo, 0]);
+    });
+
 }
 
 // strumming function
@@ -116,13 +115,13 @@ export async function strumming(direction, capo, duration) {
     // note_on with delay
     for (let n of sturmOrder) {
         outport.send([0x90, n + capo, 127]); // note_on
-        await sleep(duration); // 等 75ms 再發送下一個
+        await sleep(duration);
     }
 
     // note_off with delay
     for (let n of sturmOrder) {
         outport.send([0x80, n + capo, 0]); // note_off
-        await sleep(duration * 1.5); // 等 200ms 再發送下一個
+        await sleep(duration * 1.5);
     }
 }
 
