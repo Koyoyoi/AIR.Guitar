@@ -11,7 +11,7 @@ export let handData = { "Left": [], "Right": [] }, poseData = [];
 
 let armAngles = [];
 let gesture = '', prevGesture = '';
-let pluck = [], prevPluck = [];
+let pluck = [], prevPluck = [], pluckAngle = [];
 let action = '', prevAction = '';
 let capo = 0, timeCnt = 0;
 
@@ -97,7 +97,8 @@ async function detect() {
 
     // Right Hand
     if (handData['Right'].length != 0) {
-        pluck = await fingerPlay(handData['Right']);
+        pluck, pluckAngle = await fingerPlay(handData['Right'])
+        console.log(pluck);
     }
 
     // Plucking Control
@@ -106,14 +107,15 @@ async function detect() {
             x => !prevPluck.includes(x)
         );
 
-        if (diffPluck.length > 0 && action == 'Stop') {
+        if (diffPluck.length > 0) {
+            
             plucking(diffPluck, capo);
         }
         prevPluck = pluck.slice();
     }
 
     // Strumming Control
-    if ( poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined ) {
+    if ( poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined && poseData[16][1] < video.videoHeight) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]));
         armAngles.push(angle);
         let position = poseData[16][0] - poseData[12][0];
@@ -137,8 +139,8 @@ async function detect() {
                 armAngles = [];
             }
 
-            if (action != prevAction && action == 'Stop') {
-                let duration = await mapRange(Math.abs(diffAngle), 3, 12, 125, 1);
+            if (action != prevAction && action != 'Stop') {
+                let duration = await mapRange(Math.abs(diffAngle), 3, 15, 125, 1);
                 strumming(action, capo, duration);
                 prevAction = action;
             }
