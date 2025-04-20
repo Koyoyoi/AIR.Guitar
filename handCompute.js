@@ -61,5 +61,5 @@ export async function fingerPlay(hand) {
     if (angles[2] > 25) pick.push(2);
     if (angles[3] > 25) pick.push(3);
     if (angles[4] > 50) pick.push(4);
-    return pick, angles;
+    return { pick, angles };
 }
