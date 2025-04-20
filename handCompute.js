@@ -1,4 +1,4 @@
-import { video } from "./main.js";
+import { mapRange } from "./MIDI";
 
 export function compute(landmarks) {
     let parameters = [];
@@ -55,11 +55,11 @@ function fingerAngle(hand) {
 
 export async function fingerPlay(hand) {
     let angles = fingerAngle(hand);
-    let pick = [];
-    if (angles[0] > 25) pick.push(0);
-    if (angles[1] > 25) pick.push(1);
-    if (angles[2] > 25) pick.push(2);
-    if (angles[3] > 25) pick.push(3);
-    if (angles[4] > 50) pick.push(4);
-    return [ pick, angles ];
+    let pick = [], velocities = [];
+    if (angles[0] > 25) {pick.push(0), velocities.push(mapRange(angles[0], 30, 70, 40, 127))};
+    if (angles[1] > 25) {pick.push(1), velocities.push(mapRange(angles[0], 30, 170, 40, 127))};
+    if (angles[2] > 25) {pick.push(2), velocities.push(mapRange(angles[0], 30, 170, 40, 127))};
+    if (angles[3] > 25) {pick.push(3), velocities.push(mapRange(angles[0], 30, 170, 40, 127))};
+    if (angles[4] > 50) {pick.push(4), velocities.push(0)};
+    return [ pick, velocities ];
 }
