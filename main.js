@@ -1,19 +1,17 @@
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { compute, fingerPlay, vectorAngle, vectorCompute } from "./handCompute.js";
+import { compute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
-import { initMIDI, plucking, strumming, buildGuitarChord, mapRange } from "./MIDI.js";
+import { initMIDI, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
 import { drawCapo, drawGesture } from "./draw.js";
+import { capoCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
+export let capo = 0;
 
-let armAngles = [];
 let gesture = '', prevGesture = '';
-let pluck = [], prevPluck = [], velocities = [];
-let action = '', prevAction = '';
-let capo = 0, timeCnt = 0;
 
 // resize 函數
 function resizeCanvasAndVideo() {
@@ -83,7 +81,7 @@ async function detect() {
     await detectHand();
     await detectPose();
 
-    // Left Hand
+    // Left Hand Gesture
     if (handData['Left'].length != 0) {
         let parameters = compute(handData['Left']);
         gesture = await predict(parameters);
@@ -94,72 +92,10 @@ async function detect() {
         }
         drawGesture(gesture);
     }
-
-    // Right Hand
-    if (handData['Right'].length != 0) {
-        [pluck, velocities] = await fingerPlay(handData['Right']);
-    }
-
-    // Plucking Control
-    if (!pluck.includes(4)) {
-        let diffPluck = [...pluck, ...prevPluck].filter(
-            x => !prevPluck.includes(x)
-        );
-
-        if (diffPluck.length > 0) {
-            console.log(velocities)
-            plucking(diffPluck, capo, velocities);
-        }
-        prevPluck = pluck.slice();
-    }
-
-    // Strumming Control
-    if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined && poseData[16][1] < video.videoHeight) {
-        let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]));
-        armAngles.push(angle);
-        let position = poseData[16][0] - poseData[12][0];
-
-        if (armAngles.length >= 6) {
-            let diffs = [];
-            for (let i = 1; i < 6; i++) {
-                diffs.push(armAngles[i] - armAngles[i - 1]);
-            }
-
-            let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
-
-            if (diffAngle > 3 && position > 5) {
-                action = 'Down';
-            } else if (diffAngle < -3 && position < -15) {
-                action = 'Up';
-
-            } else {
-                action = 'Stop';
-                prevAction = 'Stop';
-                armAngles = [];
-            }
-
-            if (action != prevAction && action != 'Stop') {
-                let duration = await mapRange(Math.abs(diffAngle), 3, 15, 125, 1);
-                strumming(action, capo, duration);
-                prevAction = action;
-            }
-
-            armAngles.shift();
-        }
-    }
-
-    // Capo control 每1秒執行一次
-    if (poseData.length > 0 && timeCnt >= 30) {
-        if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
-            capo = 0;
-        } else if (poseData[16][1] < poseData[0][1]) {
-            capo = Math.min(12, capo + 1);
-        } else if (poseData[15][1] < poseData[0][1]) {
-            capo = Math.max(-12, capo - 1);
-        }
-        timeCnt = 0;
-    }
-    timeCnt += 1;
+    
+    await pluckCtrl();
+    await strumCtrl();
+    capo = await capoCtrl();
     drawCapo(capo);
 
     // 重置 handData 和 poseData
