@@ -2,20 +2,20 @@ import { ctx, canvas, video } from "./main.js";
 import { rootTab, revRootTab } from "./MIDI.js";
 
 export function drawGesture(gesture, capo) {
-
+    
+    let transName = ""
     // 設定字型與顏色
     ctx.font = "100px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
 
-    // 畫出手勢文字
-    ctx.fillText(`${ gesture}`, 50, 50);  // 位置設為左上角 
-
     if (capo != 0){
-        let n = revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]
-        ctx.fillText(`(${n})`, 80, 50); 
+        transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]})`
     }
+    
+     // 畫出手勢文字
+     ctx.fillText(`${gesture} ${transName}`, 50, 50);  // 位置設為左上角 
 
 }
 
