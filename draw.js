@@ -15,7 +15,7 @@ export function drawGesture(gesture) {
 
 export function drawCapo(capo) {
     // 設定字型與顏色
-    ctx.font = "100px Arial";
+    ctx.font = "80px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
