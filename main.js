@@ -78,7 +78,7 @@ async function detect() {
             prevGesture = gesture;
             buildGuitarChord(gesture);
         }
-        drawGesture(gesture);
+        drawGesture(gesture, capo);
     }
     
     await pluckCtrl();

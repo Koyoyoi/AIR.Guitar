@@ -5,10 +5,13 @@ const chordTab = {
     "dim": [0, 3, 6] // Dim
 };
 
-const rootTab = {
+export const rootTab = {
     "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
     "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
 };
+export const revRootTab = Object.fromEntries(
+    Object.entries(rootTab).map(([k, v]) => [v, k])
+);
 
 const guitarStandard = [40, 45, 50, 55, 59, 64];
 let outport = null;

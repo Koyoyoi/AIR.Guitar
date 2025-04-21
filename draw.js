@@ -1,6 +1,7 @@
 import { ctx, canvas, video } from "./main.js";
+import { rootTab, revRootTab } from "./MIDI.js";
 
-export function drawGesture(gesture) {
+export function drawGesture(gesture, capo) {
 
     // 設定字型與顏色
     ctx.font = "100px Arial";
@@ -9,7 +10,12 @@ export function drawGesture(gesture) {
     ctx.textBaseline = "top";
 
     // 畫出手勢文字
-    ctx.fillText(`${gesture}`, 50, 50);  // 位置設為左上角，距離 canvas 
+    ctx.fillText(`${ gesture}`, 50, 50);  // 位置設為左上角 
+
+    if (capo != 0){
+        let n = revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]
+        ctx.fillText(`(${n})`, 40, 150); 
+    }
 
 }
 
