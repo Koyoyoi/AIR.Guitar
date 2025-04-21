@@ -1,4 +1,4 @@
-import { ctx, canvas} from "./main.js";
+import { ctx, canvas, video } from "./main.js";
 
 export function drawGesture(gesture) {
 
@@ -24,4 +24,25 @@ export function drawCapo(capo) {
     ctx.textAlign = "right";  // 設為右對齊
     ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);  // 顯示 capo，距離右邊 50px，並且在上方
 
+}
+
+// resize 函數
+export function reCanva() {
+    const aspectRatio = video.videoWidth / video.videoHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let newWidth = windowWidth;
+    let newHeight = newWidth / aspectRatio;
+
+    if (newHeight > windowHeight) {
+        newHeight = windowHeight;
+        newWidth = newHeight * aspectRatio;
+    }
+
+    video.style.width = `${newWidth}px`;
+    video.style.height = `${newHeight}px`;
+
+    canvas.style.width = video.style.width;
+    canvas.style.height = video.style.height;
 }

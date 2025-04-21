@@ -3,7 +3,7 @@ import { compute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { initMIDI, buildGuitarChord } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest"
-import { drawCapo, drawGesture } from "./draw.js";
+import { drawCapo, drawGesture, reCanva } from "./draw.js";
 import { capoCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 
 // 全域變數
@@ -12,27 +12,6 @@ export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let capo = 0;
 
 let gesture = '', prevGesture = '';
-
-// resize 函數
-function resizeCanvasAndVideo() {
-    const aspectRatio = video.videoWidth / video.videoHeight;
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
-    let newWidth = windowWidth;
-    let newHeight = newWidth / aspectRatio;
-
-    if (newHeight > windowHeight) {
-        newHeight = windowHeight;
-        newWidth = newHeight * aspectRatio;
-    }
-
-    video.style.width = `${newWidth}px`;
-    video.style.height = `${newHeight}px`;
-
-    canvas.style.width = video.style.width;
-    canvas.style.height = video.style.height;
-}
 
 async function setupCamera() {
     video = document.createElement("video");
@@ -66,8 +45,8 @@ async function setupCamera() {
             video.play();
 
             // 加入 resize 控制
-            resizeCanvasAndVideo();
-            window.addEventListener("resize", resizeCanvasAndVideo);
+            reCanva();
+            window.addEventListener("resize", reCanva);
 
             resolve(video);
         };
