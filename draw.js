@@ -14,7 +14,7 @@ export function drawGesture(gesture, capo) {
 
     if (capo != 0){
         let n = revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]
-        ctx.fillText(`(${n})`, 25, 150); 
+        ctx.fillText(`(${n})`, 80, 50); 
     }
 
 }
