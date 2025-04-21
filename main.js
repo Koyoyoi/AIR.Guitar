@@ -11,6 +11,8 @@ export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let capo = 0;
 
+
+let uploadedImage = null;
 let gesture = '', prevGesture = '';
 
 async function setupCamera() {
@@ -63,7 +65,6 @@ async function setupCamera() {
     });
 }
 
-let uploadedImage = null;
 
 document.getElementById("file-upload").addEventListener("change", function (event) {
     const file = event.target.files[0];
@@ -71,30 +72,29 @@ document.getElementById("file-upload").addEventListener("change", function (even
 
     console.log("檔案名稱:", file.name);
 
-    // 確保文件是圖片
     if (file.type.startsWith("image/")) {
         const reader = new FileReader();
-        
+
         reader.onload = function (e) {
-            // 設定圖片來源為讀取的檔案
             uploadedImage = new Image();
+
+            uploadedImage.onload = function () {
+                console.log("圖片成功加載，準備繪製到畫布");
+            };
+
+            uploadedImage.onerror = function () {
+                console.error("圖片加載錯誤");
+            };
+
             uploadedImage.src = e.target.result;
         };
 
-        // 讀取圖片文件
         reader.readAsDataURL(file);
-
-        uploadedImage.onload = function() {
-            console.log("圖片成功加載，準備繪製到畫布");
-        };
-
-        uploadedImage.onerror = function() {
-            console.error("圖片加載錯誤");
-        };
     } else {
         console.log("上傳的文件不是圖片");
     }
 });
+
 
 async function detect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
