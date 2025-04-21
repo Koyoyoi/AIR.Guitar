@@ -10,9 +10,8 @@ import { capoCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let capo = 0;
+export let imgHeight = 0, imgWidth = 0, uploadedImage = null;
 
-
-let uploadedImage = null;
 let gesture = '', prevGesture = '';
 
 async function setupCamera() {
@@ -39,7 +38,7 @@ async function setupCamera() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             console.log("Video size:", video.videoWidth, video.videoHeight);
-            
+
             // 顯示標題
             const title = document.getElementById("title");
             title.textContent = "AIR Guitar";
@@ -104,21 +103,21 @@ async function detect() {
     if (uploadedImage) {
         const maxImgHeight = canvas.height;
         const naturalAspectRatio = uploadedImage.width / uploadedImage.height;
-    
+
         // 先依照高度縮放
-        let imgHeight = maxImgHeight;
-        let imgWidth = imgHeight * naturalAspectRatio;
-    
+        imgHeight = maxImgHeight;
+        imgWidth = imgHeight * naturalAspectRatio;
+
         // 如果超過 canvas 寬度的一半，則限制為一半並重新計算高度
         const maxImgWidth = canvas.width / 2;
         if (imgWidth > maxImgWidth) {
             imgWidth = maxImgWidth;
             imgHeight = imgWidth / naturalAspectRatio;
         }
-    
+
         ctx.drawImage(uploadedImage, 0, 0, imgWidth, imgHeight);
     }
-    
+
 
     await detectHand();
     await detectPose();
