@@ -12,6 +12,15 @@
 
 <body>
     <div class="title" id="title"></div>
+
+    <div class="upload-section">
+        <label for="file-upload" class="upload-box">
+            <span class="plus">+</span>
+            <input type="file" id="file-upload" style="display: none" />
+        </label>
+    </div>
+
+
     <div id="loading">
         <h1>Loading...</h1>
         <div class="loading-container">
@@ -26,6 +35,20 @@
             <div class="item"></div>
         </div>
     </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileName.textContent = `已選擇檔案：${fileInput.files[0].name}`;
+            } else {
+                fileName.textContent = '尚未選擇檔案';
+            }
+        });
+    </script>
+
 </body>
 
 </html>

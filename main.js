@@ -37,20 +37,29 @@ async function setupCamera() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             console.log("Video size:", video.videoWidth, video.videoHeight);
-
+            
+            // Show Title
             const title = document.getElementById("title");
             title.textContent = "AIR Guitar";
 
+            // Loding 隱藏
+            const loading = document.getElementById("loading");
             loading.classList.add("hidden");
+    
+            // 顯示上傳區塊
+            const uploadSection = document.querySelector(".upload-section");
+            uploadSection.classList.add("show");
+    
             video.play();
-
+    
             // 加入 resize 控制
             reCanva();
             window.addEventListener("resize", reCanva);
-
+    
             resolve(video);
         };
     });
+    
 }
 
 async function detect() {
