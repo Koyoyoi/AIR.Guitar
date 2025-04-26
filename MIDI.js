@@ -1,3 +1,19 @@
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const soundMap = {};  // 儲存每個音高對應的 AudioBuffer
+
+// 載入單一音檔（假設檔名為音高，例如 40.m4a）
+async function loadSample(note) {
+    const response = await fetch(`sound_m4a/guitar/${note}.m4a`);
+    const arrayBuffer = await response.arrayBuffer();
+    soundMap[note] = await audioContext.decodeAudioData(arrayBuffer);
+}
+
+// 預載所有需要的音檔
+export async function loadGuitarSamples() {
+    const notesToLoad = Array.from({ length: 48 }, (_, i) => i + 36); // 36~83
+    await Promise.all(notesToLoad.map(loadSample));
+    console.log("Guitar samples loaded.");
+}
 
 const chordTab = {
     "": [0, 4, 7],   // Major
