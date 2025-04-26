@@ -1,7 +1,7 @@
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { compute } from "./handCompute.js";
 import { load_SVM_Model, predict } from "./SVM.js";
-import { initMIDI, buildGuitarChord } from "./MIDI.js";
+import { initMIDI, buildGuitarChord, loadSamples } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { drawCapo, drawGesture, reCanva } from "./draw.js";
 import { capoCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
@@ -153,6 +153,7 @@ async function main() {
     await setupMediaPipe();
     await load_SVM_Model();
     await setupCamera();
+    await loadSamples();
     await initMIDI();
     buildGuitarChord('C');
     detect();
