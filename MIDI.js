@@ -1,9 +1,9 @@
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundMap = {};  // 儲存每個音高對應的 AudioBuffer
 
-// 載入 sample 音色範圍 36~83
+// 載入 sample 音色範圍 28~83
 export async function loadSamples() {
-    const notesToLoad = Array.from({ length: 48 }, (_, i) => i + 48); // 48~83
+    const notesToLoad = Array.from({ length: 56 }, (_, i) => i + 28); // 28~83
 
     await Promise.all(notesToLoad.map(async (note) => {
         const response = await fetch(`./sounds_m4a/guitar/${note}.m4a`);
@@ -13,6 +13,8 @@ export async function loadSamples() {
 
     console.log("Guitar samples loaded.");
 }
+
+
 
 const chordTab = {
     "": [0, 4, 7],   // Major
