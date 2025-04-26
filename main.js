@@ -150,10 +150,10 @@ async function detect() {
 
 // 初始化主函式
 async function main() {
+    await loadSamples();
     await setupMediaPipe();
     await load_SVM_Model();
     await setupCamera();
-    await loadSamples();
     await initMIDI();
     buildGuitarChord('C');
     detect();

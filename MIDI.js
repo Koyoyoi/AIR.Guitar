@@ -3,10 +3,10 @@ const soundMap = {};  // 儲存每個音高對應的 AudioBuffer
 
 // 載入 sample 音色範圍 36~83
 export async function loadSamples() {
-    const notesToLoad = Array.from({ length: 48 }, (_, i) => i + 36); // 36~83
+    const notesToLoad = Array.from({ length: 48 }, (_, i) => i + 48); // 48~83
 
     await Promise.all(notesToLoad.map(async (note) => {
-        const response = await fetch(`sound_m4a/guitar/${note}.m4a`);
+        const response = await fetch(`./sounds_m4a/guitar/${note}.m4a`);
         const arrayBuffer = await response.arrayBuffer();
         soundMap[note] = await audioContext.decodeAudioData(arrayBuffer);
     }));
