@@ -103,48 +103,85 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 發送 MIDI 訊號
+// 播放單一音符的 sample
+async function playSample(note, velocity, duration = 1000) {
+    const sample = soundMap[note];
+    if (sample) {
+        const source = audioContext.createBufferSource();
+        source.buffer = sample;
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = velocity / 127; // 設置音量，範圍為 0 到 1
+        source.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        console.log(`Playing note: ${note} with velocity: ${velocity}`);
+
+        source.start();
+        // 設定音符播放的時間 (duration)
+        setTimeout(() => {
+            source.stop();
+        }, duration);
+    } else {
+        console.log(`Sample for note ${note} not found.`);
+    }
+}
+
 // Plucking (playing notes) function
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
-    console.log(pluck);
+    console.log("Plucking notes:", pluck);
     pluck.forEach((p, i) => {
         notes.push([pluckNotes[p], velocities[i]]);
     });
 
-
-    // 發送 note_on 訊號
-    notes.forEach(([note, velocity]) => {
-        outport.send([0x90, note + capo, velocity]);
-    });
-
-    // 使用 setTimeout 模擬 sleep 時間，控制 note_off 時間
-    setTimeout(() => {
-        // 發送 note_off 訊號
-        notes.forEach(([note]) => {
-            outport.send([0x90, note + capo,0]);
+    // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
+    if (!outport) {
+        for (let [note, velocity] of notes) {
+            await playSample(note + capo, velocity); // 播放 sample
+        }
+    } else {
+        // 發送 MIDI 訊號 (如果有 MIDI 設備)
+        notes.forEach(([note, velocity]) => {
+            outport.send([0x90, note + capo, velocity]); // 發送 note_on 訊號
         });
-    }, 1000);  // 持續時間轉換為毫秒
+
+        // 使用 setTimeout 模擬 sleep 時間，控制 note_off 時間
+        setTimeout(() => {
+            notes.forEach(([note]) => {
+                outport.send([0x90, note + capo, 0]); // 發送 note_off 訊號
+            });
+        }, 1000);  // 持續時間轉換為毫秒
+    }
 }
 
-// strumming function
+// Strumming function
 export async function strumming(direction, capo, duration) {
-    let sturmOrder = direction == 'Up' ? guitarChord.slice().reverse() : guitarChord;
-    console.log(direction, duration, "ms");
-    duration = Math.floor(duration) * 4 / sturmOrder.length
+    let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
+    console.log(`Strumming in direction: ${direction} with duration: ${duration}ms`);
 
-    // note_on with delay
-    for (let n of sturmOrder) {
-        outport.send([0x90, n + capo, 127]); // note_on
-        await sleep(duration); 
-    }
+    duration = Math.floor(duration) * 4 / sturmOrder.length;
 
-    // note_off with delay
-    for (let n of sturmOrder) {
-        outport.send([0x80, n + capo, 0]); // note_off
-        await sleep(duration * 1.5);
+    // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
+    if (!outport) {
+        for (let n of sturmOrder) {
+            await playSample(n + capo, 127);
+            await sleep(duration);
+        }
+    } else {
+        // 如果有 MIDI 設備，發送 MIDI 訊號
+        for (let n of sturmOrder) {
+            outport.send([0x90, n + capo, 127]); // note_on
+            await sleep(duration);
+        }
+
+        // note_off with delay
+        for (let n of sturmOrder) {
+            outport.send([0x80, n + capo, 0]); // note_off
+            await sleep(duration * 1.5);
+        }
     }
 }
+
 
 export function mapRange(value, inMin, inMax, outMin, outMax) {
     value = Math.max(inMin, Math.min(value, inMax)); // 限制在範圍內
