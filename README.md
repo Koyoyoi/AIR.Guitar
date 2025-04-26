@@ -1,6 +1,6 @@
 # 🎸 AIR.Guitar
 
-**AIR.Guitar** 是一款基於瀏覽器的虛擬吉他體驗工具，結合了 MediaPipe 的手勢辨識、MIDI 音效與視覺化呈現，讓使用者僅透過手勢即可演奏吉他。
+[**AIR.Guitar**](https://koyoyoi.github.io/AIR.Guitar/) 是基於瀏覽器的虛擬吉他體驗工具，結合了 MediaPipe 的手勢辨識、MIDI 音效與視覺化呈現，讓使用者僅透過手勢即可演奏吉他。
 
 ## 🚀 功能特色
 
