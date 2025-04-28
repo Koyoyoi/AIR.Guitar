@@ -5,9 +5,7 @@ body {
     width: 100%;
     height: 100%;
     background-color: #1C1C1C;
-    /* 可選：設定背景色 */
     overflow: hidden;
-    /* 防止滾動條 */
 }
 
 .title {
@@ -15,22 +13,22 @@ body {
     font-weight: bold;
     text-align: center;
     color: #434343;
-    margin-top: 20px;  /* 輕微減少頂部空間 */
+    margin-top: 20px;  
     letter-spacing: 3px;
     font-family: 'Arial Black', sans-serif;
-    position: fixed; /* 固定在頁面頂部 */
+    position: fixed;  
     top: 0;
     width: 100%;
-    z-index: 10;  /* 保證標題不被 canvas 覆蓋 */
+    z-index: 10;   
 }
 
 canvas {
     position: absolute;
-    top: 100px; /* 讓 canvas 從標題下方開始 */
+    top: 100px;  
     left: 50%;
     transform: translateX(-50%);
     background-color: #1c1c1c;
-    z-index: 1; /* 保證 canvas 在標題下方 */
+    z-index: 1;  
 }
 
 /* loading 樣式與動畫 */
@@ -48,14 +46,12 @@ canvas {
     opacity: 1;
 }
 
-
 #loading h1 {
     font-size: 30px;
     color: #434343;
     margin-bottom: 10px;
     font-family: 'Arial Black', sans-serif;
 }
-
 
 #loading.hidden {
     opacity: 0;
