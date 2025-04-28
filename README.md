@@ -10,7 +10,7 @@
 
 ## 🖥️ 線上體驗
 
-測試使用 AIR.Guitar：[https://koyoyoi.github.io/AIR.Guitar/](https://koyoyoi.github.io/AIR.Guitar/)
+- 測試使用 AIR.Guitar：[https://koyoyoi.github.io/AIR.Guitar/](https://koyoyoi.github.io/AIR.Guitar/)
 
 ### 環境需求
 
