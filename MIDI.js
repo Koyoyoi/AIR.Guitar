@@ -7,7 +7,7 @@ export async function loadSamples() {
 
     // 使用 Promise.all 同時載入所有音色樣本
     await Promise.all(notesToLoad.map(async (note) => {
-        const response = await fetch(`./sounds_m4a/guitar/${note}.m4a`);
+        const response = await fetch(`./Sounds_m4a/guitar/${note}.m4a`);
         const arrayBuffer = await response.arrayBuffer();
         soundMap[note] = await audioContext.decodeAudioData(arrayBuffer);  
     }));
