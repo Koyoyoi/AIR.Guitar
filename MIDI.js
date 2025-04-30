@@ -9,7 +9,7 @@ export async function loadSamples() {
     await Promise.all(notesToLoad.map(async (note) => {
         const response = await fetch(`./Sounds_m4a/guitar/${note}.m4a`);
         const arrayBuffer = await response.arrayBuffer();
-        soundMap[note] = await audioContext.decodeAudioData(arrayBuffer);  
+        soundMap[note] = await audioContext.decodeAudioData(arrayBuffer);
     }));
 
     console.log("Guitar samples loaded.");
@@ -139,29 +139,29 @@ export async function plucking(pluck, capo, velocities) {
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!outport) {
         for (let [note, velocity] of notes) {
-            await playSample(note + capo, velocity);  
+            await playSample(note + capo, velocity);
         }
     } else {
         // note_on 
         notes.forEach(([note, velocity]) => {
-            outport.send([0x90, note + capo, velocity]);  
+            outport.send([0x90, note + capo, velocity]);
         });
-        
+
         // note_off
         setTimeout(() => {
             notes.forEach(([note]) => {
-                outport.send([0x90, note + capo, 0]);  
+                outport.send([0x90, note + capo, 0]);
             });
         }, 1000);  // 控制音符結束時間
     }
 }
 
 // 掃弦功能：根據掃弦方向播放音符
-export async function strumming(direction, capo, duration) {
+export async function strumming(direction, capo, diffAngle) {
+    let duration = Math.floor(await mapRange(Math.abs(diffAngle), 3, 15, 125, 1)) * 4 / sturmOrder.length; // 計算撥弦的持續時間
     let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
+   
     console.log(`Strumming in direction: ${direction} with duration: ${duration}ms`);
-
-    duration = Math.floor(duration) * 4 / sturmOrder.length;
 
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!outport) {
@@ -172,13 +172,13 @@ export async function strumming(direction, capo, duration) {
     } else {
         // note_on
         for (let n of sturmOrder) {
-            outport.send([0x90, n + capo, 127]);  
+            outport.send([0x90, n + capo, 127]);
             await sleep(duration);
         }
 
         // note_off 
         for (let n of sturmOrder) {
-            outport.send([0x80, n + capo, 0]);  
+            outport.send([0x80, n + capo, 0]);
             await sleep(duration * 1.5);
         }
     }
