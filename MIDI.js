@@ -119,8 +119,6 @@ async function playSample(note, velocity, duration = 1000) {
         source.connect(gainNode);
         gainNode.connect(audioContext.destination);
 
-        console.log(`Playing note: ${note} with velocity: ${velocity}`);
-
         source.start();
         setTimeout(() => {
             source.stop();
@@ -133,7 +131,7 @@ async function playSample(note, velocity, duration = 1000) {
 // 撥弦功能：根據撥弦的音符來播放
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
-    console.log("Plucking notes:", pluck);
+    console.log("Plucking: ", pluck, "Velocities: ", velocities);
     pluck.forEach((p, i) => {
         notes.push([pluckNotes[p], velocities[i]]);
     });
