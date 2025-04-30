@@ -1,6 +1,6 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { drawingUtils, handData, poseData } from './main.js'
-import { video } from "./main.js";
+import { video, uploadedImage } from "./main.js";
 
 let handLandmarker, poseLandmarker;
 
@@ -71,7 +71,7 @@ export async function detectPose() {
     let data = poseLandmarker.detectForVideo(video, performance.now()); // 執行姿態偵測
 
     // 如果偵測到身體標誌點，則繪製身體標記
-    if (data.landmarks) {
+    if (data.landmarks && !uploadedImage) {
         for (const landmarks of data.landmarks) {
             drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "#F8C3CD", lineWidth: 3 });
             drawingUtils.drawLandmarks(landmarks, { color: "#DB4D6D", radius: 5 });
