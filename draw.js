@@ -8,8 +8,8 @@ export function drawGesture(gesture, capo) {
 
     ctx.font = "100px Arial";
     ctx.fillStyle = "#00AA90";
-    ctx.textAlign = "left";  
-    ctx.textBaseline = "top";  
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
 
     // 如果有 capo，顯示轉位名稱
     if (capo != 0) {
@@ -17,25 +17,47 @@ export function drawGesture(gesture, capo) {
     }
 
     // 調整文字位置
-    if (video.videoHeight - imgHeight > video.videoWidth / 2 - imgWidth) {
-        posY += imgHeight - 30;  
-    } else if (video.videoHeight - imgHeight < video.videoWidth / 2 - imgWidth) {
-        posX += imgWidth;  
+    if (imgWidth != 0) {
+        if (video.videoHeight - imgHeight > video.videoWidth / 2 - imgWidth) {
+            posY += imgHeight - 30;
+        } else if (video.videoHeight - imgHeight < video.videoWidth / 2 - imgWidth) {
+            posX += imgWidth;
+        }
     }
-
     // 畫出手勢文字
-    ctx.fillText(`${gesture} ${transName}`, posX, posY);  
+    ctx.fillText(`${gesture} ${transName}`, posX, posY);
 }
 
 // 畫出 Capo 設置
 export function drawCapo(capo) {
     ctx.font = "80px Arial";
     ctx.fillStyle = "#00AA90";
-    ctx.textAlign = "right"; 
-    ctx.textBaseline = "top";  
-
+    ctx.textAlign = "right";
+    ctx.textBaseline = "top";
+    console.log(canvas.width)
     // 畫出 Capo 文字 
-    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50); 
+    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);
+}
+
+// 畫出樂譜 (jpeg, png)
+export function drawScore(uploadScore) {
+    if (uploadeScore) {
+        const maxImgHeight = canvas.height;
+        const naturalAspectRatio = uploadScore.width / uploadScore.height;
+
+        // 根據高度縮放圖片
+        imgHeight = maxImgHeight;
+        imgWidth = imgHeight * naturalAspectRatio;
+
+        // 若圖片寬度超過 canvas 寬度的一半，則調整寬度與高度
+        const maxImgWidth = canvas.width / 2;
+        if (imgWidth > maxImgWidth) {
+            imgWidth = maxImgWidth;
+            imgHeight = imgWidth / naturalAspectRatio;
+        }
+
+        ctx.drawImage(uploadScore, 0, 0, imgWidth, imgHeight);  // 繪製圖片
+    }
 }
 
 // 畫布大小重設函數

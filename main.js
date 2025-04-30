@@ -2,7 +2,7 @@ import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-visi
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { capoCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { initMIDI, buildGuitarChord, loadSamples } from "./MIDI.js";
-import { drawCapo, drawGesture, reCanva } from "./draw.js";
+import { drawCapo, drawGesture, drawScore, reCanva } from "./draw.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { compute } from "./handCompute.js";
 
@@ -102,24 +102,8 @@ async function detect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);  // 清空畫布
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);  // 繪製視頻畫面
 
-    // 如果已經上傳了圖片，根據需求顯示圖片
-    if (uploadedImage) {
-        const maxImgHeight = canvas.height;
-        const naturalAspectRatio = uploadedImage.width / uploadedImage.height;
-
-        // 根據高度縮放圖片
-        imgHeight = maxImgHeight;
-        imgWidth = imgHeight * naturalAspectRatio;
-
-        // 若圖片寬度超過 canvas 寬度的一半，則調整寬度與高度
-        const maxImgWidth = canvas.width / 2;
-        if (imgWidth > maxImgWidth) {
-            imgWidth = maxImgWidth;
-            imgHeight = imgWidth / naturalAspectRatio;
-        }
-
-        ctx.drawImage(uploadedImage, 0, 0, imgWidth, imgHeight);  // 繪製圖片
-    }
+    // 上傳樂譜，顯示圖片
+    drawScore(uploadedImage)
 
     // 呼叫 MediaPipe 手勢識別
     await detectHand();
