@@ -59,8 +59,7 @@ export async function strumCtrl() {
 
             // 如果撥弦動作改變且非停止，則執行撥弦
             if (action !== prevAction && action !== 'Stop') {
-                let duration = await mapRange(Math.abs(diffAngle), 3, 15, 125, 1); // 計算撥弦的持續時間
-                strumming(action, capo, duration); // 調用 MIDI 撥弦函數
+                strumming(action, capo, diffAngle); // 調用 MIDI 撥弦函數
                 prevAction = action;               // 更新前一個動作
             }
 
