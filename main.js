@@ -124,8 +124,8 @@ async function detect() {
     // 控制撥弦、掃弦與 capo 設置
     await pluckCtrl();
     await strumCtrl();
-    capo = await capoCtrl();
-    drawCapo(capo);  
+    await capoCtrl();
+     
 
     // 重置 handData 和 poseData
     handData['Left'] = [];

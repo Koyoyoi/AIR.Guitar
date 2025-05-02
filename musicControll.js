@@ -1,4 +1,5 @@
 import { plucking, strumming } from "./MIDI.js";
+import { drawCapo } from "./draw.js";
 import { vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
 import { handData, poseData, video, capo } from "./main.js"
 
@@ -82,5 +83,5 @@ export async function capoCtrl() {
         }
     }
     timeCnt += 1; 
-    return capo; 
+    drawCapo(capo); 
 }
