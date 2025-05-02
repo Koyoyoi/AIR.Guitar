@@ -41,7 +41,7 @@ export function drawCapo(capo) {
 
 // 畫出樂譜 (jpeg, png)
 export function drawScore(uploadScore) {
-    if (uploadeScore) {
+    if (uploadScore) {
         const maxImgHeight = canvas.height;
         const naturalAspectRatio = uploadScore.width / uploadScore.height;
 
