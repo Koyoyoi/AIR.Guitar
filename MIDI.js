@@ -93,8 +93,8 @@ export function buildGuitarChord(gesture) {
     pluckNotes.push(guitarChord[guitarChord.length - 2])
     pluckNotes.push(guitarChord[guitarChord.length - 1])
 
-    console.log(guitarChord);
-    console.log(pluckNotes)
+    //console.log(guitarChord);
+    //console.log(pluckNotes)
 }
 
 
