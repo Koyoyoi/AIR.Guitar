@@ -6,7 +6,7 @@ export async function loadSamples() {
     const notesToLoad = Array.from({ length: 56 }, (_, i) => i + 28); // 28~83
 
     await Promise.all(notesToLoad.map(async (note) => {
-        const response = await fetch(`./Sounds_m4a/guitar/${note}.m4a`);
+        const response = await fetch(`./sounds_m4a/guitar/${note}.m4a`);
         const arrayBuffer = await response.arrayBuffer();
         soundMap[note] = await audioContext.decodeAudioData(arrayBuffer);
     }));

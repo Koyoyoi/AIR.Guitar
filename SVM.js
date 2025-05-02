@@ -57,12 +57,11 @@ export async function load_SVM_Model() {
 
         # 標籤
         labels = ${JSON.stringify(labelData)}
-        print("-----------------Models Loaded!-----------------")
+        print("<< Models Loaded! >>")
     `;
 
     try {
         let result = await pyodide.runPython(pythonCode);
-        //console.log("Returned Labels:", result.toJs()); 
     } catch (error) {
         console.error("錯誤:", error);
     }
