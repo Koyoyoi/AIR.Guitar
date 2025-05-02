@@ -1,89 +1,61 @@
-import { ctx, canvas, video, imgSize } from "./main.js";
+import { ctx, canvas, video, imgHeight, imgWidth } from "./main.js";
 import { rootTab, revRootTab } from "./MIDI.js";
 
-// 畫出手勢及其轉位名稱
-export async function drawGesture(gesture, capo) {
-    let transName = "";  // 轉位
-    let posX = 50, posY = 50;  // 預設位置
+export function drawGesture(gesture, capo) {
 
+    let transName = ""
+    let posX = 50, posY = 50;
+    // 設定字型與顏色
     ctx.font = "100px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
 
-    // 如果有 capo，顯示轉位名稱
     if (capo != 0) {
-        transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]})`;
+        transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]})`
+    }
+    if (video.videoHeight - imgHeight > video.videoWidth / 2 - imgWidth) {
+        posY += imgHeight - 30
+    }
+    else if (video.videoHeight - imgHeight < video.videoWidth / 2 - imgWidth) {
+        posX += imgWidth
     }
 
-    // 調整文字位置
-    if (imgSize.w != 0) {
-        if (video.videoHeight - imgSize.h > video.videoWidth / 2 - imgSize.w) {
-            posY += imgHeight - 30;
-        } else {
-            posX += imgWidth;
-        }
-    }
     // 畫出手勢文字
-    ctx.fillText(`${gesture}`, 50, 50);
+    ctx.fillText(`${gesture} ${transName}`, posX, posY);  // 位置設為左上角 
+
 }
 
-// 畫出 Capo 設置
-export async function drawCapo(capo) {
+export function drawCapo(capo) {
+    // 設定字型與顏色
     ctx.font = "80px Arial";
     ctx.fillStyle = "#00AA90";
-    ctx.textAlign = "right";
+    ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    
-    // 畫出 Capo 文字 
-    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);
+    // 畫出 capo 文字（右上角）
+
+    ctx.textAlign = "right";  // 設為右對齊
+    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);  // 顯示 capo，距離右邊 50px，並且在上方
+
 }
 
-// 畫出樂譜 (jpeg, png)
-export function drawScore(uploadImg) {
-    if (uploadImg) {
-        const maxImgHeight = canvas.height;
-        const naturalAspectRatio = uploadImgwidth / uploadImg.height;
-
-        // 根據高度縮放圖片
-        let imgHeight = maxImgHeight;
-        let imgWidth = imgHeight * naturalAspectRatio;
-
-        // 若圖片寬度超過 canvas 寬度的一半，則調整寬度與高度
-        const maxImgWidth = canvas.width / 2;
-        if (imgWidth > maxImgWidth) {
-            imgWidth = maxImgWidth;
-            imgHeight = imgWidth / naturalAspectRatio;
-        }
-
-        // 記錄尺寸
-        imgSize.w = imgWidth;
-        imgSize.h = imgHeight;
-  
-        ctx.drawImage(uploadImg, 0, 0, imgWidth, imgHeight);  // 繪製圖片
-    }
-}
-
-// 畫布大小重設函數
+// resize 函數
 export function reCanva() {
-    const aspectRatio = video.videoWidth / video.videoHeight;  // 計算影片的寬高比
-    const windowWidth = window.innerWidth;   // 獲取視窗寬度
-    const windowHeight = window.innerHeight; // 獲取視窗高度
+    const aspectRatio = video.videoWidth / video.videoHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
 
-    let newWidth = windowWidth;              // 預設寬度為視窗寬度
-    let newHeight = newWidth / aspectRatio;  // 根據寬高比計算對應的高度
+    let newWidth = windowWidth;
+    let newHeight = newWidth / aspectRatio;
 
-    // 若新的高度超過視窗高度，則調整寬度與高度
     if (newHeight > windowHeight) {
-        newHeight = windowHeight;            // 高度限制為視窗高度
-        newWidth = newHeight * aspectRatio;  // 根據高度調整寬度
+        newHeight = windowHeight;
+        newWidth = newHeight * aspectRatio;
     }
 
-    // 更新 video 和 canvas 的尺寸，使其適應視窗大小
     video.style.width = `${newWidth}px`;
     video.style.height = `${newHeight}px`;
 
-    // 讓 canvas 追隨 video 尺寸調整
     canvas.style.width = video.style.width;
     canvas.style.height = video.style.height;
 }
