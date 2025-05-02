@@ -167,19 +167,19 @@ export async function strumming(direction, capo, diffAngle) {
 
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!outport) {
-        for (let n of sturmOrder) {
+        for (let n of strumOrder) {
             await playSample(n + capo, 127);
             await sleep(duration);
         }
     } else {
         // note_on
-        for (let n of sturmOrder) {
+        for (let n of strumOrder) {
             outport.send([0x90, n + capo, 127]);
             await sleep(duration);
         }
 
         // note_off 
-        for (let n of sturmOrder) {
+        for (let n of strumOrder) {
             outport.send([0x80, n + capo, 0]);
             await sleep(duration * 1.5);
         }
