@@ -99,8 +99,9 @@ export function buildGuitarChord(gesture) {
     pluckNotes.push(guitarChord[guitarChord.length - 2]);
     pluckNotes.push(guitarChord[guitarChord.length - 1]);
 
-    console.log(guitarChord);
-    console.log(pluckNotes);
+    // note array
+    // console.log(guitarChord);
+    // console.log(pluckNotes);
 }
 
 // 延遲函數
@@ -158,8 +159,9 @@ export async function plucking(pluck, capo, velocities) {
 
 // 掃弦功能：根據掃弦方向播放音符
 export async function strumming(direction, capo, diffAngle) {
-    let duration = Math.floor(await mapRange(Math.abs(diffAngle), 3, 15, 125, 1)) * 4 / sturmOrder.length; // 計算撥弦的持續時間
-    let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
+  
+    let strumOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
+    let duration = Math.floor(await mapRange(Math.abs(diffAngle), 3, 15, 125, 1)) * 4 / strumOrder.length; // 計算撥弦的持續時間
    
     console.log(`Strumming in direction: ${direction} with duration: ${duration}ms`);
 

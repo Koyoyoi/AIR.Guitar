@@ -10,7 +10,7 @@ export function drawGesture(gesture, capo) {
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-
+    ctx.strokeStyle = "black";
     // 如果有 capo，顯示轉位名稱
     if (capo != 0) {
         transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]})`;
@@ -34,7 +34,7 @@ export function drawCapo(capo) {
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "right";
     ctx.textBaseline = "top";
-    console.log(canvas.width)
+    
     // 畫出 Capo 文字 
     ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);
 }
