@@ -74,6 +74,18 @@ export function drawImg() {
     ctx.drawImage(uploadedImage, 0, 0, imgW, imgH);
 }
 
+// 儲存控制區的位置（供滑鼠點擊時使用）
+export let midiCtrlArea = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+};
+
+export function getMIDIctrlArea() {
+    return midiCtrlArea;
+}
+
 function drawRoundedRect(x, y, width, height, radius) {
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
@@ -97,6 +109,9 @@ export function drawMIDIportCtrl(portName) {
     const x = margin;
     const y = canvas.height - margin - boxHeight;
 
+    // 更新範圍資訊
+    midiCtrlArea = { x, y, width: boxWidth, height: boxHeight };
+
     drawRoundedRect(x, y, boxWidth, boxHeight, radius);
     ctx.fillStyle = "#FFD700";
     ctx.fill();
@@ -110,4 +125,6 @@ export function drawMIDIportCtrl(portName) {
     ctx.textBaseline = "middle";
     ctx.fillText(`MIDI: ${portName}`, x + boxWidth / 2, y + boxHeight / 2);
 }
+
+
 
