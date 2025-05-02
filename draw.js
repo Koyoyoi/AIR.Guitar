@@ -1,8 +1,8 @@
-import { ctx, canvas, video, imgHeight, imgWidth } from "./main.js";
+import { ctx, canvas, video, imgSize } from "./main.js";
 import { rootTab, revRootTab } from "./MIDI.js";
 
 // 畫出手勢及其轉位名稱
-export function drawGesture(gesture, capo) {
+export async function drawGesture(gesture, capo) {
     let transName = "";  // 轉位
     let posX = 50, posY = 50;  // 預設位置
 
@@ -10,26 +10,26 @@ export function drawGesture(gesture, capo) {
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.strokeStyle = "black";
+
     // 如果有 capo，顯示轉位名稱
     if (capo != 0) {
         transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]})`;
     }
 
     // 調整文字位置
-    if (imgWidth != 0) {
-        if (video.videoHeight - imgHeight > video.videoWidth / 2 - imgWidth) {
+    if (imgSize.w != 0) {
+        if (video.videoHeight - imgSize.h > video.videoWidth / 2 - imgSize.w) {
             posY += imgHeight - 30;
-        } else if (video.videoHeight - imgHeight < video.videoWidth / 2 - imgWidth) {
+        } else {
             posX += imgWidth;
         }
     }
     // 畫出手勢文字
-    ctx.fillText(`${gesture} ${transName}`, posX, posY);
+    ctx.fillText(`${gesture}`, 50, 50);
 }
 
 // 畫出 Capo 設置
-export function drawCapo(capo) {
+export async function drawCapo(capo) {
     ctx.font = "80px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "right";
@@ -40,14 +40,14 @@ export function drawCapo(capo) {
 }
 
 // 畫出樂譜 (jpeg, png)
-export function drawScore(uploadScore) {
-    if (uploadScore) {
+export function drawScore(uploadImg) {
+    if (uploadImg) {
         const maxImgHeight = canvas.height;
-        const naturalAspectRatio = uploadScore.width / uploadScore.height;
+        const naturalAspectRatio = uploadImgwidth / uploadImg.height;
 
         // 根據高度縮放圖片
-        imgHeight = maxImgHeight;
-        imgWidth = imgHeight * naturalAspectRatio;
+        let imgHeight = maxImgHeight;
+        let imgWidth = imgHeight * naturalAspectRatio;
 
         // 若圖片寬度超過 canvas 寬度的一半，則調整寬度與高度
         const maxImgWidth = canvas.width / 2;
@@ -56,7 +56,11 @@ export function drawScore(uploadScore) {
             imgHeight = imgWidth / naturalAspectRatio;
         }
 
-        ctx.drawImage(uploadScore, 0, 0, imgWidth, imgHeight);  // 繪製圖片
+        // 記錄尺寸
+        imgSize.w = imgWidth;
+        imgSize.h = imgHeight;
+  
+        ctx.drawImage(uploadImg, 0, 0, imgWidth, imgHeight);  // 繪製圖片
     }
 }
 

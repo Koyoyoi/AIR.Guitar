@@ -1,8 +1,9 @@
 import { plucking, strumming } from "./MIDI.js";
 import { drawCapo } from "./draw.js";
 import { vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
-import { handData, poseData, video, capo } from "./main.js"
+import { handData, poseData, video} from "./main.js"
 
+export let capo = 0;                             // capo 
 let armAngles = [];                              // 用來儲存手臂角度的陣列
 let action = '', prevAction = '';                // 記錄目前和前一個撥弦動作
 let pluck = [], prevPluck = [], velocities = []; // 儲存手指彈奏的資料
@@ -13,19 +14,19 @@ export async function pluckCtrl() {
     // 若有偵測到右手資料，則進行手指彈奏的處理
     if (handData['Right'].length !== 0) {
         [pluck, velocities] = await fingerPlay(handData['Right']);
-    }
 
-    // 如果手指彈奏的動作不包含第 4 根手指（假設是無彈奏），則觸發彈奏
-    if (!pluck.includes(4)) {
-        let diffPluck = [...pluck, ...prevPluck].filter(
-            x => !prevPluck.includes(x)            // 取得這次彈奏與前次彈奏之間的差異
-        );
+        // 如果手指彈奏的動作不包含第 4 根手指（假設是無彈奏），則觸發彈奏
+        if (!pluck.includes(4)) {
+            let diffPluck = [...pluck, ...prevPluck].filter(
+                x => !prevPluck.includes(x)            // 取得這次彈奏與前次彈奏之間的差異
+            );
 
-        if (diffPluck.length > 0) {
-            console.log(velocities);               // 輸出彈奏的速度資料
-            plucking(diffPluck, capo, velocities); // 調用 MIDI 撥弦函數
+            if (diffPluck.length > 0) {
+                console.log(velocities);               // 輸出彈奏的速度資料
+                plucking(diffPluck, velocities); // 調用 MIDI 撥弦函數
+            }
+            prevPluck = pluck.slice();                 // 更新前次的彈奏資料
         }
-        prevPluck = pluck.slice();                 // 更新前次的彈奏資料
     }
 }
 
@@ -60,7 +61,7 @@ export async function strumCtrl() {
 
             // 如果撥弦動作改變且非停止，則執行撥弦
             if (action !== prevAction && action !== 'Stop') {
-                strumming(action, capo, diffAngle); // 調用 MIDI 撥弦函數
+                strumming(action, diffAngle); // 調用 MIDI 撥弦函數
                 prevAction = action;               // 更新前一個動作
             }
 
@@ -71,17 +72,18 @@ export async function strumCtrl() {
 
 // Capo 控制函數，每秒執行一次
 export async function capoCtrl() {
+    
     if (poseData.length > 0 && timeCnt >= 30) {
         timeCnt = 0; // 重置計數器
-        
         if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
-            return 0;                       // 如果雙手都在頭以下，則不調整 capo
+            capo = 0;                       // 如果雙手都在頭以下，則不調整 capo
         } else if (poseData[16][1] < poseData[0][1]) {
-            return Math.min(12, capo + 1);  // 如果右手在頭以下，增加 capo，最大為 12
+            capo = Math.min(12, capo + 1);  // 如果右手在頭以下，增加 capo，最大為 12
         } else if (poseData[15][1] < poseData[0][1]) {
-            return Math.max(-12, capo - 1); // 如果左手在頭以下，減少 capo，最小為 -12
+            capo = Math.max(-12, capo - 1); // 如果左手在頭以下，減少 capo，最小為 -12
         }
     }
-    timeCnt += 1; 
-    drawCapo(capo); 
+
+    timeCnt += 1;
+    await drawCapo(capo);
 }

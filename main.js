@@ -1,16 +1,15 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { capoCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
+import { capoCtrl, pluckCtrl, strumCtrl, capo } from "./musicControll.js";
 import { initMIDI, buildGuitarChord, loadSamples } from "./MIDI.js";
-import { drawCapo, drawGesture, drawScore, reCanva } from "./draw.js";
+import {  drawGesture, drawScore, reCanva } from "./draw.js";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { compute } from "./handCompute.js";
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
-export let capo = 0;
-export let imgHeight = 0, imgWidth = 0, uploadedImage = null;
+export let  imgSize = { w: 0, h: 0 }, uploadedImage = null;
 
 let gesture = '', prevGesture = '';
 
@@ -118,14 +117,13 @@ async function detect() {
             prevGesture = gesture;
             buildGuitarChord(gesture);  // 根據手勢建構和弦
         }
-        drawGesture(gesture, capo); 
+        await drawGesture(gesture, capo); 
     }
 
     // 控制撥弦、掃弦與 capo 設置
     await pluckCtrl();
     await strumCtrl();
     await capoCtrl();
-     
 
     // 重置 handData 和 poseData
     handData['Left'] = [];
@@ -147,7 +145,4 @@ async function main() {
     detect();                // 開始手勢識別循環
 }
 
-// 等待 DOM 完成加載
-window.addEventListener('DOMContentLoaded', async () => {
-    await main();
-});
+main()

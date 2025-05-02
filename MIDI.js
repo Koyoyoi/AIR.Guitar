@@ -1,3 +1,5 @@
+import { capo } from "./musicControll.js";
+
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundMap = {};  // 儲存每個音高對應的 AudioBuffer
 
@@ -130,7 +132,7 @@ async function playSample(note, velocity, duration = 1000) {
 }
 
 // 撥弦功能：根據撥弦的音符來播放
-export async function plucking(pluck, capo, velocities) {
+export async function plucking(pluck, velocities) {
     let notes = [];
     console.log("Plucking: ", pluck, "Velocities: ", velocities);
     pluck.forEach((p, i) => {
@@ -158,7 +160,7 @@ export async function plucking(pluck, capo, velocities) {
 }
 
 // 掃弦功能：根據掃弦方向播放音符
-export async function strumming(direction, capo, diffAngle) {
+export async function strumming(direction, diffAngle) {
   
     let strumOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
     let duration = Math.floor(await mapRange(Math.abs(diffAngle), 3, 15, 125, 1)) * 4 / strumOrder.length; // 計算撥弦的持續時間
