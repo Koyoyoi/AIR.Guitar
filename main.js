@@ -53,7 +53,7 @@ async function setupCamera() {
 
             video.play();
 
-            // 加入 resize 控制
+            // resize 
             reCanva();
             window.addEventListener("resize", reCanva);
 
@@ -62,7 +62,7 @@ async function setupCamera() {
     });
 }
 
-
+// upload event
 document.getElementById("file-upload").addEventListener("change", function (event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -97,20 +97,18 @@ async function detect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // 如果圖片已經加載，則根據需求繪製圖片
-    if (uploadedImage) {
-        drawImg()
-    }
+    // draw image
+    if (uploadedImage) { drawImg() }
 
-    await detectHand();
-    await detectPose();
+    await detectHand();  // mediapipe hand detect
+    await detectPose();  // mediapipe pose detect
 
-    await chordCtrl();
-    await pluckCtrl();
-    await strumCtrl();
-    await capoCtrl();
+    await chordCtrl();   // gestrue of chord
+    await pluckCtrl();   // pluck control
+    await strumCtrl();   // strum control
+    await capoCtrl();    // capo  control
 
-    // 重置 handData 和 poseData
+    // 重置 handData、poseData
     handData['Left'] = [];
     handData['Right'] = [];
     poseData = [];
@@ -121,13 +119,13 @@ async function detect() {
 
 // 初始化主函式
 async function main() {
-    await loadSamples();
+    await loadSamples();     
     await setupMediaPipe();
     await load_SVM_Model();
     await setupCamera();
     await initMIDI();
     buildGuitarChord('C');
-    detect();
+    detect();               // start detect loop
 }
 
 // 等待 DOM 完成加載
