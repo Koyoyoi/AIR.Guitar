@@ -4,15 +4,16 @@ import { rootTab, revRootTab } from "./MIDI.js";
 let imgH = 0, imgW = 0
 
 export function drawGesture(gesture, capo) {
-
+    // 畫出手勢文字(左上角)
     let transName = ""
     let posX = 50, posY = 50;
-    // 設定字型與顏色
+ 
     ctx.font = "100px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-
+    
+    // transpose re-name and re-position
     if (capo != 0) {
         transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]}${gesture.slice(1)})`
     }
@@ -23,21 +24,16 @@ export function drawGesture(gesture, capo) {
         posX += imgW
     }
 
-    // 畫出手勢文字
-    ctx.fillText(`${gesture} ${transName}`, posX, posY);  // 位置設為左上角 
-
+    ctx.fillText(`${gesture} ${transName}`, posX, posY);  
 }
 
 export function drawCapo(capo) {
-    // 設定字型與顏色
+    // 畫出 capo 文字(右上角）
     ctx.font = "80px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "right";
     ctx.textBaseline = "top";
-    // 畫出 capo 文字（右上角）
-
-    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);  // 顯示 capo，距離右邊 50px，並且在上方
-
+    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);  
 }
 
 export function drawImg() {
