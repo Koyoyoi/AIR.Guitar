@@ -1,18 +1,16 @@
-import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { compute } from "./handCompute.js";
-import { load_SVM_Model, predict } from "./SVM.js";
-import { initMIDI, buildGuitarChord, loadSamples } from "./MIDI.js";
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { drawCapo, drawGesture, reCanva } from "./draw.js";
-import { capoCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
+import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
+import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
+import { initMIDI, buildGuitarChord, loadSamples } from "./MIDI.js";
+import { load_SVM_Model } from "./SVM.js";
+import { reCanva, drawImg } from "./draw.js";
+
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
-export let capo = 0;
-export let imgHeight = 0, imgWidth = 0, uploadedImage = null;
+export let uploadedImage = null;
 
-let gesture = '', prevGesture = '';
 
 async function setupCamera() {
     video = document.createElement("video");
@@ -101,43 +99,16 @@ async function detect() {
 
     // 如果圖片已經加載，則根據需求繪製圖片
     if (uploadedImage) {
-        const maxImgHeight = canvas.height;
-        const naturalAspectRatio = uploadedImage.width / uploadedImage.height;
-
-        // 先依照高度縮放
-        imgHeight = maxImgHeight;
-        imgWidth = imgHeight * naturalAspectRatio;
-
-        // 如果超過 canvas 寬度的一半，則限制為一半並重新計算高度
-        const maxImgWidth = canvas.width / 2;
-        if (imgWidth > maxImgWidth) {
-            imgWidth = maxImgWidth;
-            imgHeight = imgWidth / naturalAspectRatio;
-        }
-
-        ctx.drawImage(uploadedImage, 0, 0, imgWidth, imgHeight);
+        drawImg()
     }
-
 
     await detectHand();
     await detectPose();
 
-    // Left Hand Gesture
-    if (handData['Left'].length != 0) {
-        let parameters = compute(handData['Left']);
-        gesture = await predict(parameters);
-        if (prevGesture != gesture) {
-            console.log(gesture);
-            prevGesture = gesture;
-            buildGuitarChord(gesture);
-        }
-        drawGesture(gesture, capo);
-    }
-
+    await chordCtrl();
     await pluckCtrl();
     await strumCtrl();
-    capo = await capoCtrl();
-    drawCapo(capo);
+    await capoCtrl();
 
     // 重置 handData 和 poseData
     handData['Left'] = [];

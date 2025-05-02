@@ -1,11 +1,31 @@
-import { plucking, strumming, mapRange } from "./MIDI.js";
-import { vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
-import { handData, poseData, video, capo } from "./main.js"
+import { buildGuitarChord, plucking, strumming, mapRange } from "./MIDI.js";
+import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
+import { handData, poseData, video } from "./main.js"
+import { predict } from "./SVM.js";
+import { drawCapo, drawGesture } from "./draw.js";
 
+export let capo = 0;
+
+let gesture = '', prevGesture = '';
 let armAngles = [];
 let action = '', prevAction = '';
 let pluck = [], prevPluck = [], velocities = [];
 let timeCnt = 0;
+
+export async function chordCtrl() {
+    // Chord Control
+    if (handData['Left'].length != 0) {
+        let parameters = compute(handData['Left']);
+        gesture = await predict(parameters);
+        if (prevGesture != gesture) {
+            console.log(gesture);
+            prevGesture = gesture;
+            buildGuitarChord(gesture);
+        }
+        drawGesture(gesture, capo);
+    }
+
+}
 
 export async function pluckCtrl() {
     // Plucking Control
@@ -68,13 +88,13 @@ export async function capoCtrl() {
     if (poseData.length > 0 && timeCnt >= 30) {
         timeCnt = 0;
         if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
-            return 0;
+            capo = 0;
         } else if (poseData[16][1] < poseData[0][1]) {
-            return Math.min(12, capo + 1);
+            capo = Math.min(12, capo + 1);
         } else if (poseData[15][1] < poseData[0][1]) {
-            return Math.max(-12, capo - 1);
+            capo = Math.max(-12, capo - 1);
         }
     }
     timeCnt += 1;
-    return capo
+    drawCapo(capo)
 }
