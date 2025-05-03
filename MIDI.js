@@ -1,7 +1,6 @@
 import { portOpen } from "./musicControll.js";
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const soundMap = {};  // 儲存每個音高對應的 AudioBuffer
 
 let soundSample;
 
@@ -123,7 +122,7 @@ export async function plucking(pluck, capo, velocities) {
 
             try {
                 // 播放音符（立即播放，持續 1 秒）
-                soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 2, duration: 1 });
+                soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
                 console.log(`播放音符：${midiNote}, 音量：${velocity}`);
             } catch (err) {
                 console.error("播放音符時發生錯誤:", err);
@@ -154,7 +153,7 @@ export async function strumming(direction, capo, duration) {
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!portOpen) {
         for (let n of sturmOrder) {
-            piano.play(n + capo, audioContext.currentTime, { gain: 1.5 }); 
+            soundSample.play(n + capo, audioContext.currentTime, { gain: 4, duration: 1 }); 
             await sleep(duration); 
         }
     } else if (outport) {
