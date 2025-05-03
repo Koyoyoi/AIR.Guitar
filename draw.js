@@ -1,5 +1,5 @@
 import { ctx, canvas, video, uploadedImage } from "./main.js";
-import { rootTab, revRootTab } from "./MIDI.js";
+import { rootTab, revRootTab } from "./sound.js";
 import { portOpen } from "./musicControll.js";
 
 let imgH = 0, imgW = 0

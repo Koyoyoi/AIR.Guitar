@@ -1,4 +1,4 @@
-import { mapRange } from "./MIDI.js";
+import { mapRange } from "./sound.js";
 
 // 3D 向量運算
 export function vectorCompute(p1, p2) {

@@ -1,26 +1,33 @@
-import { portOpen } from "./musicControll.js";
+import { portOpen } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
 
-let soundSample;
+let soundSample; // 儲存音色樣本
 
 // 載入 sample 音色
 export async function loadSamples() {
     Soundfont.instrument(audioContext, 'acoustic_guitar_steel', {
-        soundfont: 'FluidR3_GM',
+        soundfont: 'FluidR3_GM', // 使用 FluidR3_GM SoundFont
     }).then(function (loadedPiano) {
-        soundSample = loadedPiano;
+        soundSample = loadedPiano; // 載入完成後，將音色樣本儲存
     });
 
     console.log("Guitar samples loaded.");
+
+    if (audioContext.state === 'suspended') {
+        audioContext.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
+        console.log('AudioContext 已恢復');
+    }
 }
 
+// 和弦類型表
 const chordTab = {
-    "": [0, 4, 7],   // Major
-    "m": [0, 3, 7],  // minor
-    "dim": [0, 3, 6] // Dim
+    "": [0, 4, 7],   // Major 大調
+    "m": [0, 3, 7],  // minor 小調
+    "dim": [0, 3, 6] // Dim 減和弦
 };
 
+// 根音對應表
 export const rootTab = {
     "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
     "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
@@ -29,9 +36,9 @@ export const revRootTab = Object.fromEntries(
     Object.entries(rootTab).map(([k, v]) => [v, k])
 );
 
-const guitarStandard = [40, 45, 50, 55, 59, 64];
-let outport = null;
-let guitarChord = [], pluckNotes = []
+const guitarStandard = [40, 45, 50, 55, 59, 64];  // 吉他標準調音
+let outport = null;  // 儲存 MIDI 輸出端口
+let guitarChord = [], pluckNotes = []  // 儲存吉他和弦與挑弦音符
 
 // 初始化 MIDI
 export async function initMIDI() {
@@ -60,26 +67,26 @@ export async function initMIDI() {
         });
 }
 
-// Build the guitar chord based on gesture (e.g., "C", "Cm", etc.)
+// 根據手勢建立吉他和弦（例如 "C"、"Cm" 等）
 export function buildGuitarChord(gesture) {
     const root = gesture[0];
     const chordType = gesture.slice(1);
     let findRoot = false;
-    // Calculate the chord's notes based on root and chord type
+    // 計算和弦的音符根據根音與和弦類型
     let chord = chordTab[chordType].map(i => (i + rootTab[root]) % 12);
     guitarChord = [];
     pluckNotes = [];
-    // Iterate over each note in guitar standard tuning
+    // 遍歷每根吉他弦上的音符
     for (let note of guitarStandard) {
         let n = note % 12;
 
-        // Calculate closest note to the current guitar string's note
+        // 計算與當前吉他弦音符最接近的音符
         let closest = Math.min(...chord.map(i => {
             let diff = i - n;
             return diff < 0 ? diff + 12 : diff;
         })) + note;
 
-        // Check if the closest note matches the root note
+        // 檢查最接近的音符是否與根音匹配
         if (closest % 12 === rootTab[root]) {
             findRoot = true;
         }
@@ -88,62 +95,53 @@ export function buildGuitarChord(gesture) {
             guitarChord.push(closest);
         }
     }
-    pluckNotes.push(guitarChord[0])
-    pluckNotes.push(guitarChord[guitarChord.length - 3])
-    pluckNotes.push(guitarChord[guitarChord.length - 2])
-    pluckNotes.push(guitarChord[guitarChord.length - 1])
-
-    //console.log(guitarChord);
-    //console.log(pluckNotes)
+    pluckNotes.push(guitarChord[0])  // 第一根弦音符
+    pluckNotes.push(guitarChord[guitarChord.length - 3]) // 第三根弦音符
+    pluckNotes.push(guitarChord[guitarChord.length - 2]) // 第二根弦音符
+    pluckNotes.push(guitarChord[guitarChord.length - 1]) // 第四根弦音符
 }
 
 
+// 延遲
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Plucking (playing notes) function
+// 撥弦
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
     const noteSequence = { notes: [], totalTime: 0 }
     console.log("Plucking notes:", pluck);
     pluck.forEach((p, i) => {
-        notes.push([pluckNotes[p], velocities[i]]);
+        notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
     });
-    if (audioContext.state === 'suspended') {
-        audioContext.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
-        console.log('AudioContext 已恢復');
-    }
+    
 
-    // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!portOpen) {
         for (let [note, velocity] of notes) {
             const midiNote = note + capo;
 
-            try {
-                // 播放音符（立即播放，持續 1 秒）
-                soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
-                console.log(`播放音符：${midiNote}, 音量：${velocity}`);
-            } catch (err) {
-                console.error("播放音符時發生錯誤:", err);
-            }
+            soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
+            console.log(`播放音符：${midiNote}, 音量：${velocity}`);
+
         }
     } else if (outport) {
         // 發送 MIDI 訊號 (如果有 MIDI 設備)
+        // note_on
         notes.forEach(([note, velocity]) => {
-            outport.send([0x90, note + capo, velocity]); // 發送 note_on 訊號
+            outport.send([0x90, note + capo, velocity]);
         });
 
-        // 使用 setTimeout 模擬 sleep 時間，控制 note_off 時間
+        //  note_off 
         setTimeout(() => {
             notes.forEach(([note]) => {
-                outport.send([0x90, note + capo, 0]); // 發送 note_off 訊號
+                outport.send([0x90, note + capo, 0]);
             });
         }, 1000);  // 持續時間轉換為毫秒
     } else { console.log('midi port no device.') }
 }
 
-// Strumming function
+// 掃弦
 export async function strumming(direction, capo, duration) {
     let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
     console.log(`direction: ${direction} with duration: ${duration}ms`);
@@ -153,28 +151,29 @@ export async function strumming(direction, capo, duration) {
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!portOpen) {
         for (let n of sturmOrder) {
-            soundSample.play(n + capo, audioContext.currentTime, { gain: 4, duration: 1 }); 
-            await sleep(duration); 
+            soundSample.play(n + capo, audioContext.currentTime, { gain: 4, duration: 1 });
+            await sleep(duration);
         }
     } else if (outport) {
         // 如果有 MIDI 設備，發送 MIDI 訊號
+        // note_on
         for (let n of sturmOrder) {
-            outport.send([0x90, n + capo, 127]); // note_on
+            outport.send([0x90, n + capo, 127]);
             await sleep(duration);
         }
 
-        // note_off with delay
+        // note_off 
         for (let n of sturmOrder) {
-            outport.send([0x80, n + capo, 0]); // note_off
+            outport.send([0x80, n + capo, 0]);
             await sleep(duration * 1.5);
         }
     } else { console.log('midi port no device.') }
 }
 
-
+// 範圍映射函數
 export function mapRange(value, inMin, inMax, outMin, outMax) {
     value = Math.max(inMin, Math.min(value, inMax)); // 限制在範圍內
 
     const ratio = (value - inMin) / (inMax - inMin);
-    return outMin + (outMax - outMin) * ratio;
+    return outMin + (outMax - outMin) * ratio; // 返回映射結果
 }

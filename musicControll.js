@@ -1,4 +1,4 @@
-import { buildGuitarChord, plucking, strumming, mapRange, initMIDI } from "./MIDI.js";
+import { buildGuitarChord, plucking, strumming, mapRange, initMIDI } from "./sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
 import { handData, poseData, video } from "./main.js"
 import { predict } from "./SVM.js";
