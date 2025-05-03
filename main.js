@@ -85,67 +85,78 @@ async function setupCamera() {
 }
 
 
-// upload event
-window.onload = function () {
-    // 檢查 Magenta.js 是否正確加載
-    if (typeof mm === "undefined") {
-        console.error("Magenta.js 未正確載入！");
-    }
 
-    document.getElementById("file-upload").addEventListener("change", async function (event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        console.log("檔案名稱:", file.name);
-
-        // 處理圖片文件
-        if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                const uploadedImage = new Image();
-
-                uploadedImage.onload = function () {
-                    console.log("圖片成功加載，準備繪製到畫布");
-                    const canvas = document.getElementById("canvas");
-                    const ctx = canvas.getContext("2d");
-                    canvas.width = uploadedImage.width;
-                    canvas.height = uploadedImage.height;
-                    ctx.drawImage(uploadedImage, 0, 0);
-                };
-
-                uploadedImage.onerror = function () {
-                    console.error("圖片加載錯誤");
-                };
-
-                uploadedImage.src = e.target.result;
-            };
-
-            reader.readAsDataURL(file);
+    window.onload = async function () {
+        // 檢查 Magenta.js 是否正確加載
+        if (typeof mm === "undefined") {
+            console.error("Magenta.js 未正確載入！");
+            return;
         }
-        // 處理 MIDI 檔案
-        else if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const noteSequence = await mm.blobToNoteSequence(new Blob([arrayBuffer]));
 
-                console.log("🎵 MIDI NoteSequence:", noteSequence);
+        const soundFontPlayer = new mm.SoundFontPlayer(
+            'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus'
+        );
 
-                // 播放 MIDI 音樂
-                const player = new mm.Player();
-                player.start(noteSequence);
-            } catch (error) {
-                console.error("處理 MIDI 檔案時發生錯誤:", error);
-                alert("處理 MIDI 檔案時發生錯誤。請檢查檔案是否有效。");
+        // 等待 SoundFont 樣本加載完成
+        soundFontPlayer.onSamplesLoaded = function () {
+            console.log("SoundFont 样本加载完成！");
+        };
+
+        document.getElementById("file-upload").addEventListener("change", async function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            console.log("檔案名稱:", file.name);
+
+            // 處理圖片文件
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const uploadedImage = new Image();
+
+                    uploadedImage.onload = function () {
+                        console.log("圖片成功加載，準備繪製到畫布");
+                        const canvas = document.getElementById("canvas");
+                        const ctx = canvas.getContext("2d");
+                        canvas.width = uploadedImage.width;
+                        canvas.height = uploadedImage.height;
+                        ctx.drawImage(uploadedImage, 0, 0);
+                    };
+
+                    uploadedImage.onerror = function () {
+                        console.error("圖片加載錯誤");
+                    };
+
+                    uploadedImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
             }
-        }
-        // 如果既不是圖片也不是 MIDI 檔案
-        else {
-            console.log("這不是有效的圖片或 MIDI 檔案");
-            alert("請上傳有效的圖片或 MIDI 檔案！");
-        }
-    });
-}
+            // 處理 MIDI 檔案
+            else if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const blob = new Blob([arrayBuffer], { type: "audio/midi" });
+
+                    // 播放 MIDI 檔案
+                    const noteSequence = await mm.blobToNoteSequence(blob);
+
+                    // 載入音效並播放
+                    await soundFontPlayer.loadSamples(noteSequence); // 確保音效載入
+                    soundFontPlayer.start(noteSequence);
+
+                    console.log("🎶 MIDI 播放中...");
+                } catch (err) {
+                    console.error("讀取 MIDI 發生錯誤：", err);
+                    alert("無法播放 MIDI 檔案。");
+                }
+            } else {
+                alert("請上傳圖片或 MIDI 檔案！");
+            }
+        });
+    };
+
 
 async function detect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
