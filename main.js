@@ -2,13 +2,14 @@ import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-visi
 import { capoCtrl, chordCtrl, pluckCtrl, portCtrl, strumCtrl } from "./musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDI, buildGuitarChord, loadSamples } from "./sound.js";
-import { reCanva, drawImg, draw_midiPortArea } from "./draw.js";
+import { reCanva, drawImg, draw_midiPortArea, draw_sampleNameArea } from "./draw.js";
 import { load_SVM_Model } from "./SVM.js";
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
+export let mouse = {X: 0, Y: 0}
 
 let soundFontPlayer;
 
@@ -58,23 +59,14 @@ async function setupCamera() {
                 const scaleX = canvas.width / rect.width;
                 const scaleY = canvas.height / rect.height;
 
-                const mouseX = (e.clientX - rect.left) * scaleX;
-                const mouseY = (e.clientY - rect.top) * scaleY;
+                mouse.X = (e.clientX - rect.left) * scaleX;
+                mouse.Y = (e.clientY - rect.top) * scaleY;
 
-                const checkArea = draw_midiPortArea();
-
-                // 檢查是否點擊在 MIDI 控制區域
-                if (
-                    mouseX >= checkArea.x &&
-                    mouseX <= checkArea.x + checkArea.w &&
-                    mouseY >= checkArea.y &&
-                    mouseY <= checkArea.y + checkArea.h
-                ) {
-                    console.log("✅ MIDI port 控制區被點擊！");
-                    portCtrl();
-                } else {
-                    console.log("❌ 點擊位置不在 MIDI port 控制區內");
-                }
+                draw_midiPortArea();
+                draw_sampleNameArea();
+                
+                mouse.X = 0
+                mouse.Y = 0
             });
 
             video.play();
@@ -102,7 +94,7 @@ window.onload = async function () {
 
     // 等待 SoundFont 樣本加載完成
     soundFontPlayer.onSamplesLoaded = function () {
-        console.log("SoundFont 样本加载完成！");
+        console.log("SoundFont Loaded！");
     };
 
     // 處理上傳檔案（圖片或 MIDI 檔案）
@@ -169,6 +161,7 @@ async function detect() {
     // 繪製上傳的圖片與 MIDI 控制區域
     if (uploadedImage) { drawImg() }
     draw_midiPortArea();
+    draw_sampleNameArea();
 
     // 偵測手勢與姿勢
     await detectHand();  // mediapipe 手勢偵測

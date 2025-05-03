@@ -1,22 +1,32 @@
-import { portOpen } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
+import { portOpen, sampleName } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
 
 let soundSample; // 儲存音色樣本
 
+export const instruments = [
+    "acoustic_guitar_nylon",
+    "acoustic_guitar_steel",
+    "electric_guitar_jazz",
+    "electric_guitar_clean",
+    "electric_guitar_muted",
+    "overdriven_guitar",
+    "distortion_guitar",
+    "guitar_harmonics",]
+
 // 載入 sample 音色
 export async function loadSamples() {
-    Soundfont.instrument(audioContext, 'acoustic_guitar_steel', {
+    Soundfont.instrument(audioContext, instruments[sampleName], {
         soundfont: 'FluidR3_GM', // 使用 FluidR3_GM SoundFont
     }).then(function (loadedPiano) {
         soundSample = loadedPiano; // 載入完成後，將音色樣本儲存
     });
 
-    console.log("Guitar samples loaded.");
+    console.log(`${instruments[sampleName]} loaded.`);
 
     if (audioContext.state === 'suspended') {
         audioContext.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
-        console.log('AudioContext 已恢復');
+        console.log('AudioContext 已啟用');
     }
 }
 

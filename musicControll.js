@@ -1,16 +1,17 @@
-import { buildGuitarChord, plucking, strumming, mapRange, initMIDI } from "./sound.js";
+import { buildGuitarChord, plucking, strumming, mapRange, initMIDI, instruments, loadSamples } from "./sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
 import { handData, poseData, video } from "./main.js"
 import { predict } from "./SVM.js";
-import {  drawCapo, drawGesture } from "./draw.js";
+import { draw_sampleNameArea, drawCapo, drawGesture } from "./draw.js";
 
-export let capo = 0, portOpen = false;
+export let capo = 0, portOpen = false, sampleName = 0 ;
 
 let gesture = '', prevGesture = '';
 let armAngles = [];
 let action = '', prevAction = '';
 let pluck = [], prevPluck = [], velocities = [];
 let timeCnt = 0;
+
 
 export async function chordCtrl() {
     // Chord Control
@@ -101,5 +102,17 @@ export async function capoCtrl() {
 
 export async function portCtrl() {
     portOpen = !portOpen
-    if(portOpen) {await initMIDI()}
+    if (portOpen) { await initMIDI() }
+}
+
+export async function sampleCtrl(c){
+    if (c == '-'){
+        sampleName -= 1
+    }else if (c == '+'){
+        sampleName += 1
+    }
+    sampleName = (instruments.length + sampleName) % instruments.length
+    console.log(sampleName)
+    loadSamples();
+    
 }
