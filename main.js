@@ -9,6 +9,7 @@ import { reCanva, drawImg, draw_midiPortArea } from "./draw.js";
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
+export let soundFontPlayer;
 
 
 async function setupCamera() {
@@ -93,7 +94,7 @@ async function setupCamera() {
             return;
         }
 
-        const soundFontPlayer = new mm.SoundFontPlayer(
+        soundFontPlayer = new mm.SoundFontPlayer(
             'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus'
         );
 

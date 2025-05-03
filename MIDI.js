@@ -3,19 +3,18 @@ import { portOpen } from "./musicControll.js";
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundMap = {};  // 儲存每個音高對應的 AudioBuffer
 
-// 載入 sample 音色範圍 28~83
-export async function loadSamples() {
-    const notesToLoad = Array.from({ length: 56 }, (_, i) => i + 28); // 28~83
+let soundSample;
 
-    await Promise.all(notesToLoad.map(async (note) => {
-        const response = await fetch(`./Sounds_m4a/guitar/${note}.m4a`);
-        const arrayBuffer = await response.arrayBuffer();
-        soundMap[note] = await audioContext.decodeAudioData(arrayBuffer);
-    }));
+// 載入 sample 音色
+export async function loadSamples() {
+    Soundfont.instrument(audioContext, 'acoustic_guitar_steel', {
+        soundfont: 'FluidR3_GM',
+    }).then(function (loadedPiano) {
+        soundSample = loadedPiano;
+    });
 
     console.log("Guitar samples loaded.");
 }
-
 
 const chordTab = {
     "": [0, 4, 7],   // Major
@@ -104,43 +103,33 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 播放單一音符的 sample
-async function playSample(note, velocity, duration = 1000) {
-    const sample = soundMap[note];
-    if (sample) {
-        const source = audioContext.createBufferSource();
-        source.buffer = sample;
-        const gainNode = audioContext.createGain();
-        gainNode.gain.value = velocity / 127; // 設置音量，範圍為 0 到 1
-        source.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        console.log(`Playing note: ${note} with velocity: ${velocity}`);
-
-        source.start();
-        // 設定音符播放的時間 (duration)
-        setTimeout(() => {
-            source.stop();
-        }, duration);
-    } else {
-        console.log(`Sample for note ${note} not found.`);
-    }
-}
-
 // Plucking (playing notes) function
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
+    const noteSequence = { notes: [], totalTime: 0 }
     console.log("Plucking notes:", pluck);
     pluck.forEach((p, i) => {
         notes.push([pluckNotes[p], velocities[i]]);
     });
+    if (audioContext.state === 'suspended') {
+        audioContext.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
+        console.log('AudioContext 已恢復');
+    }
 
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!portOpen) {
         for (let [note, velocity] of notes) {
-            await playSample(note + capo, velocity); // 播放 sample
+            const midiNote = note + capo;
+
+            try {
+                // 播放音符（立即播放，持續 1 秒）
+                soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 2, duration: 1 });
+                console.log(`播放音符：${midiNote}, 音量：${velocity}`);
+            } catch (err) {
+                console.error("播放音符時發生錯誤:", err);
+            }
         }
-    } else if(outport){
+    } else if (outport) {
         // 發送 MIDI 訊號 (如果有 MIDI 設備)
         notes.forEach(([note, velocity]) => {
             outport.send([0x90, note + capo, velocity]); // 發送 note_on 訊號
@@ -152,7 +141,7 @@ export async function plucking(pluck, capo, velocities) {
                 outport.send([0x90, note + capo, 0]); // 發送 note_off 訊號
             });
         }, 1000);  // 持續時間轉換為毫秒
-    } else {console.log('midi port no device.')}
+    } else { console.log('midi port no device.') }
 }
 
 // Strumming function
@@ -165,10 +154,10 @@ export async function strumming(direction, capo, duration) {
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
     if (!portOpen) {
         for (let n of sturmOrder) {
-            await playSample(n + capo, 127);
-            await sleep(duration);
+            piano.play(n + capo, audioContext.currentTime, { gain: 1.5 }); 
+            await sleep(duration); 
         }
-    } else if (outport){
+    } else if (outport) {
         // 如果有 MIDI 設備，發送 MIDI 訊號
         for (let n of sturmOrder) {
             outport.send([0x90, n + capo, 127]); // note_on
@@ -180,7 +169,7 @@ export async function strumming(direction, capo, duration) {
             outport.send([0x80, n + capo, 0]); // note_off
             await sleep(duration * 1.5);
         }
-    } else {console.log('midi port no device.')}
+    } else { console.log('midi port no device.') }
 }
 
 
