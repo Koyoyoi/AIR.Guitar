@@ -143,7 +143,7 @@ export function draw_sampleNameArea() {
 
     // 區域的位置與大小
     let Area = {
-        x: video.videoWidth - canvas.width * 0.4,
+        x: video.videoWidth - canvas.width * 0.3,
         y: canvas.height - 20 - canvas.height * 0.08,
         w: canvas.width * 0.25,
         h: canvas.height * 0.08
@@ -153,9 +153,6 @@ export function draw_sampleNameArea() {
     drawRoundedRect(Area.x, Area.y, Area.w, Area.h, 10);
     ctx.fillStyle = "#434343";
     ctx.fill();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "#1c1c1c";
-    ctx.stroke();
 
     // 顯示 MIDI 控制區域的狀態
     ctx.font = `700 ${Area.h * 0.5}px Arial`;
@@ -165,70 +162,64 @@ export function draw_sampleNameArea() {
     ctx.fillText(`${instruments[sampleName]}`, Area.x + Area.w / 2, Area.y + Area.h / 2);
 
     // 繪製左右箭頭按鈕
-    const buttonWidth = Area.h * 0.6
-    const buttonHeight = Area.h
+    const buttonWidth = Area.h * 0.8;
+    const buttonHeight = Area.h;
     const buttonY = Area.y + (Area.h - buttonHeight) / 2;
 
-    // 左側按鈕（<）
+    // 左側按鈕（三角形）
     let LButton = {
-        x: Area.x - 40,
+        x: Area.x - 50,
         y: buttonY,
         w: buttonWidth,
         h: buttonHeight
     };
 
-    drawRoundedRect(LButton.x, LButton.y, LButton.w, LButton.h, 10);
+
+    // 畫左箭頭（實心三角形）
     ctx.fillStyle = "#434343";
+    ctx.beginPath();
+    ctx.moveTo(LButton.x + LButton.w, LButton.y);
+    ctx.lineTo(LButton.x, LButton.y + LButton.h / 2);
+    ctx.lineTo(LButton.x + LButton.w, LButton.y + LButton.h);
+    ctx.closePath();
     ctx.fill();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "#1c1c1c";
-    ctx.stroke();
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `${buttonHeight * 0.8}px Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("<", LButton.x + LButton.w / 2, LButton.y + LButton.h / 2);
-
-    // 右側按鈕（>）
+    // 右側按鈕（三角形）
     let RButton = {
-        x: Area.x + Area.w - buttonWidth + 40,
+        x: Area.x + Area.w - buttonWidth + 50,
         y: buttonY,
         w: buttonWidth,
         h: buttonHeight
     };
 
-    drawRoundedRect(RButton.x, RButton.y, RButton.w, RButton.h, 10);
+    // 畫右箭頭（實心三角形）
     ctx.fillStyle = "#434343";
+    ctx.beginPath();
+    ctx.moveTo(RButton.x , RButton.y);
+    ctx.lineTo(RButton.x + RButton.w, RButton.y + RButton.h / 2);
+    ctx.lineTo(RButton.x , RButton.y + RButton.h);
+    ctx.closePath();
     ctx.fill();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "#1c1c1c";
-    ctx.stroke();
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `${buttonHeight * 0.8}px Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(">", RButton.x + RButton.w / 2, RButton.y + RButton.h / 2);
-
-    // 檢查是否點擊在 MIDI 控制區域
+    // 檢查是否點擊在按鈕上
     if (mouse.X != 0 && mouse.Y != 0) {
         if (
-            mouse.X >=  LButton.x &&
-            mouse.X <=  LButton.x +  LButton.w &&
-            mouse.Y >=  LButton.y &&
-            mouse.Y <=  LButton.y +  LButton.h
+            mouse.X >= LButton.x &&
+            mouse.X <= LButton.x + LButton.w &&
+            mouse.Y >= LButton.y &&
+            mouse.Y <= LButton.y + LButton.h
         ) {
             console.log("✅ sample Left 被點擊！");
-            sampleCtrl('-')
+            sampleCtrl('-');
         } else if (
-            mouse.X >=  RButton.x &&
-            mouse.X <=  RButton.x +  RButton.w &&
-            mouse.Y >=  RButton.y &&
-            mouse.Y <=  RButton.y +  RButton.h
+            mouse.X >= RButton.x &&
+            mouse.X <= RButton.x + RButton.w &&
+            mouse.Y >= RButton.y &&
+            mouse.Y <= RButton.y + RButton.h
         ) {
-            console.log("✅ sample Reft 被點擊！");
-            sampleCtrl('+')
+            console.log("✅ sample Right 被點擊！");
+            sampleCtrl('+');
         }
     }
+
 }
