@@ -5,7 +5,6 @@ import { initMIDI, buildGuitarChord, loadSamples } from "./MIDI.js";
 import { load_SVM_Model } from "./SVM.js";
 import { reCanva, drawImg, draw_midiPortArea } from "./draw.js";
 
-
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
@@ -55,22 +54,22 @@ async function setupCamera() {
                 const rect = canvas.getBoundingClientRect(); // 取得 canvas 在畫面上的實際位置與尺寸
                 const scaleX = canvas.width / rect.width;
                 const scaleY = canvas.height / rect.height;
-            
+
                 const mouseX = (e.clientX - rect.left) * scaleX;
                 const mouseY = (e.clientY - rect.top) * scaleY;
-                
+
                 const checkArea = draw_midiPortArea();
-            
+
                 if (
                     mouseX >= checkArea.x &&
-                    mouseX <= checkArea.x + checkArea.w&&
+                    mouseX <= checkArea.x + checkArea.w &&
                     mouseY >= checkArea.y &&
                     mouseY <= checkArea.y + checkArea.h
                 ) {
-                    console.log("✅ MIDI 控制區被點擊！");
+                    console.log("✅ MIDI port 控制區被點擊！");
                     portCtrl();
                 } else {
-                    console.log("❌ 點擊位置不在 MIDI 控制區內");
+                    console.log("❌ 點擊位置不在 MIDI port 控制區內");
                 }
             });
 
@@ -85,35 +84,68 @@ async function setupCamera() {
     });
 }
 
+
 // upload event
-document.getElementById("file-upload").addEventListener("change", function (event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    console.log("檔案名稱:", file.name);
-
-    if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-            uploadedImage = new Image();
-
-            uploadedImage.onload = function () {
-                console.log("圖片成功加載，準備繪製到畫布");
-            };
-
-            uploadedImage.onerror = function () {
-                console.error("圖片加載錯誤");
-            };
-
-            uploadedImage.src = e.target.result;
-        };
-
-        reader.readAsDataURL(file);
-    } else {
-        console.log("上傳的文件不是圖片");
+window.onload = function () {
+    // 檢查 Magenta.js 是否正確加載
+    if (typeof mm === "undefined") {
+        console.error("Magenta.js 未正確載入！");
     }
-});
+
+    document.getElementById("file-upload").addEventListener("change", async function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        console.log("檔案名稱:", file.name);
+
+        // 處理圖片文件
+        if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const uploadedImage = new Image();
+
+                uploadedImage.onload = function () {
+                    console.log("圖片成功加載，準備繪製到畫布");
+                    const canvas = document.getElementById("canvas");
+                    const ctx = canvas.getContext("2d");
+                    canvas.width = uploadedImage.width;
+                    canvas.height = uploadedImage.height;
+                    ctx.drawImage(uploadedImage, 0, 0);
+                };
+
+                uploadedImage.onerror = function () {
+                    console.error("圖片加載錯誤");
+                };
+
+                uploadedImage.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+        // 處理 MIDI 檔案
+        else if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const noteSequence = await mm.blobToNoteSequence(new Blob([arrayBuffer]));
+
+                console.log("🎵 MIDI NoteSequence:", noteSequence);
+
+                // 播放 MIDI 音樂
+                const player = new mm.Player();
+                player.start(noteSequence);
+            } catch (error) {
+                console.error("處理 MIDI 檔案時發生錯誤:", error);
+                alert("處理 MIDI 檔案時發生錯誤。請檢查檔案是否有效。");
+            }
+        }
+        // 如果既不是圖片也不是 MIDI 檔案
+        else {
+            console.log("這不是有效的圖片或 MIDI 檔案");
+            alert("請上傳有效的圖片或 MIDI 檔案！");
+        }
+    });
+}
 
 async function detect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);

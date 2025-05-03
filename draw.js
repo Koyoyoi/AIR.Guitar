@@ -115,6 +115,3 @@ export function draw_midiPortArea() {
 
     return midiPortArea
 }
-
-
-
