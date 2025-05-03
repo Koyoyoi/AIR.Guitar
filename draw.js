@@ -29,7 +29,7 @@ export function drawGesture(gesture, capo) {
     let transName = ""
     let posX = 50, posY = 50;
 
-    ctx.font = "100px Arial";
+    ctx.font = "700 100px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
@@ -50,7 +50,7 @@ export function drawGesture(gesture, capo) {
 
 export function drawCapo(capo) {
     // 畫出 capo 文字(右上角）
-    ctx.font = "80px Arial";
+    ctx.font = "700 80px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "right";
     ctx.textBaseline = "top";
@@ -106,7 +106,8 @@ export function draw_midiPortArea() {
     ctx.strokeStyle = "#1c1c1c";
     ctx.stroke();
 
-    ctx.font = `${midiPortArea.h * 0.5}px Arial`;
+    ctx.font = `700 ${midiPortArea.h * 0.5}px Arial`;
+    ctx.font
     ctx.fillStyle = portOpen ? "#00AA90" : "#787d7b";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";

@@ -158,7 +158,7 @@ export async function plucking(pluck, capo, velocities) {
 // Strumming function
 export async function strumming(direction, capo, duration) {
     let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
-    console.log(`Strumming in direction: ${direction} with duration: ${duration}ms`);
+    console.log(`direction: ${direction} with duration: ${duration}ms`);
 
     duration = Math.floor(duration) * 4 / sturmOrder.length;
 

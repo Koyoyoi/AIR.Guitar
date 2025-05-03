@@ -60,14 +60,6 @@ async function setupCamera() {
                 const mouseY = (e.clientY - rect.top) * scaleY;
                 
                 const checkArea = draw_midiPortArea();
-                console.log(`Canvas 被點擊，位置: (${mouseX}, ${mouseY})`);
-                console.log("控制區 Y:", checkArea.y);
-                console.log("控制區高度:", checkArea.height);
-            
-                console.log("mouseX >= checkArea.x:", mouseX >= checkArea.x);
-                console.log("mouseX <= checkArea.x + checkArea.width:", mouseX <= checkArea.x + checkArea.w);
-                console.log("mouseY >= checkArea.y:", mouseY >= checkArea.y);
-                console.log("mouseY <= checkArea.y + checkArea.height:", mouseY <= checkArea.y + checkArea.h);
             
                 if (
                     mouseX >= checkArea.x &&
