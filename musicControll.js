@@ -1,10 +1,10 @@
-import { buildGuitarChord, plucking, strumming, mapRange } from "./MIDI.js";
+import { buildGuitarChord, plucking, strumming, mapRange, initMIDI } from "./MIDI.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
 import { handData, poseData, video } from "./main.js"
 import { predict } from "./SVM.js";
-import { drawCapo, drawGesture } from "./draw.js";
+import {  drawCapo, drawGesture } from "./draw.js";
 
-export let capo = 0;
+export let capo = 0, portOpen = false;
 
 let gesture = '', prevGesture = '';
 let armAngles = [];
@@ -97,4 +97,9 @@ export async function capoCtrl() {
     }
     timeCnt += 1;
     drawCapo(capo)
+}
+
+export async function portCtrl() {
+    portOpen = !portOpen
+    if(portOpen) {await initMIDI()}
 }

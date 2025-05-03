@@ -1,5 +1,6 @@
 import { ctx, canvas, video, uploadedImage } from "./main.js";
 import { rootTab, revRootTab } from "./MIDI.js";
+import { portOpen } from "./musicControll.js";
 
 let imgH = 0, imgW = 0
 
@@ -27,24 +28,24 @@ export function drawGesture(gesture, capo) {
     // 畫出手勢文字(左上角)
     let transName = ""
     let posX = 50, posY = 50;
- 
+
     ctx.font = "100px Arial";
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    
+
     // transpose re-name and re-position
     if (capo != 0) {
         transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]}${gesture.slice(1)})`
     }
     if (video.videoHeight - imgH > video.videoWidth / 2 - imgW) {
-        posY += imgH- 30
+        posY += imgH - 30
     }
     else if (video.videoHeight - imgH < video.videoWidth / 2 - imgW) {
         posX += imgW
     }
 
-    ctx.fillText(`${gesture} ${transName}`, posX, posY);  
+    ctx.fillText(`${gesture} ${transName}`, posX, posY);
 }
 
 export function drawCapo(capo) {
@@ -53,7 +54,7 @@ export function drawCapo(capo) {
     ctx.fillStyle = "#00AA90";
     ctx.textAlign = "right";
     ctx.textBaseline = "top";
-    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);  
+    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);
 }
 
 export function drawImg() {
@@ -74,18 +75,6 @@ export function drawImg() {
     ctx.drawImage(uploadedImage, 0, 0, imgW, imgH);
 }
 
-// 儲存控制區的位置（供滑鼠點擊時使用）
-export let midiCtrlArea = {
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0
-};
-
-export function getMIDIctrlArea() {
-    return midiCtrlArea;
-}
-
 function drawRoundedRect(x, y, width, height, radius) {
     ctx.beginPath();
     ctx.moveTo(x + radius, y);
@@ -100,30 +89,30 @@ function drawRoundedRect(x, y, width, height, radius) {
     ctx.closePath();
 }
 
-export function drawMIDIportCtrl(portName) {
-    const boxWidth = canvas.width * 0.3;
-    const boxHeight = canvas.height * 0.08;
-    const margin = 30;
+export function draw_midiPortArea() {
     const radius = 20;
 
-    const x = margin;
-    const y = canvas.height - margin - boxHeight;
+    let midiPortArea = {
+        x: 30,
+        y: canvas.height - 30 - canvas.height * 0.08,
+        w: canvas.width * 0.2,
+        h: canvas.height * 0.08
+    };
 
-    // 更新範圍資訊
-    midiCtrlArea = { x, y, width: boxWidth, height: boxHeight };
-
-    drawRoundedRect(x, y, boxWidth, boxHeight, radius);
-    ctx.fillStyle = "#FFD700";
+    drawRoundedRect(midiPortArea.x, midiPortArea.y, midiPortArea.w, midiPortArea.h, radius);
+    ctx.fillStyle = "#434343";
     ctx.fill();
     ctx.lineWidth = 3;
-    ctx.strokeStyle = "#444";
+    ctx.strokeStyle = "#1c1c1c";
     ctx.stroke();
 
-    ctx.font = `${boxHeight * 0.4}px Arial`;
-    ctx.fillStyle = "#000";
+    ctx.font = `${midiPortArea.h * 0.5}px Arial`;
+    ctx.fillStyle = portOpen ? "#00AA90" : "#787d7b";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(`MIDI: ${portName}`, x + boxWidth / 2, y + boxHeight / 2);
+    ctx.fillText(`MIDI : ${portOpen ? 'on' : 'off'}`, midiPortArea.x + midiPortArea.w / 2, midiPortArea.y + midiPortArea.h / 2);
+
+    return midiPortArea
 }
 
 

@@ -1,3 +1,5 @@
+import { portOpen } from "./musicControll.js";
+
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundMap = {};  // 儲存每個音高對應的 AudioBuffer
 
@@ -134,11 +136,11 @@ export async function plucking(pluck, capo, velocities) {
     });
 
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
-    if (!outport) {
+    if (!portOpen) {
         for (let [note, velocity] of notes) {
             await playSample(note + capo, velocity); // 播放 sample
         }
-    } else {
+    } else if(outport){
         // 發送 MIDI 訊號 (如果有 MIDI 設備)
         notes.forEach(([note, velocity]) => {
             outport.send([0x90, note + capo, velocity]); // 發送 note_on 訊號
@@ -150,7 +152,7 @@ export async function plucking(pluck, capo, velocities) {
                 outport.send([0x90, note + capo, 0]); // 發送 note_off 訊號
             });
         }, 1000);  // 持續時間轉換為毫秒
-    }
+    } else {console.log('midi port no device.')}
 }
 
 // Strumming function
@@ -161,12 +163,12 @@ export async function strumming(direction, capo, duration) {
     duration = Math.floor(duration) * 4 / sturmOrder.length;
 
     // 如果沒有 MIDI 設備 (outport 沒有設定)，使用 Web Audio 播放音檔
-    if (!outport) {
+    if (!portOpen) {
         for (let n of sturmOrder) {
             await playSample(n + capo, 127);
             await sleep(duration);
         }
-    } else {
+    } else if (outport){
         // 如果有 MIDI 設備，發送 MIDI 訊號
         for (let n of sturmOrder) {
             outport.send([0x90, n + capo, 127]); // note_on
@@ -178,7 +180,7 @@ export async function strumming(direction, capo, duration) {
             outport.send([0x80, n + capo, 0]); // note_off
             await sleep(duration * 1.5);
         }
-    }
+    } else {console.log('midi port no device.')}
 }
 
 
