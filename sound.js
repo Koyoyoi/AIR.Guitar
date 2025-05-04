@@ -1,3 +1,4 @@
+import { draw_singleNote } from "./Draw/drawMIDI.js";
 import { portOpen, sampleName } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
 
 export const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
@@ -13,22 +14,6 @@ export const instruments = [
     "overdriven_guitar",
     "distortion_guitar",
     "guitar_harmonics",]
-
-// 載入 sample 音色
-export async function loadSamples() {
-    Soundfont.instrument(audioContext, instruments[sampleName], {
-        soundfont: 'FluidR3_GM', // 使用 FluidR3_GM SoundFont
-    }).then(function (loadedPiano) {
-        soundSample = loadedPiano; // 載入完成後，將音色樣本儲存
-    });
-
-    console.log(`${instruments[sampleName]} loaded.`);
-
-    if (audioContext.state === 'suspended') {
-        audioContext.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
-        console.log('AudioContext 已啟用');
-    }
-}
 
 // 和弦類型表
 const chordTab = {
@@ -75,6 +60,22 @@ export async function initMIDI() {
             console.error("MIDI access failed", err);
             return false;
         });
+}
+
+// 載入 sample 音色
+export async function loadSamples() {
+    Soundfont.instrument(audioContext, instruments[sampleName], {
+        soundfont: 'FluidR3_GM', // 使用 FluidR3_GM SoundFont
+    }).then(function (loadedPiano) {
+        soundSample = loadedPiano; // 載入完成後，將音色樣本儲存
+    });
+
+    console.log(`${instruments[sampleName]} loaded.`);
+
+    if (audioContext.state === 'suspended') {
+        audioContext.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
+        console.log('AudioContext 已啟用');
+    }
 }
 
 // 根據手勢建立吉他和弦（例如 "C"、"Cm" 等）
@@ -128,10 +129,9 @@ export async function plucking(pluck, capo, velocities) {
     if (!portOpen) {
         for (let [note, velocity] of notes) {
             const midiNote = note + capo;
-
+            draw_singleNote(midiNote, velocity, 10)
             soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
             console.log(`播放音符：${midiNote}, 音量：${velocity}`);
-
         }
     } else if (outport) {
         // 發送 MIDI 訊號 (如果有 MIDI 設備)

@@ -5,7 +5,7 @@ import { initMIDI, buildGuitarChord, loadSamples } from "./sound.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js"
 import { load_SVM_Model } from "./SVM.js";
-import { draw_midiAnimation } from "./Draw/drawMIDI.js";
+import { draw_midiAnimation, draw_singleNote } from "./Draw/drawMIDI.js";
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
@@ -69,6 +69,9 @@ async function setupCamera() {
 
                 draw_midiPortArea();
                 draw_sampleNameArea();
+
+                draw_singleNote(60,127,10)
+
 
                 mouse.X = 0
                 mouse.Y = 0
@@ -150,10 +153,13 @@ window.onload = async function () {
     });
 };
 
+
 // 手勢與姿勢偵測主函式
 async function detect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+
 
     // 繪製上傳的圖片與 MIDI 控制區域
     if (uploadedImage) { drawImg() }
