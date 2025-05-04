@@ -2,9 +2,7 @@ import { draw_singleNote } from "./Draw/drawMIDI.js";
 import { portOpen, sampleName } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
 
 export const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
-
 export let soundSample; // 儲存音色樣本
-
 export const instruments = [
     "acoustic_guitar_nylon",
     "acoustic_guitar_steel",
@@ -21,19 +19,19 @@ const chordTab = {
     "m": [0, 3, 7],  // minor 小調
     "dim": [0, 3, 6] // Dim 減和弦
 };
-
 // 根音對應表
 export const rootTab = {
     "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
     "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
 };
+// 反向對應表
 export const revRootTab = Object.fromEntries(
     Object.entries(rootTab).map(([k, v]) => [v, k])
 );
 
 const guitarStandard = [40, 45, 50, 55, 59, 64];  // 吉他標準調音
-let outport = null;  // 儲存 MIDI 輸出端口
-let guitarChord = [], pluckNotes = []  // 儲存吉他和弦與挑弦音符
+let outport = null;                               // 儲存 MIDI 輸出端口
+let guitarChord = [], pluckNotes = []             // 儲存吉他和弦與挑弦音符
 
 // 初始化 MIDI
 export async function initMIDI() {

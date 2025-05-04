@@ -1,7 +1,7 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { initMIDI, buildGuitarChord, loadSamples } from "./sound.js";
+import { initMIDI, buildGuitarChord, loadSamples, mapRange } from "./sound.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js"
 import { load_SVM_Model } from "./SVM.js";
@@ -13,7 +13,7 @@ export let midiCanvas, midiCtx;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
 export let mouse = { X: 0, Y: 0 }
-export let noteSequence = null;
+export let noteSequence = [];
 
 // 設置相機（video）並初始化畫布（canvas）和相關設定
 async function setupCamera() {
@@ -70,7 +70,7 @@ async function setupCamera() {
                 draw_midiPortArea();
                 draw_sampleNameArea();
 
-                draw_singleNote(60,127,10)
+                draw_singleNote(60, 127, 10)
 
 
                 mouse.X = 0
@@ -135,13 +135,22 @@ window.onload = async function () {
                 const blob = new Blob([arrayBuffer], { type: "audio/midi" });
 
                 // load MIDI 檔案
-                noteSequence = await mm.blobToNoteSequence(blob);
-
+                let midifile = await mm.blobToNoteSequence(blob);
+                noteSequence = midifile.notes.map(note => ({
+                    pitch: note.pitch,
+                    v: note.velocity,
+                    start: note.startTime,
+                    end: note.endTime,
+                    x: canvas.width, // 起始 X 座標（畫面右側）
+                    y: mapRange(note.pitch, 24, 96, video.videoHeight, 0),
+                    w: note.endTime - note.startTime,
+                    h: 15
+                }));
+                console.log(noteSequence)
                 console.log("🎶 MIDI 播放中...");
 
                 draw_midiAnimation();
-                noteSequence = null;
-
+             
             } catch (err) {
                 console.error("讀取 MIDI 發生錯誤：", err);
             }
@@ -154,12 +163,15 @@ window.onload = async function () {
 };
 
 
+export function reset(){
+    noteSequence = []
+}
+
+
 // 手勢與姿勢偵測主函式
 async function detect() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-
 
     // 繪製上傳的圖片與 MIDI 控制區域
     if (uploadedImage) { drawImg() }
