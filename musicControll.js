@@ -2,7 +2,7 @@ import { buildGuitarChord, plucking, strumming, mapRange, initMIDI, instruments,
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
 import { handData, poseData, video } from "./main.js"
 import { predict } from "./SVM.js";
-import {  drawCapo, drawGesture } from "./draw.js";
+import {  drawCapo, drawGesture } from "./Draw/drawInfo.js";
 
 export let capo = 0, portOpen = false, sampleName = 0 ;
 

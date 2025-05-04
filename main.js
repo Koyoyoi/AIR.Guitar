@@ -1,8 +1,8 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { capoCtrl, chordCtrl, pluckCtrl, portCtrl, strumCtrl } from "./musicControll.js";
+import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDI, buildGuitarChord, loadSamples } from "./sound.js";
-import { reCanva, drawImg, draw_midiPortArea, draw_sampleNameArea } from "./draw.js";
+import { reCanva, drawImg, draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
 
 // 全域變數

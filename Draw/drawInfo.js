@@ -1,6 +1,6 @@
-import { ctx, canvas, video, uploadedImage, mouse } from "./main.js";
-import { rootTab, revRootTab, instruments } from "./sound.js";
-import { portCtrl, portOpen, sampleCtrl, sampleName } from "./musicControll.js";
+import { ctx, canvas, video, uploadedImage, mouse } from "../main.js";
+import { rootTab, revRootTab, instruments } from "../sound.js";
+import { portCtrl, portOpen, sampleCtrl, sampleName } from "../musicControll.js";
 import { drawRect, drawTriangle } from "./drawGraph.js";
 
 let imgH = 0, imgW = 0

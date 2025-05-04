@@ -1,4 +1,4 @@
-import { ctx } from "./main.js";
+import { ctx } from "../main.js";
 
 export function drawTriangle(area, direction = "left", color = "#434343") {
     const { x, y, w, h } = area;
