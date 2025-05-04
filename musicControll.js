@@ -112,7 +112,5 @@ export async function sampleCtrl(c){
         sampleName += 1
     }
     sampleName = (instruments.length + sampleName) % instruments.length
-    console.log(sampleName)
     loadSamples();
-    
 }
