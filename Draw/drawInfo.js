@@ -9,13 +9,14 @@ export function reCanva() {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
+    // 計算寬度與高度
     let newWidth = windowWidth;
     let newHeight = newWidth / aspectRatio;
 
-    // 如果調整後的高度大於視窗高度，則根據視窗高度調整大小
-    if (newHeight > windowHeight) {
-        newHeight = windowHeight;
-        newWidth = newHeight * aspectRatio;
+    // 如果調整後的高度超過 900px 或視窗高度，則進行調整
+    if (newHeight > windowHeight || newHeight > 900) {
+        newHeight = Math.min(windowHeight, 900);  // 高度最大為 900px 或視窗高度
+        newWidth = newHeight * aspectRatio;  // 根據新的高度計算寬度
     }
 
     // 設置影片和畫布的寬高
@@ -24,7 +25,26 @@ export function reCanva() {
 
     canvas.style.width = video.style.width;
     canvas.style.height = video.style.height;
+
+    // 確保畫面在垂直方向居中顯示，並避免被遮擋
+    const verticalOffset = Math.max(0, (windowHeight - newHeight) / 2);  // 確保偏移量不為負數
+    video.style.position = 'absolute';
+    video.style.top = `${verticalOffset}px`;
+
+    canvas.style.position = 'absolute';
+    canvas.style.top = `${verticalOffset}px`;
+
+    // 檢查影片的高度是否與標題重疊，超過一定位置隱藏標題
+    const title = document.getElementById("title");
+    if (title) {
+        if (verticalOffset < 100) { // 例如，影片頂部與標題重疊時隱藏標題
+            title.style.display = 'none'; // 隱藏標題
+        } else {
+            title.style.display = 'block'; // 顯示標題
+        }
+    }
 }
+
 
 // 畫出手勢與轉調資訊
 export function drawGesture(gesture, capo) {
