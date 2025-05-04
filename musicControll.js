@@ -40,7 +40,6 @@ export async function pluckCtrl() {
         );
 
         if (diffPluck.length > 0) {
-            console.log(velocities)
             plucking(diffPluck, capo, velocities);
         }
         prevPluck = pluck.slice();
