@@ -1,5 +1,5 @@
 import { video, canvas, noteSequence } from "../main.js";
-import { drawCircle } from "./drawGraph.js";
+import { drawCircle} from "./drawGraph.js";
 import { mapRange, soundSample, audioContext } from "../sound.js";
 
 export async function draw_midiAnimation() {
@@ -19,7 +19,7 @@ export async function draw_midiAnimation() {
         x: canvas.width, // 起始 X 座標（畫面右側）
         y: mapRange(note.pitch, 24, 96, video.videoHeight, 0),
         w: (note.endTime - note.startTime) * pixelsPerSecond,
-        h: 20
+        h: 15
     }));
 
     const currentTime = audioContext.currentTime;
@@ -28,7 +28,7 @@ export async function draw_midiAnimation() {
         soundSample.play(
             note.pitch,
             currentTime + note.start,  // 延後播放
-            { gain: 2, velocity: note.v, duration: note.end - note.start }
+            { velocity: note.v, duration: note.end - note.start }
         );
     });
 
@@ -40,7 +40,17 @@ export async function draw_midiAnimation() {
             if (elapsed >= note.start) {
                 // 計算 X 位置，從畫布右側開始移動
                 note.x = canvas.width - (elapsed - note.start) * pixelsPerSecond; // X 位置向左移動
-                drawCircle(note.x, note.y, note.h / 2, "#EE9A9A");
+
+                // 使用 drawRect 函數繪製圓角矩形作為音符
+                const area = {
+                    x: note.x - note.w / 2,
+                    y: note.y,
+                    w: note.w,
+                    h: note.h
+                };
+
+                drawCircle(area, "#EE9A9A");
+
             }
         });
 
@@ -49,36 +59,6 @@ export async function draw_midiAnimation() {
             requestAnimationFrame(drawFrame);
         } else {
             console.log("✅ 動畫播放完畢");
-        }
-    }
-
-    requestAnimationFrame(drawFrame);
-}
-
-export async function draw_singleMIDI(note, velocity, duration) {
-    const startTime = performance.now();
-    const pixelsPerSecond = 100;
-
-    const n = {
-        pitch: note,
-        v: velocity,
-        start: 0,
-        end: duration,
-        x: canvas.width,
-        y: mapRange(note, 24, 96, video.videoHeight, 0),
-        w: duration * pixelsPerSecond,
-        h: 20
-    };
-
-    function drawFrame(now) {
-        const elapsed = (now - startTime) / 1000;
-        n.x = canvas.width - (elapsed - n.start) * pixelsPerSecond;
-        drawCircle(n.x, n.y, n.h / 2, "#EE9A9A");
-
-        if (n.x > canvas.width / 2) {
-            requestAnimationFrame(drawFrame);
-        } else {
-            console.log("✅ 單一音符動畫播放完畢");
         }
     }
 

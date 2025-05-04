@@ -1,6 +1,7 @@
 import { portOpen, sampleName } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
 
 export const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
+
 export let soundSample; // 儲存音色樣本
 
 export const instruments = [
@@ -28,6 +29,14 @@ export async function loadSamples() {
         console.log('AudioContext 已啟用');
     }
 }
+
+// 和弦類型表
+const chordTab = {
+    "": [0, 4, 7],   // Major 大調
+    "m": [0, 3, 7],  // minor 小調
+    "dim": [0, 3, 6] // Dim 減和弦
+};
+
 // 根音對應表
 export const rootTab = {
     "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
@@ -36,12 +45,6 @@ export const rootTab = {
 export const revRootTab = Object.fromEntries(
     Object.entries(rootTab).map(([k, v]) => [v, k])
 );
-// 和弦類型表
-const chordTab = {
-    "": [0, 4, 7],   // Major 大調
-    "m": [0, 3, 7],  // minor 小調
-    "dim": [0, 3, 6] // Dim 減和弦
-};
 
 const guitarStandard = [40, 45, 50, 55, 59, 64];  // 吉他標準調音
 let outport = null;  // 儲存 MIDI 輸出端口
