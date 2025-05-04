@@ -12,7 +12,7 @@ export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
 export let mouse = {X: 0, Y: 0}
-export let noteSequence;
+export let noteSequence = null;
 
 // 設置相機（video）並初始化畫布（canvas）和相關設定
 async function setupCamera() {
@@ -133,7 +133,8 @@ window.onload = async function () {
                 console.log("🎶 MIDI 播放中...");
 
                 draw_midiAnimation();
-                
+                noteSequence = null;
+
             } catch (err) {
                 console.error("讀取 MIDI 發生錯誤：", err);
             }
