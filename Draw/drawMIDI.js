@@ -21,7 +21,7 @@ export async function draw_midiAnimation() {
     const startTime = performance.now(); // 動畫起始時間
     const pixelsPerSecond = 100; // 控制滑動速度
     const videoHeight = video.videoHeight; // 使用影片的高度
-    const noteHeight = 10; // 音符的高度
+    const noteHeight = 9; // 音符的高度
 
     function drawFrame(now) {
         const elapsed = (now - startTime) / 1000; // 秒為單位
