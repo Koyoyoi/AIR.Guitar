@@ -146,7 +146,7 @@ window.onload = async function () {
                     w: note.endTime - note.startTime,
                     h: 15
                 }));
-                console.log(noteSequence)
+                
                 console.log("🎶 MIDI 播放中...");
 
                 draw_midiAnimation();

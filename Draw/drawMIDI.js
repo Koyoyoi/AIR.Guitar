@@ -7,6 +7,7 @@ export async function draw_midiAnimation() {
         console.warn("⚠️ 沒有 MIDI 音符可顯示！");
         return;
     }
+    console.log(noteSequence)
 
     const startTime = performance.now(); // 動畫起始時間
     const pixelsPerSecond = 100; // 控制滑動速度
@@ -42,6 +43,7 @@ export async function draw_midiAnimation() {
         });
     
         const endTime = Math.max(...noteSequence.map(n => n.end));
+        console.log(elapsed , endTime + 2)
         if (elapsed < endTime + 2) {
             requestAnimationFrame(drawFrame);
         } else {

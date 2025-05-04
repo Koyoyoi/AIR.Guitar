@@ -1,5 +1,6 @@
-import { draw_singleNote } from "./Draw/drawMIDI.js";
+import { draw_midiAnimation, draw_singleNote } from "./Draw/drawMIDI.js";
 import { portOpen, sampleName } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
+import { noteSequence, canvas } from "./main.js";
 
 export const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
 export let soundSample; // 儲存音色樣本
@@ -127,10 +128,11 @@ export async function plucking(pluck, capo, velocities) {
     if (!portOpen) {
         for (let [note, velocity] of notes) {
             const midiNote = note + capo;
-            draw_singleNote(midiNote, velocity, 10)
+            
             soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
             console.log(`播放音符：${midiNote}, 音量：${velocity}`);
         }
+
     } else if (outport) {
         // 發送 MIDI 訊號 (如果有 MIDI 設備)
         // note_on
