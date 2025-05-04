@@ -5,12 +5,14 @@ import { initMIDI, buildGuitarChord, loadSamples } from "./sound.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js"
 import { load_SVM_Model } from "./SVM.js";
+import { draw_midiAnimation } from "./Draw/drawMIDI.js";
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
 export let mouse = {X: 0, Y: 0}
+export let noteSequence;
 
 let soundFontPlayer;
 
@@ -137,13 +139,16 @@ window.onload = async function () {
                 const blob = new Blob([arrayBuffer], { type: "audio/midi" });
 
                 // 播放 MIDI 檔案
-                const noteSequence = await mm.blobToNoteSequence(blob);
+                noteSequence = await mm.blobToNoteSequence(blob);
 
                 // 載入音效並播放
                 await soundFontPlayer.loadSamples(noteSequence); 
                 soundFontPlayer.start(noteSequence);
 
                 console.log("🎶 MIDI 播放中...");
+
+                draw_midiAnimation();
+                
             } catch (err) {
                 console.error("讀取 MIDI 發生錯誤：", err);
                 alert("無法播放 MIDI 檔案。");
