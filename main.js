@@ -14,8 +14,6 @@ export let uploadedImage = null;
 export let mouse = {X: 0, Y: 0}
 export let noteSequence;
 
-let soundFontPlayer;
-
 // 設置相機（video）並初始化畫布（canvas）和相關設定
 async function setupCamera() {
     video = document.createElement("video");
@@ -91,15 +89,6 @@ window.onload = async function () {
         return;
     }
 
-    soundFontPlayer = new mm.SoundFontPlayer(
-        'https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus'
-    );
-
-    // 等待 SoundFont 樣本加載完成
-    soundFontPlayer.onSamplesLoaded = function () {
-        console.log("SoundFont Loaded！");
-    };
-
     // 處理上傳檔案（圖片或 MIDI 檔案）
     document.getElementById("file-upload").addEventListener("change", async function (event) {
         const file = event.target.files[0];
@@ -138,12 +127,8 @@ window.onload = async function () {
                 const arrayBuffer = await file.arrayBuffer();
                 const blob = new Blob([arrayBuffer], { type: "audio/midi" });
 
-                // 播放 MIDI 檔案
+                // load MIDI 檔案
                 noteSequence = await mm.blobToNoteSequence(blob);
-
-                // 載入音效並播放
-                await soundFontPlayer.loadSamples(noteSequence); 
-                soundFontPlayer.start(noteSequence);
 
                 console.log("🎶 MIDI 播放中...");
 
@@ -151,9 +136,10 @@ window.onload = async function () {
                 
             } catch (err) {
                 console.error("讀取 MIDI 發生錯誤：", err);
-                alert("無法播放 MIDI 檔案。");
             }
-        } else {
+        }
+        
+        else {
             alert("請上傳圖片或 MIDI 檔案！");
         }
     });

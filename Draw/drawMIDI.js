@@ -1,6 +1,6 @@
 import { video, canvas, noteSequence } from "../main.js";
 import { drawRect } from "./drawGraph.js";
-import { mapRange } from "../sound.js";
+import { mapRange, soundSample, audioContext } from "../sound.js";
 
 export async function draw_midiAnimation() {
     if (!noteSequence || !noteSequence.notes || noteSequence.notes.length === 0) {
@@ -13,6 +13,7 @@ export async function draw_midiAnimation() {
 
     const notes = noteSequence.notes.map(note => ({
         pitch: note.pitch,
+        v: note.velocity,
         start: note.startTime,
         end: note.endTime,
         x: canvas.width, // 起始 X 座標（畫面右側）
@@ -20,6 +21,16 @@ export async function draw_midiAnimation() {
         w: (note.endTime - note.startTime) * pixelsPerSecond,
         h: 9
     }));
+
+    const currentTime = audioContext.currentTime;
+
+    notes.forEach(note => {
+        soundSample.play(
+            note.pitch,
+            currentTime + note.start,  // 延後播放
+            { velocity: note.v, duration: note.end - note.start }
+        );
+    });
 
     function drawFrame(now) {
         const elapsed = (now - startTime) / 1000; // 秒為單位
@@ -37,6 +48,7 @@ export async function draw_midiAnimation() {
                     w: note.w,
                     h: note.h
                 };
+
                 drawRect(area, 5, "#EE9A9A"); // 圓角半徑為 5，顏色為 #EE9A9A
             }
         });

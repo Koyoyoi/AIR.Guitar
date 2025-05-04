@@ -1,8 +1,8 @@
 import { portOpen, sampleName } from "./musicControll.js";  // 從 musicControll.js 載入 portOpen 變數
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
+export const audioContext = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻上下文
 
-let soundSample; // 儲存音色樣本
+export let soundSample; // 儲存音色樣本
 
 export const instruments = [
     "acoustic_guitar_nylon",
