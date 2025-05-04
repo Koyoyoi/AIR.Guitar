@@ -48,3 +48,11 @@ export function drawRect(area, radius, color = "#434343") {
 
     ctx.fill();  // 填充顏色
 }
+
+// 畫圓形的輔助函式
+export function drawCircle(x, y, radius, color = "#434343") {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+}
