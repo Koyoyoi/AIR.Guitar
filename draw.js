@@ -1,6 +1,7 @@
 import { ctx, canvas, video, uploadedImage, mouse } from "./main.js";
 import { rootTab, revRootTab, instruments } from "./sound.js";
 import { portCtrl, portOpen, sampleCtrl, sampleName } from "./musicControll.js";
+import { drawRect, drawTriangle } from "./drawGraph.js";
 
 let imgH = 0, imgW = 0
 
@@ -84,20 +85,7 @@ export function drawImg() {
     ctx.drawImage(uploadedImage, 0, 0, imgW, imgH);
 }
 
-// 畫圓角矩形的輔助函式
-function drawRoundedRect(x, y, width, height, radius) {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-}
+
 
 // 畫出 MIDI 控制區域
 export function draw_midiPortArea() {
@@ -111,12 +99,7 @@ export function draw_midiPortArea() {
     };
 
     // 畫圓角矩形區域
-    drawRoundedRect(Area.x, Area.y, Area.w, Area.h, radius);
-    ctx.fillStyle = "#434343";
-    ctx.fill();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = "#1c1c1c";
-    ctx.stroke();
+    drawRect(Area, 10)
 
     // 區域的狀態
     ctx.font = `700 ${Area.h * 0.5}px Arial`;
@@ -139,6 +122,10 @@ export function draw_midiPortArea() {
     }
 }
 
+
+
+
+
 export function draw_sampleNameArea() {
 
     // 區域的位置與大小
@@ -149,18 +136,6 @@ export function draw_sampleNameArea() {
         h: canvas.height * 0.08
     };
 
-    // 畫圓角矩形區域
-    drawRoundedRect(Area.x, Area.y, Area.w, Area.h, 10);
-    ctx.fillStyle = "#434343";
-    ctx.fill();
-
-    // 顯示 MIDI 控制區域的狀態
-    ctx.font = `700 ${Area.h * 0.5}px Arial`;
-    ctx.fillStyle = "#787d7b";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(`${instruments[sampleName]}`, Area.x + Area.w / 2, Area.y + Area.h / 2);
-
     // 繪製左右箭頭按鈕
     const buttonWidth = Area.h * 0.8;
     const buttonHeight = Area.h;
@@ -168,38 +143,34 @@ export function draw_sampleNameArea() {
 
     // 左側按鈕（三角形）
     let LButton = {
-        x: Area.x - 50,
+        x: Area.x - 60,
         y: buttonY,
         w: buttonWidth,
         h: buttonHeight
     };
-
-
-    // 畫左箭頭（實心三角形）
-    ctx.fillStyle = "#434343";
-    ctx.beginPath();
-    ctx.moveTo(LButton.x + LButton.w, LButton.y);
-    ctx.lineTo(LButton.x, LButton.y + LButton.h / 2);
-    ctx.lineTo(LButton.x + LButton.w, LButton.y + LButton.h);
-    ctx.closePath();
-    ctx.fill();
 
     // 右側按鈕（三角形）
     let RButton = {
-        x: Area.x + Area.w - buttonWidth + 50,
+        x: Area.x + Area.w - buttonWidth + 60,
         y: buttonY,
         w: buttonWidth,
         h: buttonHeight
     };
 
+
+    // 畫圓角矩形區域
+    drawRect(Area, 10);
     // 畫右箭頭（實心三角形）
-    ctx.fillStyle = "#434343";
-    ctx.beginPath();
-    ctx.moveTo(RButton.x , RButton.y);
-    ctx.lineTo(RButton.x + RButton.w, RButton.y + RButton.h / 2);
-    ctx.lineTo(RButton.x , RButton.y + RButton.h);
-    ctx.closePath();
-    ctx.fill();
+    drawTriangle(RButton, "right");
+    // 畫左箭頭（實心三角形）
+    drawTriangle(LButton, "left");
+
+    // 顯示 sample name 
+    ctx.font = `700 ${Area.h * 0.5}px Arial`;
+    ctx.fillStyle = "#787d7b";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(`${instruments[sampleName]}`, Area.x + Area.w / 2, Area.y + Area.h / 2);
 
     // 檢查是否點擊在按鈕上
     if (mouse.X != 0 && mouse.Y != 0) {
