@@ -120,13 +120,11 @@ function sleep(ms) {
 // 撥弦
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
-    const noteSequence = { notes: [], totalTime: 0 }
-    console.log("Plucking notes:", pluck);
+   
     pluck.forEach((p, i) => {
         notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
     });
     
-
     if (!portOpen) {
         for (let [note, velocity] of notes) {
             const midiNote = note + capo;
