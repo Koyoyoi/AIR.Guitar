@@ -1,4 +1,4 @@
-import { ctx, canvas, video, uploadedImage} from "../main.js";
+import { ctx, canvas, midiCtx, midiCanvas, video, uploadedImage} from "../main.js";
 import { rootTab, revRootTab } from "../sound.js";
 
 let imgH = 0, imgW = 0
@@ -26,6 +26,9 @@ export function reCanva() {
     canvas.style.width = video.style.width;
     canvas.style.height = video.style.height;
 
+    midiCanvas.style.width = video.style.width;
+    midiCanvas.style.height = video.style.height;
+
     // 確保畫面在垂直方向居中顯示，並避免被遮擋
     const verticalOffset = Math.max(0, (windowHeight - newHeight) / 2);  // 確保偏移量不為負數
     video.style.position = 'absolute';
@@ -33,6 +36,9 @@ export function reCanva() {
 
     canvas.style.position = 'absolute';
     canvas.style.top = `${verticalOffset}px`;
+
+    midiCanvas.style.position = 'absolute';
+    midiCanvas.style.top = `${verticalOffset}px`;
 
     // 檢查影片的高度是否與標題重疊，超過一定位置隱藏標題
     const title = document.getElementById("title");

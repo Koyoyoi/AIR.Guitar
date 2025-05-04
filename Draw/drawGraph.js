@@ -1,4 +1,4 @@
-import { ctx } from "../main.js";
+import { ctx, midiCtx } from "../main.js";
 
 export function drawTriangle(area, direction = "left", color = "#434343") {
     const { x, y, w, h } = area;
@@ -54,8 +54,8 @@ export function drawCircle(area, color) {
     const centerY = area.y + area.h / 2;
     const radius = area.h / 2;
 
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
-    ctx.fill();
+    midiCtx.beginPath();
+    midiCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    midiCtx.fillStyle = color;
+    midiCtx.fill();
 }

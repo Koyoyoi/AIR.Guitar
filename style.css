@@ -24,12 +24,23 @@ body {
 
 canvas {
     position: absolute;
-    top: 100px;  
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #1c1c1c;
-    z-index: 1;  
+    top: 100px;  /* 調整距離頂部的距離 */
+    left: 50%;   /* 水平居中 */
+    transform: translateX(-50%);  /* 精確居中 */
+    background-color: #1c1c1c;  /* 背景顏色 */
 }
+
+#myCanvas {
+    z-index: 0; /* 底層：畫影像與手勢 */
+    background-color: #1c1c1c;
+}
+
+#midiCanvas {
+    z-index: 1;
+    pointer-events: none;
+    background-color: transparent; /* 確保透明背景 */
+}
+
 
 /* loading 樣式與動畫 */
 #loading {

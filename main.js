@@ -9,9 +9,10 @@ import { draw_midiAnimation } from "./Draw/drawMIDI.js";
 
 // 全域變數
 export let video, canvas, ctx, drawingUtils;
+export let midiCanvas, midiCtx;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
-export let mouse = {X: 0, Y: 0}
+export let mouse = { X: 0, Y: 0 }
 export let noteSequence = null;
 
 // 設置相機（video）並初始化畫布（canvas）和相關設定
@@ -33,6 +34,9 @@ async function setupCamera() {
     canvas = document.getElementById("myCanvas");
     ctx = canvas.getContext("2d");
     drawingUtils = new DrawingUtils(ctx);
+    midiCanvas = document.getElementById("midiCanvas");
+    midiCtx = midiCanvas.getContext("2d");
+
 
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
@@ -65,7 +69,7 @@ async function setupCamera() {
 
                 draw_midiPortArea();
                 draw_sampleNameArea();
-                
+
                 mouse.X = 0
                 mouse.Y = 0
             });
@@ -139,7 +143,7 @@ window.onload = async function () {
                 console.error("讀取 MIDI 發生錯誤：", err);
             }
         }
-        
+
         else {
             alert("請上傳圖片或 MIDI 檔案！");
         }
