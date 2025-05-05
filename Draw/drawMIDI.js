@@ -1,6 +1,6 @@
 import { noteSequence, canvas } from "../main.js";
 import { drawCircle } from "./drawGraph.js";
-import { audioContext, soundSample, mapRange } from "../sound.js";
+import { audioCtx, soundSample, mapRange } from "../sound.js";
 
 // 繪製整個 MIDI 音符序列的動畫
 export async function draw_midiAnimation() {
@@ -12,7 +12,7 @@ export async function draw_midiAnimation() {
     const startTime = performance.now(); // 動畫起始時間
     const pixelsPerSecond = 100;         // 控制滑動速度
 
-    const currentTime = audioContext.currentTime;
+    const currentTime = audioCtx.currentTime;
 
     // 播放所有音符
     noteSequence.forEach(note => {

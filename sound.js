@@ -1,7 +1,7 @@
 import { portOpen, sampleName } from "./musicControll.js";  // 載入 MIDI 端口狀態與音色樣本名稱
 
 // 創建音頻上下文，處理音頻的播放
-export const audioContext = new (window.AudioContext || window.webkitAudioContext)(); 
+export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
 export let soundSample; // 儲存音色樣本
 // 預設的樂器列表
 export const instruments = [
@@ -9,24 +9,21 @@ export const instruments = [
     "electric_guitar_clean", "electric_guitar_muted", "overdriven_guitar", 
     "distortion_guitar", "guitar_harmonics",
 ];
-
-// 和弦類型表，根據和弦的字母符號選擇不同的音程
+// 根音對應表
+export const rootTab = {
+    "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
+    "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
+};
+// 反向根音對應表
+export const revRootTab = Object.fromEntries(
+    Object.entries(rootTab).map(([k, v]) => [v, k])
+);
+// 和弦類型表
 const chordTab = {
     "": [0, 4, 7],   // Major 大調
     "m": [0, 3, 7],  // minor 小調
     "dim": [0, 3, 6] // Dim 減和弦
 };
-
-// 根音對應表，將字母表示的音符轉換為對應的數字
-export const rootTab = {
-    "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,
-    "F#": 6, "G": 7, "G#": 8, "A": 9, "A#": 10, "B": 11
-};
-
-// 反向根音對應表，將數字轉換為對應的字母
-export const revRootTab = Object.fromEntries(
-    Object.entries(rootTab).map(([k, v]) => [v, k])
-);
 
 // 標準吉他音高（從低音弦到高音弦）
 const guitarStandard = [40, 45, 50, 55, 59, 64]; 
@@ -63,7 +60,7 @@ export async function initMIDI() {
 
 // 載入音色樣本，選擇相應的樂器並初始化
 export async function loadSamples() {
-    Soundfont.instrument(audioContext, instruments[sampleName], {
+    Soundfont.instrument(audioCtx, instruments[sampleName], {
         soundfont: 'FluidR3_GM', // 使用 FluidR3_GM SoundFont
     }).then(function (loadedPiano) {
         soundSample = loadedPiano; // 載入完成後，將音色樣本儲存
@@ -71,8 +68,8 @@ export async function loadSamples() {
 
     console.log(`${instruments[sampleName]} loaded.`);
 
-    if (audioContext.state === 'suspended') {
-        audioContext.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
         console.log('AudioContext 已啟用');
     }
 }
@@ -129,7 +126,7 @@ export async function plucking(pluck, capo, velocities) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
         notes.forEach(([note, velocity]) => {
             const midiNote = note + capo; // 計算實際的 MIDI 音符
-            soundSample.play(midiNote, audioContext.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
+            soundSample.play(midiNote, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
             console.log(`播放音符：${midiNote}, 音量：${velocity}`);
         });
 
@@ -158,7 +155,7 @@ export async function strumming(direction, capo, duration) {
     if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
         for (let n of sturmOrder) {
-            soundSample.play(n + capo, audioContext.currentTime, { gain: 4, duration: 1 });
+            soundSample.play(n + capo, audioCtx.currentTime, { gain: 4, duration: 1 });
             await sleep(duration);
         }
     } else if (outport) {
