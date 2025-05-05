@@ -127,10 +127,6 @@ window.onload = async function () {
                     v: note.velocity,
                     start: note.startTime,
                     end: note.endTime,
-                    x: canvas.width,
-                    y: mapRange(note.pitch, 24, 96, video.videoHeight, 0),
-                    w: note.endTime - note.startTime,
-                    h: 15
                 }));
 
                 console.log("🎶 MIDI 播放中...");
@@ -147,12 +143,6 @@ window.onload = async function () {
         }
     });
 };
-
-
-// 外部重設函式 
-export function reset() {
-    noteSequence = [];
-}
 
 // 主偵測函式：處理即時畫面、偵測、與音樂互動 
 async function detect() {
