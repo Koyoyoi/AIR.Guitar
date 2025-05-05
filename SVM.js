@@ -67,9 +67,8 @@ export async function load_SVM_Model() {
     }
 }
 
-// 假设 parameters 是一个数组
 export async function predict(parameters) {
-    // 构建 Python 代码
+    // python code part
     let pythonCode = `
         import numpy as np
 

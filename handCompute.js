@@ -66,7 +66,7 @@ export function compute(landmarks) {
     return parameters;
 }
 
-// 用手指角度來觸發播放哪些音符與速度
+// 用手指角度來觸發
 export async function fingerPlay(hand) {
     const angles = fingerAngle(hand);
     let pick = [], velocities = [];
