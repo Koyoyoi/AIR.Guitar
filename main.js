@@ -1,11 +1,11 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx } from "./sound.js";
+import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx , mapRange} from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
-import { draw_midiAnimation } from "./Draw/drawMIDI.js";
+import { draw_midiAnimation, animatePluck } from "./Draw/drawMIDI.js";
 
 //  全域變數宣告區 
 export let canvas = { base: {}, midi: {} };
@@ -122,24 +122,25 @@ window.onload = async function () {
 
                 // 使用 Magenta.js 解析 MIDI
                 let midifile = await mm.blobToNoteSequence(blob);
-                noteSequence = midifile.notes.map(note => ({
-                    pitch: note.pitch,
-                    v: note.velocity,
-                    start: note.startTime,
-                    end: note.endTime,
-                }));
 
-                console.log(noteSequence);
+                noteSequence = midifile.notes.map(note => (
+                    animatePluck(
+                        note.pitch,
+                        mapRange(note.pitch, 21, 108, 0, canvas['midi'].cvs.width),
+                        0 - note.startTime * 100,
+                        100
+                    )
+                ));
 
                 // 播放所有音符
-                noteSequence.forEach(note => {
+                midifile.notes.forEach(note => {
                     soundSample.play(
                         note.pitch,
-                        audioCtx.currentTime + note.start,    // 延後播放
-                        { velocity: note.v, duration: note.end - note.start }
+                        audioCtx.currentTime + note.startTime,    // 延後播放
+                        { velocity: note.velocity, duration: note.endTime - note.startTime }
                     );
                 });
-
+                
             } catch (err) {
                 console.error("讀取 MIDI 發生錯誤：", err);
             }
