@@ -1,3 +1,7 @@
+import { noteSequence, canvas } from "../main.js";
+import { drawCircle } from "./drawGraph.js";
+import { audioContext, soundSample } from "../sound.js";
+
 // 繪製整個 MIDI 音符序列的動畫
 export async function draw_midiAnimation() {
     if (!noteSequence || noteSequence.length == 0) {
@@ -22,12 +26,12 @@ export async function draw_midiAnimation() {
 
     function drawFrame(now) {
         const elapsed = (now - startTime) / 1000; // 已過時間（秒）
-        midiCtx.clearRect(0, 0, midiCanvas.width, midiCanvas.height); // 清除畫布
+        canvas['midi'].ctx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height); // 清除畫布
 
         // 畫出音符
         noteSequence.forEach(note => {
             if (elapsed >= note.start) {
-                note.x = canvas.width - (elapsed - note.start) * pixelsPerSecond;
+                note.x = canvas['midi'].cvs.width - (elapsed - note.start) * pixelsPerSecond;
 
                 const area = {
                     x: note.x - (note.w * 100) / 2,
@@ -44,9 +48,8 @@ export async function draw_midiAnimation() {
         if (elapsed < endTime + 2) {
             requestAnimationFrame(drawFrame); // 繼續播放動畫
         } else {
-            midiCtx.clearRect(0, 0, midiCanvas.width, midiCanvas.height); // 停止動畫並清除畫布
+            canvas['midi'].ctx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height); // 清除畫布
             console.log("✅ 動畫播放完畢");
-            reset(); // 重置
         }
     }
 
@@ -83,11 +86,11 @@ export async function draw_singleNote(note, velocity, duration) {
         const elapsed = (now - startTime) / 1000; // 計算經過的時間
 
         // 清除畫布
-        midiCtx.clearRect(0, 0, midiCanvas.width, midiCanvas.height);
+        midiCtx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height);
 
         if (elapsed >= noteData.start) {
             // 計算 X 位置，從畫布右側開始移動
-            noteData.x = canvas.width - (elapsed - noteData.start) * pixelsPerSecond;
+            noteData.x = canvas['midi'].cvs.width - (elapsed - noteData.start) * pixelsPerSecond;
 
             // 使用圓形繪製音符
             const area = {
@@ -103,7 +106,7 @@ export async function draw_singleNote(note, velocity, duration) {
         if (elapsed < noteData.end + 2) {
             requestAnimationFrame(drawFrame); // 繼續繪製動畫
         } else {
-            midiCtx.clearRect(0, 0, midiCanvas.width, midiCanvas.height); // 停止並清除畫布
+            midiCtx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height); // 停止並清除畫布
             console.log("✅ 動畫播放完畢");
         }
     }

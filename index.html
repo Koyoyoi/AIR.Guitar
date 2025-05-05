@@ -2,41 +2,30 @@
 <html lang="zh-TW">
 
 <head>
-    <meta charset="UTF-8"> <!-- 設定字元編碼為 UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 響應式設計 -->
-    <title>AIR Guitar</title> <!-- 頁面標題 -->
-
-    <!-- 引入 Magenta.js（AI 音樂工具） -->
-    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@latest"></script>
-
-    <!-- 引入 Pyodide（在瀏覽器執行 Python 的工具） -->
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js"></script>
-
-    <!-- 引入 Soundfont-Player（可播放 MIDI 音色） -->
-    <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
-
-    <!-- 模組化 JavaScript，載入 MediaPipe 相關邏輯 -->
-    <script type="module" src="./MediaPipe.js" defer></script>
-
-    <!-- 引入樣式表 -->
+    <meta charset="UTF-8">                                                 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">                   
+    <title>AIR Guitar</title>                                            
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@latest"></script>                                    <!-- Magenta -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js"></script>                              <!-- Pyodide -->
+    <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>     <!-- Soundfont-Player -->
+    <script type="module" src="./main.js" defer></script>                                                   
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- 頁面標題區塊 -->
     <div class="title" id="title"></div>
 
     <!-- 畫布區：分為兩個 canvas，主視覺與 MIDI 視覺呈現 -->
     <div class="canvas-wrapper">
-        <canvas id="myCanvas" width="1280" height="720"></canvas> <!-- 主畫布 -->
-        <canvas id="midiCanvas" width="1280" height="720"></canvas> <!-- 顯示 MIDI 音符等資訊 -->
+        <canvas id="baseCanvas" width="1280" height="720"></canvas>   <!-- 主畫布 -->
+        <canvas id="midiCanvas" width="1280" height="720"></canvas>   <!-- 顯示 MIDI 音符等資訊 -->
     </div>
 
     <!-- 檔案上傳區，支援 .mid、.png、.jpeg -->
     <div class="upload-section">
         <label for="file-upload" class="upload-box">
-            <span class="plus">+</span> <!-- 顯示 "+" 圖示 -->
+            <span class="plus">+</span> 
             <input type="file" id="file-upload" style="display: none" accept=".mid,.png,.jpeg" />
         </label>
     </div>

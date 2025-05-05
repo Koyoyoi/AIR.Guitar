@@ -1,7 +1,4 @@
-// 從其他模組載入函式
-import { draw_midiAnimation, draw_singleNote } from "./Draw/drawMIDI.js";
 import { portOpen, sampleName } from "./musicControll.js";  // 載入 MIDI 端口狀態與音色樣本名稱
-import { noteSequence, canvas } from "./main.js";
 
 // 創建音頻上下文，處理音頻的播放
 export const audioContext = new (window.AudioContext || window.webkitAudioContext)(); 

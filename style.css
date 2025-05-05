@@ -34,7 +34,7 @@ canvas {
 }
 
 /* 主畫布（顯示手勢與背景） */
-#myCanvas {
+#baseCanvas {
     z-index: 0; /* 底層 */
 }
 

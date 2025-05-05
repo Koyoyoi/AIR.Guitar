@@ -1,15 +1,15 @@
-// === 模組匯入區 ===
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
-import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDI, buildGuitarChord, loadSamples, mapRange } from "./sound.js";
-import { reCanva, drawImg } from "./Draw/drawInfo.js";
+import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js";
+import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
+import { draw_midiAnimation } from "./Draw/drawMIDI.js";
+import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
-import { draw_midiAnimation, draw_singleNote } from "./Draw/drawMIDI.js";
 
-// === 全域變數宣告區 ===
-export let video, canvas, ctx, drawingUtils;
+//  全域變數宣告區 
+export let canvas = {base: {}, midi: {}};
+export let video, drawingUtils;
 export let midiCanvas, midiCtx;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
@@ -17,7 +17,7 @@ export let mouse = { X: 0, Y: 0 };
 export let noteSequence = [];
 
 
-// === 相機設定與畫布初始化 ===
+// 相機設定與畫布初始化 
 async function setupCamera() {
     video = document.createElement("video");
     video.style.display = "none";
@@ -31,16 +31,14 @@ async function setupCamera() {
     video.srcObject = stream;
 
     // 設定畫布與繪圖環境
-    canvas = document.getElementById("myCanvas");
-    ctx = canvas.getContext("2d");
-    drawingUtils = new DrawingUtils(ctx);
-    midiCanvas = document.getElementById("midiCanvas");
-    midiCtx = midiCanvas.getContext("2d");
+    canvas['base'] = {cvs: document.getElementById("baseCanvas"), ctx : {}}
+    canvas['base'].ctx = canvas.base.cvs.getContext("2d")
+    drawingUtils = new DrawingUtils(canvas.base.ctx);
+    canvas['midi'] = {cvs: document.getElementById("midiCanvas"), ctx : {}}
+    canvas['midi'].ctx = canvas.midi.cvs.getContext("2d");
 
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
             console.log("Video size:", video.videoWidth, video.videoHeight);
 
             // 顯示標題
@@ -53,17 +51,16 @@ async function setupCamera() {
             document.querySelector(".upload-section")?.classList.add("show");
 
             // 點擊畫布時的事件：取得滑鼠座標並顯示 MIDI 控制
-            canvas.addEventListener("click", (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
+            canvas['base'].cvs.addEventListener("click", (e) => {
+                const rect = canvas['base'].cvs.getBoundingClientRect();
+                const scaleX = canvas['base'].cvs.width / rect.width;
+                const scaleY = canvas['base'].cvs.height / rect.height;
 
                 mouse.X = (e.clientX - rect.left) * scaleX;
                 mouse.Y = (e.clientY - rect.top) * scaleY;
 
                 draw_midiPortArea();
                 draw_sampleNameArea();
-                draw_singleNote(60, 127, 10); // 範例音符
 
                 // 重置滑鼠位置
                 mouse.X = 0;
@@ -118,7 +115,7 @@ window.onload = async function () {
         }
 
         // = 處理 MIDI 檔 =
-        else if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
+        if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const blob = new Blob([arrayBuffer], { type: "audio/midi" });
@@ -152,16 +149,15 @@ window.onload = async function () {
 };
 
 
-// === 外部重設函式 ===
+// 外部重設函式 
 export function reset() {
     noteSequence = [];
 }
 
-
-// === 主偵測函式：處理即時畫面、偵測、與音樂互動 ===
+// 主偵測函式：處理即時畫面、偵測、與音樂互動 
 async function detect() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas['base'].ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
+    canvas['base'].ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     // 若有上傳圖片則顯示
     if (uploadedImage) drawImg();
@@ -174,7 +170,7 @@ async function detect() {
     await detectHand();
     await detectPose();
 
-    // 音樂控制（依據手勢與姿勢）
+    // 音樂控制
     await chordCtrl();
     await pluckCtrl();
     await strumCtrl();
@@ -202,7 +198,7 @@ async function main() {
 }
 
 
-// === 等待 HTML 載入完成後啟動主程式 ===
+// 等待 HTML 載入完成後啟動主程式 
 window.addEventListener('DOMContentLoaded', async () => {
     await main();
 });

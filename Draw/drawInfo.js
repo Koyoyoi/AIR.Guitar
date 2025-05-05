@@ -1,5 +1,4 @@
-// 從 main.js 引入所需的變數
-import { ctx, canvas, midiCtx, midiCanvas, video, uploadedImage } from "../main.js";
+import { canvas, video, uploadedImage } from "../main.js";
 import { rootTab, revRootTab } from "../sound.js";
 
 // 用來儲存圖片的高度與寬度
@@ -25,22 +24,22 @@ export function reCanva() {
     video.style.width = `${newWidth}px`;
     video.style.height = `${newHeight}px`;
 
-    canvas.style.width = video.style.width;
-    canvas.style.height = video.style.height;
+    canvas['base'].cvs.style.width = video.style.width;
+    canvas['base'].cvs.style.height = video.style.height;
 
-    midiCanvas.style.width = video.style.width;
-    midiCanvas.style.height = video.style.height;
+    canvas['midi'].cvs.style.width = video.style.width;
+    canvas['midi'].cvs.style.height = video.style.height;
 
     // 計算並確保畫面垂直居中顯示，避免被遮擋
     const verticalOffset = Math.max(0, (windowHeight - newHeight) / 2);  // 確保偏移量不為負數
     video.style.position = 'absolute';
     video.style.top = `${verticalOffset}px`;
 
-    canvas.style.position = 'absolute';
-    canvas.style.top = `${verticalOffset}px`;
+    canvas['base'].cvs.style.position = 'absolute';
+    canvas['base'].cvs.style.top = `${verticalOffset}px`;
 
-    midiCanvas.style.position = 'absolute';
-    midiCanvas.style.top = `${verticalOffset}px`;
+    canvas['midi'].cvs.style.position = 'absolute';
+    canvas['midi'].cvs.style.top = `${verticalOffset}px`;
 
     // 檢查影片的高度是否與標題重疊，若重疊則隱藏標題
     const title = document.getElementById("title");
@@ -59,10 +58,10 @@ export function drawGesture(gesture, capo) {
     let posX = 50, posY = 50;
 
     // 設定文字樣式
-    ctx.font = "700 100px Arial";
-    ctx.fillStyle = "#00AA90";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
+    canvas['base'].ctx.font = "700 100px Arial";
+    canvas['base'].ctx.fillStyle = "#00AA90";
+    canvas['base'].ctx.textAlign = "left";
+    canvas['base'].ctx.textBaseline = "top";
 
     // 如果 capo 不為 0，則顯示轉調資訊
     if (capo != 0) {
@@ -78,21 +77,21 @@ export function drawGesture(gesture, capo) {
     }
 
     // 顯示手勢與轉調名稱
-    ctx.fillText(`${gesture} ${transName}`, posX, posY);
+    canvas['base'].ctx.fillText(`${gesture} ${transName}`, posX, posY);
 }
 
 // 繪製 capo 設定資訊，顯示在畫布的右上角
 export function drawCapo(capo) {
-    ctx.font = "700 80px Arial";  // 設定字型大小
-    ctx.fillStyle = "#00AA90";  // 設定顏色
-    ctx.textAlign = "right";  // 文字對齊右邊
-    ctx.textBaseline = "top";  // 文字基準線為上端
-    ctx.fillText(`Capo: ${capo}`, canvas.width - 50, 50);  // 顯示 capo 設定資訊
+    canvas['base'].ctx.font = "700 80px Arial";  // 設定字型大小
+    canvas['base'].ctx.fillStyle = "#00AA90";  // 設定顏色
+    canvas['base'].ctx.textAlign = "right";  // 文字對齊右邊
+    canvas['base'].ctx.textBaseline = "top";  // 文字基準線為上端
+    canvas['base'].ctx.fillText(`Capo: ${capo}`, canvas['base'].cvs.width - 50, 50);  // 顯示 capo 設定資訊
 }
 
 // 繪製上傳的圖片，並根據畫布大小調整圖片的大小
 export function drawImg() {
-    const maxImgHeight = canvas.height;  // 最大圖片高度為畫布高度
+    const maxImgHeight = canvas['base'].cvs.height;  // 最大圖片高度為畫布高度
     const naturalAspectRatio = uploadedImage.width / uploadedImage.height;  // 圖片的自然寬高比
 
     // 根據高度來縮放圖片
@@ -100,12 +99,12 @@ export function drawImg() {
     imgW = imgH * naturalAspectRatio;
 
     // 如果圖片寬度超過畫布的一半，則限制為畫布寬度的一半，並重新計算高度
-    const maxImgWidth = canvas.width / 2;
+    const maxImgWidth = canvas['base'].cvs.width / 2;
     if (imgW > maxImgWidth) {
         imgW = maxImgWidth;
         imgH = imgW / naturalAspectRatio;
     }
 
     // 在畫布上繪製上傳的圖片
-    ctx.drawImage(uploadedImage, 0, 0, imgW, imgH);
+    canvas['base'].ctx.drawImage(uploadedImage, 0, 0, imgW, imgH);
 }
