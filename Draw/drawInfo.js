@@ -7,8 +7,8 @@ let imgH = 0, imgW = 0;
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
     const aspectRatio = video.videoWidth / video.videoHeight; // 影片的寬高比
-    const windowWidth = window.innerWidth; // 取得視窗寬度
-    const windowHeight = window.innerHeight; // 取得視窗高度
+    const windowWidth = window.innerWidth;                    // 取得視窗寬度
+    const windowHeight = window.innerHeight;                  // 取得視窗高度
 
     // 計算新的寬度和高度
     let newWidth = windowWidth;
@@ -16,8 +16,8 @@ export function reCanva() {
 
     // 如果調整後的高度超過 900px 或視窗高度，則進行調整
     if (newHeight > windowHeight || newHeight > 900) {
-        newHeight = Math.min(windowHeight, 900);  // 高度最大為 900px 或視窗高度
-        newWidth = newHeight * aspectRatio;  // 根據新的高度計算寬度
+        newHeight = Math.min(windowHeight, 900);       // 高度最大為 900px 或視窗高度
+        newWidth = newHeight * aspectRatio;            // 根據新的高度計算寬度
     }
 
     // 設置影片和畫布的寬高
@@ -44,8 +44,8 @@ export function reCanva() {
     // 檢查影片的高度是否與標題重疊，若重疊則隱藏標題
     const title = document.getElementById("title");
     if (title) {
-        if (verticalOffset < 100) { // 例如，影片頂部與標題重疊時隱藏標題
-            title.style.display = 'none'; // 隱藏標題
+        if (verticalOffset < 100) {      
+            title.style.display = 'none';  // 隱藏標題
         } else {
             title.style.display = 'block'; // 顯示標題
         }
@@ -73,7 +73,7 @@ export function drawGesture(gesture, capo) {
         posY += imgH - 30;  // 調整文字的 Y 座標
     }
     else if (video.videoHeight - imgH < video.videoWidth / 2 - imgW) {
-        posX += imgW;  // 調整文字的 X 座標
+        posX += imgW;       // 調整文字的 X 座標
     }
 
     // 顯示手勢與轉調名稱
@@ -83,15 +83,15 @@ export function drawGesture(gesture, capo) {
 // 繪製 capo 設定資訊，顯示在畫布的右上角
 export function drawCapo(capo) {
     canvas['base'].ctx.font = "700 80px Arial";  // 設定字型大小
-    canvas['base'].ctx.fillStyle = "#00AA90";  // 設定顏色
-    canvas['base'].ctx.textAlign = "right";  // 文字對齊右邊
-    canvas['base'].ctx.textBaseline = "top";  // 文字基準線為上端
+    canvas['base'].ctx.fillStyle = "#00AA90";    // 設定顏色
+    canvas['base'].ctx.textAlign = "right";      // 文字對齊右邊
+    canvas['base'].ctx.textBaseline = "top";     // 文字基準線為上端
     canvas['base'].ctx.fillText(`Capo: ${capo}`, canvas['base'].cvs.width - 50, 50);  // 顯示 capo 設定資訊
 }
 
 // 繪製上傳的圖片，並根據畫布大小調整圖片的大小
 export function drawImg() {
-    const maxImgHeight = canvas['base'].cvs.height;  // 最大圖片高度為畫布高度
+    const maxImgHeight = canvas['base'].cvs.height;                         // 最大圖片高度為畫布高度
     const naturalAspectRatio = uploadedImage.width / uploadedImage.height;  // 圖片的自然寬高比
 
     // 根據高度來縮放圖片
