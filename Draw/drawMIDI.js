@@ -1,8 +1,9 @@
-import { noteSequence, canvas } from "../main.js";
+import { noteSequence, canvas, updateSeq } from "../main.js";
 import { drawCircle } from "./drawGraph.js";
 import { audioCtx, soundSample, mapRange } from "../sound.js";
 
-let seq
+export let seq = [];
+let startTime = performance.now()
 
 // 繪製整個 MIDI 音符序列的動畫
 export async function draw_midiAnimation() {
@@ -11,9 +12,9 @@ export async function draw_midiAnimation() {
         return;
     }
 
-    seq = noteSequence
-
-    const startTime = performance.now(); // 動畫起始時間
+    if(seq.length == 0){
+         startTime = performance.now();
+    } // 動畫起始時間
     const pixelsPerSecond = 100;         // 控制滑動速度
 
     const currentTime = audioCtx.currentTime;
@@ -26,6 +27,8 @@ export async function draw_midiAnimation() {
             { velocity: note.v, duration: note.end - note.start }
         );
     });
+
+    seq = noteSequence
 
     function drawFrame(now) {
         const elapsed = (now - startTime) / 1000; // 已過時間（秒）
@@ -50,6 +53,7 @@ export async function draw_midiAnimation() {
         });
         
         if (seq.length > 0) {
+            updateSeq();
             requestAnimationFrame(drawFrame); // 繼續播放動畫
         } else {
             canvas['midi'].ctx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height); 

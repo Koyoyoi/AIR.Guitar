@@ -1,9 +1,9 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { initMIDI, buildGuitarChord, loadSamples, mapRange } from "./sound.js";
+import { initMIDI, buildGuitarChord, loadSamples } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { draw_midiAnimation } from "./Draw/drawMIDI.js";
+import { draw_midiAnimation, seq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
 
@@ -78,6 +78,10 @@ async function setupCamera() {
     });
 }
 
+export function updateSeq(){
+    noteSequence = seq
+}
+
 // === 網頁載入完成後，處理檔案上傳邏輯（圖片或 MIDI）===
 window.onload = async function () {
     // 確保 Magenta.js 已載入（MIDI 用）
@@ -129,7 +133,7 @@ window.onload = async function () {
                     end: note.endTime,
                 }));
 
-                console.log("🎶 MIDI 播放中...");
+                console.log(noteSequence);
                 draw_midiAnimation(); // 播放動畫
 
             } catch (err) {

@@ -32,6 +32,7 @@ const guitarStandard = [40, 45, 50, 55, 59, 64];
 
 let outport = null; // 儲存 MIDI 輸出端口
 let guitarChord = [], pluckNotes = []; // 儲存吉他和弦與挑弦音符
+let startTime = performance.now();
 
 // 初始化 MIDI 端口，獲取並設置第一個可用的 MIDI 輸出端口
 export async function initMIDI() {
@@ -119,7 +120,11 @@ function sleep(ms) {
 // 撥弦函數，根據指定的音符與力度來播放音符
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
-   
+    
+    if(noteSequence.length == 0){
+        startTime = performance.now(); 
+    }
+    const now = performance.now();
     pluck.forEach((p, i) => {
         notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
     });
@@ -132,12 +137,12 @@ export async function plucking(pluck, capo, velocities) {
             console.log(`播放音符：${midiNote}, 音量：${velocity}`);
             noteSequence.push({
                 pitch: midiNote,
-                start: 0,
+                start: (now - startTime) / 1000,
                 end: 1.5,
                 v: velocity
             })
         });
-
+        console.log(noteSequence)
         draw_midiAnimation();
 
     } else if (outport) {
