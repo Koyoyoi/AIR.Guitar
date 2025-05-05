@@ -3,9 +3,9 @@ import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx } from "
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { draw_midiAnimation, seq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
+import { draw_midiAnimation } from "./Draw/drawMIDI.js";
 
 //  全域變數宣告區 
 export let canvas = { base: {}, midi: {} };
@@ -78,10 +78,6 @@ async function setupCamera() {
     });
 }
 
-export function updateSeq() {
-    noteSequence = seq
-}
-
 // === 網頁載入完成後，處理檔案上傳邏輯（圖片或 MIDI）===
 window.onload = async function () {
     // 確保 Magenta.js 已載入（MIDI 用）
@@ -134,7 +130,6 @@ window.onload = async function () {
                 }));
 
                 console.log(noteSequence);
-                draw_midiAnimation(); // 播放動畫
 
                 // 播放所有音符
                 noteSequence.forEach(note => {
@@ -198,6 +193,7 @@ async function main() {
     await initMIDI();            // MIDI 設定
     buildGuitarChord('C');       // 建立預設 C 和弦
     detect();                    // 開始主偵測循環
+    draw_midiAnimation();
 }
 
 

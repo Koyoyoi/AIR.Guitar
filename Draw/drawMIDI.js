@@ -1,53 +1,40 @@
-import { noteSequence, canvas, updateSeq } from "../main.js";
+import {  canvas, } from "../main.js";
 import { drawCircle } from "./drawGraph.js";
 import {  mapRange } from "../sound.js";
 
 export let seq = [];
-let startTime = performance.now()
 
-// 繪製整個 MIDI 音符序列的動畫
-export async function draw_midiAnimation() {
-    if (!noteSequence || noteSequence.length == 0) {
-        console.warn("⚠️ 沒有 MIDI 音符可顯示！");
-        return;
-    }
+export function animatePluck(midiNote) {
+    // 將音符加入動畫隊列
+    seq.push({
+        x: mapRange(midiNote, 21, 108, 0, canvas['midi'].cvs.width),  // 簡單取餘數決定 X 位置
+        y: 0,
+        note: midiNote,
+        speed: 100 + Math.random() * 50  // 隨機速度
+    });
+    console.log(seq)
+}
 
-    if(seq.length == 0){
-         startTime = performance.now();
-    } // 動畫起始時間
-    const pixelsPerSecond = 200;         // 控制滑動速度
-    seq = noteSequence
+let lastTime = performance.now();
 
-    function drawFrame(now) {
-        const elapsed = (now - startTime) / 1000; // 已過時間（秒）
-        canvas['midi'].ctx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height); 
+export async function draw_midiAnimation(now) {
+    const dt = (now - lastTime) / 1000;
+    lastTime = now;
 
-        // 畫出音符
-        seq = seq.filter(note => {
-            const posX = canvas['midi'].cvs.width - (elapsed - note.start) * pixelsPerSecond;
-        
-            // 如果剩下 x < 畫面10% 移除
-            if (posX >= canvas['midi'].cvs.width * 0.1) {
-                const area = {
-                    x: posX - ((note.end - note.start) * pixelsPerSecond) / 2,
-                    y: mapRange(note.pitch, 24, 96, canvas['midi'].cvs.height, 0),
-                    w: (note.end - note.start) * 100,
-                    h: 15
-                };
-                drawCircle(area, "#EE9A9A");
-                return true; // 保留這個 note
-            }
-            return false; // 過濾掉這個 note（即刪除）
-        });
-        
-        if (seq.length > 0) {
-            updateSeq();
-            requestAnimationFrame(drawFrame); // 繼續播放動畫
-        } else {
-            canvas['midi'].ctx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height); 
-            console.log("✅ 動畫播放完畢");
+    canvas['midi'].ctx.clearRect(0, 0, canvas['midi'].cvs.width, canvas['midi'].cvs.height);
+    seq.forEach((n, i) => {
+        n.y += n.speed * dt;
+        canvas['midi'].ctx.fillStyle = 'white';
+        canvas['midi'].ctx.fillRect(n.x, n.y, 10, 10);
+    });
+
+    // 移除已掉出畫布的音符
+    for (let i = seq.length - 1; i >= 0; i--) {
+        if (seq[i].y > canvas['midi'].cvs.height) {
+            seq.splice(i, 1);
         }
     }
 
-    requestAnimationFrame(drawFrame); // 開始動畫
+    requestAnimationFrame(draw_midiAnimation);
 }
+
