@@ -1,5 +1,5 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { initMIDI, buildGuitarChord, loadSamples } from "./sound.js";
+import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
 import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
@@ -8,7 +8,7 @@ import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
 
 //  全域變數宣告區 
-export let canvas = {base: {}, midi: {}};
+export let canvas = { base: {}, midi: {} };
 export let video, drawingUtils;
 export let midiCanvas, midiCtx;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
@@ -31,10 +31,10 @@ async function setupCamera() {
     video.srcObject = stream;
 
     // 設定畫布與繪圖環境
-    canvas['base'] = {cvs: document.getElementById("baseCanvas"), ctx : {}}
+    canvas['base'] = { cvs: document.getElementById("baseCanvas"), ctx: {} }
     canvas['base'].ctx = canvas.base.cvs.getContext("2d")
     drawingUtils = new DrawingUtils(canvas.base.ctx);
-    canvas['midi'] = {cvs: document.getElementById("midiCanvas"), ctx : {}}
+    canvas['midi'] = { cvs: document.getElementById("midiCanvas"), ctx: {} }
     canvas['midi'].ctx = canvas.midi.cvs.getContext("2d");
 
     return new Promise((resolve) => {
@@ -78,7 +78,7 @@ async function setupCamera() {
     });
 }
 
-export function updateSeq(){
+export function updateSeq() {
     noteSequence = seq
 }
 
@@ -135,6 +135,15 @@ window.onload = async function () {
 
                 console.log(noteSequence);
                 draw_midiAnimation(); // 播放動畫
+
+                // 播放所有音符
+                noteSequence.forEach(note => {
+                    soundSample.play(
+                        note.pitch,
+                        audioCtx.currentTime + note.start,    // 延後播放
+                        { velocity: note.v, duration: note.end - note.start }
+                    );
+                });
 
             } catch (err) {
                 console.error("讀取 MIDI 發生錯誤：", err);

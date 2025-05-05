@@ -1,6 +1,6 @@
 import { noteSequence, canvas, updateSeq } from "../main.js";
 import { drawCircle } from "./drawGraph.js";
-import { audioCtx, soundSample, mapRange } from "../sound.js";
+import {  mapRange } from "../sound.js";
 
 export let seq = [];
 let startTime = performance.now()
@@ -15,19 +15,7 @@ export async function draw_midiAnimation() {
     if(seq.length == 0){
          startTime = performance.now();
     } // 動畫起始時間
-    const pixelsPerSecond = 100;         // 控制滑動速度
-
-    const currentTime = audioCtx.currentTime;
-
-    // 播放所有音符
-    noteSequence.forEach(note => {
-        soundSample.play(
-            note.pitch,
-            currentTime + note.start,    // 延後播放
-            { velocity: note.v, duration: note.end - note.start }
-        );
-    });
-
+    const pixelsPerSecond = 200;         // 控制滑動速度
     seq = noteSequence
 
     function drawFrame(now) {
@@ -41,7 +29,7 @@ export async function draw_midiAnimation() {
             // 如果剩下 x < 畫面10% 移除
             if (posX >= canvas['midi'].cvs.width * 0.1) {
                 const area = {
-                    x: posX - ((note.end - note.start) * 100) / 2,
+                    x: posX - ((note.end - note.start) * pixelsPerSecond) / 2,
                     y: mapRange(note.pitch, 24, 96, canvas['midi'].cvs.height, 0),
                     w: (note.end - note.start) * 100,
                     h: 15

@@ -120,9 +120,10 @@ function sleep(ms) {
 // 撥弦函數，根據指定的音符與力度來播放音符
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
-    
+    let firstCall = false
     if(noteSequence.length == 0){
         startTime = performance.now(); 
+        firstCall = true
     }
     const now = performance.now();
     pluck.forEach((p, i) => {
@@ -139,11 +140,10 @@ export async function plucking(pluck, capo, velocities) {
                 pitch: midiNote,
                 start: (now - startTime) / 1000,
                 end: 1.5,
-                v: velocity
+                v: 0
             })
         });
-        console.log(noteSequence)
-        draw_midiAnimation();
+        if(firstCall){ draw_midiAnimation() };
 
     } else if (outport) {
         // 發送 MIDI 訊號 (如果有 MIDI 設備)
