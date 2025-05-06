@@ -5,7 +5,7 @@ import { predict } from "./SVM.js";
 import { drawCapo, drawGesture } from "./Draw/drawInfo.js";
 
 // 設定全域變數
-export let capo = 0, portOpen = false, sampleName = 0;
+export let capo = 0, portOpen = false, sampleName = 0, showCtrl = false;
 
 let gesture = '', prevGesture = '';  // 手勢相關
 let armAngles = [];  // 手臂角度
@@ -122,4 +122,9 @@ export async function sampleCtrl(c) {
     }
     sampleName = (instruments.length + sampleName) % instruments.length;  // 確保樣本索引在範圍內
     loadSamples();  // 加載對應的樣本
+}
+
+
+export async function showConfig() {
+    showCtrl = !showCtrl
 }

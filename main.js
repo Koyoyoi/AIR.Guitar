@@ -1,7 +1,7 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx , mapRange} from "./sound.js";
-import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./musicControll.js";
-import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js";
+import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx, mapRange } from "./sound.js";
+import { capoCtrl, chordCtrl, pluckCtrl, showCtrl, strumCtrl } from "./musicControll.js";
+import { draw_config, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea } from "./Draw/drawCtrl.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
@@ -61,6 +61,7 @@ async function setupCamera() {
 
                 draw_midiPortArea();
                 draw_sampleNameArea();
+                draw_config();
 
                 // 重置滑鼠位置
                 mouse.X = 0;
@@ -140,7 +141,7 @@ window.onload = async function () {
                         { velocity: note.velocity, duration: note.endTime - note.startTime }
                     );
                 });
-                
+
             } catch (err) {
                 console.error("讀取 MIDI 發生錯誤：", err);
             }
@@ -162,8 +163,12 @@ async function detect() {
     if (uploadedImage) drawImg();
 
     // 顯示控制區
-    draw_midiPortArea();
-    draw_sampleNameArea();
+    if (showCtrl) {
+        draw_midiPortArea();
+        draw_sampleNameArea();
+        draw_ModeCtrl();
+    }
+    draw_config();
 
     // 執行 MediaPipe 偵測
     await detectHand();

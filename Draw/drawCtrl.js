@@ -1,18 +1,54 @@
 import { drawRect, drawTriangle } from "./drawGraph.js";
-import { portCtrl, portOpen, sampleCtrl, sampleName } from "../musicControll.js";
+import { portCtrl, portOpen, sampleCtrl, sampleName, showConfig } from "../musicControll.js";
 import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
 
+ // 載入並顯示圖片
+ let img = new Image();
+ img.src = './IMG/config.png';
+
+export function draw_config(){
+     // 區域的位置與大小
+     let Area = {
+        x: canvas['base'].cvs.width - canvas['base'].cvs.height * 0.1,
+        y: canvas['base'].cvs.height - 20 - canvas['base'].cvs.height * 0.08,
+        w: canvas['base'].cvs.height * 0.1,
+        h: canvas['base'].cvs.height * 0.1
+    };
+   
+    canvas['base'].ctx.drawImage(img, Area.x, Area.y, Area.w, Area.h);
+
+    // 檢查是否點擊在控制區域
+    if (mouse.X != 0 && mouse.Y != 0) {
+        if (
+            mouse.X >= Area.x &&
+            mouse.X <= Area.x + Area.w &&
+            mouse.Y >= Area.y &&
+            mouse.Y <= Area.y + Area.h
+        ) {
+            console.log("✅ confing 控制區被點擊！");
+            showConfig();
+        }
+    }
+
+}
+
 export function draw_ModeCtrl(){
     let Area = {
-        x: canvas['base'].cvs.width / 2 - canvas['base'].cvs.width * 0.2,
+        x: canvas['base'].cvs.width / 2 - canvas['base'].cvs.width * 0.1,
         y: 0,
         w: canvas['base'].cvs.width * 0.2,
         h: canvas['base'].cvs.height * 0.08
     };
 
-    drawRect(Area, 20)
+    drawRect(Area, 15)
 
+    // 區域的狀態
+    canvas['base'].ctx.font = `700 ${Area.h * 0.5}px Arial`;
+    canvas['base'].ctx.fillStyle = "#787d7b"; // 如果 portOpen 為 true，顯示為綠色，否則顯示為灰色
+    canvas['base'].ctx.textAlign = "center";
+    canvas['base'].ctx.textBaseline = "middle";
+    canvas['base'].ctx.fillText("自由模式", Area.x + Area.w / 2, Area.y + Area.h / 2);
 }
 // 畫出 MIDI 控制區域
 export function draw_midiPortArea() {
@@ -52,9 +88,9 @@ export function draw_sampleNameArea() {
 
     // 區域的位置與大小
     let Area = {
-        x: canvas['base'].cvs.width - canvas['base'].cvs.width * 0.3,
+        x: canvas['base'].cvs.width / 2 - canvas['base'].cvs.width * 0.15,
         y: canvas['base'].cvs.height - 20 - canvas['base'].cvs.height * 0.08,
-        w: canvas['base'].cvs.width * 0.25,
+        w: canvas['base'].cvs.width * 0.3,
         h: canvas['base'].cvs.height * 0.08
     };
 
