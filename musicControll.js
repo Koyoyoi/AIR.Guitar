@@ -1,4 +1,3 @@
-// 引入相關功能模組
 import { buildGuitarChord, plucking, strumming, mapRange, initMIDI, instruments, loadSamples } from "./sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
 import { handData, poseData, video } from "./main.js";
@@ -14,10 +13,7 @@ let action = '', prevAction = '';  // 動作狀態
 let pluck = [], prevPluck = [], velocities = [];  // 撥弦狀態與速度
 let timeCnt = 0;  // 計時器
 
-/**
- * 和弦控制
- * 當偵測到左手時，計算手勢並切換和弦
- */
+// 和弦控制
 export async function chordCtrl() {
     if (handData['Left'].length != 0) {
         let parameters = compute(handData['Left']);
@@ -35,10 +31,7 @@ export async function chordCtrl() {
     }
 }
 
-/**
- * 撥弦控制
- * 當偵測到右手時，控制撥弦動作
- */
+// 撥弦控制
 export async function pluckCtrl() {
     if (handData['Right'].length != 0) {
         [pluck, velocities] = await fingerPlay(handData['Right']);  // 計算撥弦與速度
@@ -55,10 +48,7 @@ export async function pluckCtrl() {
     }
 }
 
-/**
- * 掃弦控制
- * 根據身體姿勢來判斷掃弦動作
- */
+// 掃弦控制
 export async function strumCtrl() {
     if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined && poseData[16][1] < video.videoHeight) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]));  // 計算手臂的角度
@@ -97,10 +87,7 @@ export async function strumCtrl() {
     }
 }
 
-/**
- * 品位控制
- * 根據姿勢來調整吉他品位
- */
+// 品位控制
 export async function capoCtrl() {
     if (poseData.length > 0 && timeCnt >= 30) {
         timeCnt = 0;
@@ -118,10 +105,7 @@ export async function capoCtrl() {
     drawCapo(capo);  // 更新畫面上的品位顯示
 }
 
-/**
- * MIDI Port 控制
- * 開關 MIDI 端口
- */
+// MIDI Port 控制
 export async function portCtrl() {
     portOpen = !portOpen;
     if (portOpen) {
@@ -129,10 +113,7 @@ export async function portCtrl() {
     }
 }
 
-/**
- * 樣本控制
- * 切換吉他樣本
- */
+// sound font控制
 export async function sampleCtrl(c) {
     if (c == '-') {
         sampleName -= 1;  // 減少樣本索引
