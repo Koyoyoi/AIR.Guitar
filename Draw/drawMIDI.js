@@ -9,10 +9,10 @@ let lastTime = performance.now();
 export function animateSeq(midiNote, posX = null, posY = null, speed = 0) {
     // 將音符加入動畫隊列
     seq.push({
-        x: posX != null ? posX : mapRange(midiNote, 21, 108, 0, canvas['midi'].cvs.width),  // 簡單取餘數決定 X 位置
+        x: posX != null ? posX : mapRange(midiNote, 21, 108, 0, canvas['midi'].cvs.width),  
         y: posY != null ? posY : 0,
         note: midiNote,
-        speed: speed != 0? speed : 100 + Math.random() * 50  // 隨機速度
+        speed: speed != 0 ? speed : 100 + Math.random() * 50  // 隨機速度
     });
 }
 
@@ -25,7 +25,7 @@ export async function midiDrawLoop(now) {
     seq.forEach((n, i) => {
         n.y += n.speed * dt;
         
-        drawCircle({x: n.x, y: n.y, w: 15, h: 15}, "#EEA9A9")
+        drawCircle({x: n.x, y: n.y, w: 20, h: 20}, "#EEA9A9")
     });
 
     // 移除已掉出畫布的音符
