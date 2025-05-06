@@ -1,11 +1,11 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx, mapRange } from "./sound.js";
-import { capoCtrl, chordCtrl, pluckCtrl, showCtrl, strumCtrl } from "./musicControll.js";
-import { draw_config, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg } from "./Draw/drawCtrl.js";
+import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg } from "./Draw/drawCtrl.js";
+import { initMIDIPort, buildGuitarChord, soundSample, audioCtx, mapRange } from "./sound.js";
+import { capoCtrl, chordCtrl, pluckCtrl, showAllCtrl, strumCtrl } from "./musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
+import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
-import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
 
 //  全域變數宣告區 
 export let canvas = { base: {}, midi: {} };
@@ -14,8 +14,6 @@ export let midiCanvas, midiCtx;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let uploadedImage = null;
 export let mouse = { X: 0, Y: 0 };
-export let noteSequence = [];
-
 
 // 相機設定與畫布初始化 
 async function setupCamera() {
@@ -59,9 +57,11 @@ async function setupCamera() {
                 mouse.X = (e.clientX - rect.left) * scaleX;
                 mouse.Y = (e.clientY - rect.top) * scaleY;
 
-                draw_midiPortArea();
-                draw_sampleNameArea();
-                draw_config();
+                if (showAllCtrl) {
+                    draw_midiPortArea();
+                    draw_sampleNameArea();
+                }
+                draw_setting();
 
                 // 重置滑鼠位置
                 mouse.X = 0;
@@ -79,7 +79,7 @@ async function setupCamera() {
     });
 }
 
-// === 網頁載入完成後，處理檔案上傳邏輯（圖片或 MIDI）===
+// 網頁載入完成後，處理檔案上傳邏輯（圖片或 MIDI）
 window.onload = async function () {
     // 確保 Magenta.js 已載入（MIDI 用）
     if (typeof mm === "undefined") {
@@ -92,7 +92,7 @@ window.onload = async function () {
         if (!file) return;
         console.log("檔案名稱:", file.name);
 
-        // = 處理圖片檔 =
+        //  處理圖片檔 
         if (file.type.startsWith("image/")) {
             const reader = new FileReader();
 
@@ -115,39 +115,31 @@ window.onload = async function () {
             reader.readAsDataURL(file);
         }
 
-        // = 處理 MIDI 檔 =
+        //  處理 MIDI 檔 
         if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const blob = new Blob([arrayBuffer], { type: "audio/midi" });
+            const arrayBuffer = await file.arrayBuffer();
+            const blob = new Blob([arrayBuffer], { type: "audio/midi" });
 
-                // 使用 Magenta.js 解析 MIDI
-                let midifile = await mm.blobToNoteSequence(blob);
+            // 使用 Magenta.js 解析 MIDI
+            let midifile = await mm.blobToNoteSequence(blob);
 
-                noteSequence = midifile.notes.map(note => (
-                    animateSeq(
-                        note.pitch,
-                        mapRange(note.pitch, 21, 108, 0, canvas['midi'].cvs.width),
-                        0 - note.startTime * 100,
-                        100
-                    )
-                ));
-
-                // 播放所有音符
-                midifile.notes.forEach(note => {
-                    soundSample.play(
-                        note.pitch,
-                        audioCtx.currentTime + note.startTime,    // 延後播放
-                        { velocity: note.velocity, duration: note.endTime - note.startTime }
-                    );
-                });
-
-            } catch (err) {
-                console.error("讀取 MIDI 發生錯誤：", err);
-            }
+            // 播放所有音符
+            midifile.notes.forEach(note => {
+                animateSeq(
+                    note.pitch,
+                    mapRange(note.pitch, 21, 108, 0, canvas['midi'].cvs.width),
+                    0 - note.startTime * 100,
+                    100
+                );
+                soundSample.play(
+                    note.pitch,
+                    audioCtx.currentTime + note.startTime,    // 延後播放
+                    { velocity: note.velocity, duration: note.endTime - note.startTime }
+                );
+            });
         }
 
-        // = 非支援格式 =
+        //  非支援格式 
         else {
             alert("請上傳圖片或 MIDI 檔案！");
         }
@@ -155,7 +147,7 @@ window.onload = async function () {
 };
 
 // 主偵測函式：處理即時畫面、偵測、與音樂互動 
-async function detect() {
+async function detectLoop() {
     canvas['base'].ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
     canvas['base'].ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
@@ -163,12 +155,12 @@ async function detect() {
     if (uploadedImage) drawImg();
 
     // 顯示控制區
-    if (showCtrl) {
+    if (showAllCtrl) {
         draw_midiPortArea();
         draw_sampleNameArea();
         draw_ModeCtrl();
     }
-    draw_config();
+    draw_setting();
 
     // 執行 MediaPipe 偵測
     await detectHand();
@@ -186,23 +178,20 @@ async function detect() {
     poseData = [];
 
     // 持續偵測
-    requestAnimationFrame(detect);
+    requestAnimationFrame(detectLoop);
 }
 
-
-// === 主程式：載入模組並開始偵測 ===
+// 主程式：載入模組並開始偵測 
 async function main() {
-    await loadSamples();         // 音效取樣
-    await loadImg();
+    await loadImg();             // 載入圖檔 ./IMGs
     await setupMediaPipe();      // MediaPipe 模組初始化
     await load_SVM_Model();      // 載入手勢模型
     await setupCamera();         // 相機與畫布設定
-    await initMIDI();            // MIDI 設定
+    await initMIDIPort();        // MIDI 設定
     buildGuitarChord('C');       // 建立預設 C 和弦
-    detect();                    // 開始主偵測循環
-    midiDrawLoop();
+    detectLoop();                // base canva detect loop
+    midiDrawLoop();              // midi canva draw   loop
 }
-
 
 // 等待 HTML 載入完成後啟動主程式 
 window.addEventListener('DOMContentLoaded', async () => {

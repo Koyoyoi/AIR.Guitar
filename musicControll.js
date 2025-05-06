@@ -1,11 +1,11 @@
-import { buildGuitarChord, plucking, strumming, mapRange, initMIDI, instruments, loadSamples } from "./sound.js";
+import { buildGuitarChord, plucking, strumming, mapRange, initMIDIPort, instruments, loadSamples } from "./sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
 import { handData, poseData, video } from "./main.js";
 import { predict } from "./SVM.js";
 import { drawCapo, drawGesture } from "./Draw/drawInfo.js";
 
 // 設定全域變數
-export let capo = 0, portOpen = false, sampleName = 0, showCtrl = false;
+export let capo = 0, portOpen = false, sampleName = 0, showAllCtrl = false;
 
 let gesture = '', prevGesture = '';  // 手勢相關
 let armAngles = [];  // 手臂角度
@@ -94,11 +94,11 @@ export async function capoCtrl() {
 
         // 判斷姿勢並調整品位
         if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
-            capo = 0;  // 恢復到原來品位
+            capo = 0;   
         } else if (poseData[16][1] < poseData[0][1]) {
-            capo = Math.min(12, capo + 1);  // 增加品位
+            capo = Math.min(12, capo + 1);  
         } else if (poseData[15][1] < poseData[0][1]) {
-            capo = Math.max(-12, capo - 1);  // 減少品位
+            capo = Math.max(-12, capo - 1);   
         }
     }
     timeCnt += 1;  // 計時器更新
@@ -109,7 +109,7 @@ export async function capoCtrl() {
 export async function portCtrl() {
     portOpen = !portOpen;
     if (portOpen) {
-        await initMIDI();  // 初始化 MIDI
+        await initMIDIPort();  // 初始化 MIDI
     }
 }
 
@@ -124,7 +124,6 @@ export async function sampleCtrl(c) {
     loadSamples();  // 加載對應的樣本
 }
 
-
-export async function showConfig() {
-    showCtrl = !showCtrl
+export async function settingCtrl() {
+    showAllCtrl = !showAllCtrl
 }

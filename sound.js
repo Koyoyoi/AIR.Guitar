@@ -6,9 +6,14 @@ export const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 export let soundSample; // 儲存音色樣本
 // 預設的樂器列表
 export const instruments = [
-    "acoustic_guitar_nylon", "acoustic_guitar_steel", "electric_guitar_jazz",
-    "electric_guitar_clean", "electric_guitar_muted", "overdriven_guitar",
-    "distortion_guitar", "guitar_harmonics",
+    "acoustic_guitar_nylon", 
+    "acoustic_guitar_steel", 
+    "electric_guitar_jazz",
+    "electric_guitar_clean", 
+    "electric_guitar_muted", 
+    "overdriven_guitar",
+    "distortion_guitar", 
+    "guitar_harmonics"
 ];
 // 根音對應表
 export const rootTab = {
@@ -33,7 +38,8 @@ let outport = null; // 儲存 MIDI 輸出端口
 let guitarChord = [], pluckNotes = []; // 儲存吉他和弦與挑弦音符
 
 // 初始化 MIDI 端口，獲取並設置第一個可用的 MIDI 輸出端口
-export async function initMIDI() {
+export async function initMIDIPort() {
+    loadSamples();
     return navigator.requestMIDIAccess()
         .then((midiAccess) => {
             // 確認 MIDI 訪問權限

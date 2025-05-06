@@ -4,6 +4,8 @@ import {  mapRange } from "../sound.js";
 
 export let seq = [];
 
+let lastTime = performance.now();
+
 export function animateSeq(midiNote, posX = null, posY = null, speed = 0) {
     // 將音符加入動畫隊列
     seq.push({
@@ -15,7 +17,6 @@ export function animateSeq(midiNote, posX = null, posY = null, speed = 0) {
     console.log(seq)
 }
 
-let lastTime = performance.now();
 
 export async function midiDrawLoop(now) {
     const dt = (now - lastTime) / 1000;

@@ -1,5 +1,5 @@
 import { drawRect, drawTriangle } from "./drawGraph.js";
-import { portCtrl, portOpen, sampleCtrl, sampleName, showConfig, showCtrl } from "../musicControll.js";
+import { portCtrl, portOpen, sampleCtrl, sampleName, settingCtrl, showAllCtrl } from "../musicControll.js";
 import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
 
@@ -23,7 +23,7 @@ export async function loadImg(){
 
 }
 
-export function draw_config(){
+export function draw_setting(){
      // 區域的位置與大小
      let Area = {
         x: canvas['base'].cvs.width - canvas['base'].cvs.height * 0.1,
@@ -31,7 +31,7 @@ export function draw_config(){
         w: canvas['base'].cvs.height * 0.1,
         h: canvas['base'].cvs.height * 0.1
     };
-    let img = showCtrl? IMGs['close_setting'] : IMGs['open_setting']
+    let img = showAllCtrl? IMGs['close_setting'] : IMGs['open_setting']
     canvas['base'].ctx.drawImage(img, Area.x, Area.y, Area.w, Area.h);
 
     // 檢查是否點擊在控制區域
@@ -43,7 +43,7 @@ export function draw_config(){
             mouse.Y <= Area.y + Area.h
         ) {
             console.log("✅ confing 控制區被點擊！");
-            showConfig();
+            settingCtrl();
         }
     }
 
