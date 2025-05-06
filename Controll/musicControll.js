@@ -1,8 +1,8 @@
-import { buildGuitarChord, plucking, strumming, mapRange, initMIDIPort, instruments, loadSamples } from "./sound.js";
-import { compute, vectorAngle, vectorCompute, fingerPlay } from "./handCompute.js";
-import { handData, poseData, video } from "./main.js";
-import { predict } from "./SVM.js";
-import { drawCapo, drawGesture } from "./Draw/drawInfo.js";
+import { buildGuitarChord, plucking, strumming, mapRange, initMIDIPort, instruments, loadSamples } from "../sound.js";
+import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
+import { handData, poseData, video } from "../main.js";
+import { predict } from "../SVM.js";
+import { drawCapo, drawGesture } from "../Draw/drawInfo.js";
 
 // 設定全域變數
 export let capo = 0, portOpen = false, sampleName = 0, showAllCtrl = false;

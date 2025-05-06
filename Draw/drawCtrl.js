@@ -1,5 +1,5 @@
 import { drawRect, drawTriangle } from "./drawGraph.js";
-import { portCtrl, portOpen, sampleCtrl, sampleName, settingCtrl, showAllCtrl } from "../musicControll.js";
+import { portCtrl, portOpen, sampleCtrl, sampleName, settingCtrl, showAllCtrl } from "../Controll/musicControll.js";
 import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
 

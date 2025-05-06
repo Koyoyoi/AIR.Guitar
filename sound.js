@@ -1,4 +1,4 @@
-import { portOpen, sampleName } from "./musicControll.js";  // 載入 MIDI 端口狀態與音色樣本名稱
+import { portOpen, sampleName } from "./Controll/musicControll.js";  // 載入 MIDI 端口狀態與音色樣本名稱
 import { animateSeq } from "./Draw/drawMIDI.js";
 
 // 創建音頻上下文，處理音頻的播放
