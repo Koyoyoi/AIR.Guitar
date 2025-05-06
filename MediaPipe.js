@@ -1,4 +1,3 @@
-// 引入 MediaPipe 所需元件與自訂主程式變數
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { drawingUtils, handData, poseData } from './main.js';
 import { video } from "./main.js";
@@ -6,9 +5,7 @@ import { video } from "./main.js";
 // 全域變數：用來儲存模型實例
 let handLandmarker, poseLandmarker;
 
-/**
- * 初始化 MediaPipe 手部與姿勢偵測模型
- */
+// 初始化 MediaPipe 手部與姿勢偵測模型
 export async function setupMediaPipe() {
     const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -39,17 +36,15 @@ export async function setupMediaPipe() {
     });
 }
 
-/**
- * 偵測手部關鍵點並繪製圖像，同時更新 handData
- */
+// 偵測手部關鍵點並繪製圖像，同時更新 handData
 export async function detectHand() {
     if (!handLandmarker) return;
 
     let data = handLandmarker.detectForVideo(video, performance.now());
 
     if (data.landmarks) {
+        // 畫手部關節連線與節點
         for (const landmarks of data.landmarks) {
-            // 畫手部關節連線與節點
             drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "#F8C3CD", lineWidth: 4 });
             drawingUtils.drawLandmarks(landmarks, { color: "#DB4D6D", radius: 4 });
         }
@@ -70,17 +65,15 @@ export async function detectHand() {
     }
 }
 
-/**
- * 偵測身體關鍵點並繪製圖像，同時更新 poseData
- */
+// 偵測身體關鍵點並繪製圖像，同時更新 poseData
 export async function detectPose() {
     if (!poseLandmarker) return;
 
     let data = poseLandmarker.detectForVideo(video, performance.now());
 
     if (data.landmarks) {
-        for (const landmarks of data.landmarks) {
-            // 畫身體關節連線與節點
+        // 畫身體關節連線與節點
+        for (const landmarks of data.landmarks) {   
             drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "green", lineWidth: 3 });
             drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
         }
