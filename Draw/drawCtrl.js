@@ -3,6 +3,17 @@ import { portCtrl, portOpen, sampleCtrl, sampleName } from "../musicControll.js"
 import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
 
+export function draw_ModeCtrl(){
+    let Area = {
+        x: canvas['base'].cvs.width / 2 - canvas['base'].cvs.width * 0.2,
+        y: 0,
+        w: canvas['base'].cvs.width * 0.2,
+        h: canvas['base'].cvs.height * 0.08
+    };
+
+    drawRect(Area, 20)
+
+}
 // 畫出 MIDI 控制區域
 export function draw_midiPortArea() {
     // 定義 MIDI 控制區域的位置與大小
