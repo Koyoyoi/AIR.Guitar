@@ -44,7 +44,7 @@ export async function pluckCtrl() {
         if (diffPluck.length > 0) {
             plucking(diffPluck, capo, velocities);  // 撥弦
         }
-        prevPluck = pluck.slice();  // 更新撥弦狀態
+        prevPluck = pluck.slice();                  // 更新撥弦狀態
     }
 }
 
@@ -101,7 +101,7 @@ export async function capoCtrl() {
             capo = Math.max(-12, capo - 1);   
         }
     }
-    timeCnt += 1;  // 計時器更新
+    timeCnt += 1;    // 計時器更新
     drawCapo(capo);  // 更新畫面上的品位顯示
 }
 
