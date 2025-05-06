@@ -1,9 +1,9 @@
 import { portOpen, sampleName } from "./Controll/musicControll.js";  // 載入 MIDI 端口狀態與音色樣本名稱
 import { animateSeq } from "./Draw/drawMIDI.js";
 
-// 創建音頻上下文，處理音頻的播放
-export const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-export let soundSample; // 儲存音色樣本
+
+export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放
+export let soundSample;                                                           // 儲存音色樣本
 // 預設的樂器列表
 export const instruments = [
     "acoustic_guitar_nylon", 
@@ -127,7 +127,7 @@ export async function plucking(pluck, capo, velocities) {
         notes.forEach(([note, velocity]) => {
             soundSample.play(note + capo, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
             console.log(`音符：${note + capo}, 音量：${velocity}`);
-           
+            // 加入動畫隊列
             animateSeq(note + capo);
 
         });
@@ -160,7 +160,7 @@ export async function strumming(direction, capo, duration) {
         for (let n of sturmOrder) {
             soundSample.play(n + capo, audioCtx.currentTime, { gain: 4, duration: 1 });
             await sleep(duration);
-
+            // 加入動畫隊列
             animateSeq(n + capo);
         }
     } else if (outport) {
