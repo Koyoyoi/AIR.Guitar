@@ -134,7 +134,7 @@ export async function plucking(pluck, capo, velocities) {
         notes.forEach(([note, velocity]) => {
             const midiNote = note + capo; // 計算實際的 MIDI 音符
             soundSample.play(midiNote, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
-            console.log(`播放音符：${midiNote}, 音量：${velocity}`);
+            console.log(`音符：${midiNote}, 音量：${velocity}`);
            
             animateSeq(midiNote);
 
