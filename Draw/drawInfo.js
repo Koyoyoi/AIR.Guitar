@@ -14,12 +14,6 @@ export function reCanva() {
     let newWidth = windowWidth;
     let newHeight = newWidth / aspectRatio;
 
-    // 如果調整後的高度超過 900px 或視窗高度，則進行調整
-    if (newHeight > windowHeight || newHeight > 900) {
-        newHeight = Math.min(windowHeight, 900);       // 高度最大為 900px 或視窗高度
-        newWidth = newHeight * aspectRatio;            // 根據新的高度計算寬度
-    }
-
     // 設置影片和畫布的寬高
     video.style.width = `${newWidth}px`;
     video.style.height = `${newHeight}px`;
