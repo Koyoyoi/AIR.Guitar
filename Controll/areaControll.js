@@ -2,7 +2,6 @@ import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
 // 設定全域變數
 export let capo = 0, portOpen = false, sampleNum = 0, showAllCtrl = false;
-export let modeNum = 0;
 
 // MIDI Port 控制
 export async function portCtrl() {

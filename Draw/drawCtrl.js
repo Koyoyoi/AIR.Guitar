@@ -4,6 +4,7 @@ import { mouse, canvas  } from "../main.js";
 import { portCtrl, portOpen, sampleCtrl, settingCtrl, showAllCtrl, sampleNum } from "../Controll/areaControll.js";
 
 let IMGs = {}
+let modeNum = 0;
 const modeName = ["自由模式", "歌曲演奏"];
 
 
@@ -89,7 +90,30 @@ export function draw_ModeCtrl(){
     canvas['base'].ctx.fillStyle = "#787d7b"; // 如果 portOpen 為 true，顯示為綠色，否則顯示為灰色
     canvas['base'].ctx.textAlign = "center";
     canvas['base'].ctx.textBaseline = "middle";
-    canvas['base'].ctx.fillText("自由模式", Area.x + Area.w / 2, Area.y + Area.h / 2);
+    canvas['base'].ctx.fillText(`${modeName[modeNum]}`, Area.x + Area.w / 2, Area.y + Area.h / 2);
+
+     // 檢查是否點擊在按鈕上
+     if (mouse.X != 0 && mouse.Y != 0) {
+        if (
+            mouse.X >= LButton.x &&
+            mouse.X <= LButton.x + LButton.w &&
+            mouse.Y >= LButton.y &&
+            mouse.Y <= LButton.y + LButton.h
+        ) {
+            console.log("✅ mode Left 被點擊！");
+            modeNum -= 1
+        } else if (
+            mouse.X >= RButton.x &&
+            mouse.X <= RButton.x + RButton.w &&
+            mouse.Y >= RButton.y &&
+            mouse.Y <= RButton.y + RButton.h
+        ) {
+            console.log("✅ mode Right 被點擊！");
+            modeNum += 1
+        }
+    }
+
+    modeNum = (modeName.length + modeNum) % modeName.length;
 }
 // 畫出 MIDI 控制區域
 export function draw_midiPortArea() {

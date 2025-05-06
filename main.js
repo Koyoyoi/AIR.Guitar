@@ -62,6 +62,7 @@ async function setupCamera() {
                 if (showAllCtrl) {
                     draw_midiPortArea();
                     draw_sampleNameArea();
+                    draw_ModeCtrl()
                 }
                 draw_setting();
 
@@ -167,9 +168,6 @@ async function detectLoop() {
     // 執行 MediaPipe 偵測
     await detectHand();
     await detectPose();
-
-    drawRect({x: poseData[0].x, y: poseData[0].y, w: 200, h: 200}, 10)
-
 
     // 音樂控制
     await chordCtrl();
