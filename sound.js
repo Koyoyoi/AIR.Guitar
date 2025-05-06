@@ -65,20 +65,19 @@ export async function initMIDIPort() {
         });
 }
 
-// 載入音色樣本，選擇相應的樂器並初始化
+// Load the sound font
 export async function loadSamples() {
-    Soundfont.instrument(audioCtx, instruments[sampleName], {
-        soundfont: 'FluidR3_GM', // 使用 FluidR3_GM SoundFont
-    }).then(function (loadedPiano) {
-        soundSample = loadedPiano; // 載入完成後，將音色樣本儲存
+    if (audioCtx.state === 'suspended') {
+        await audioCtx.resume(); // 等待 AudioContext 恢復
+        console.log('AudioContext 已啟用');
+    }
+
+    // 等待樂器載入完成
+    soundSample = await Soundfont.instrument(audioCtx, instruments[sampleName], {
+        soundfont: 'FluidR3_GM',
     });
 
     console.log(`${instruments[sampleName]} loaded.`);
-
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume(); // 恢復 AudioContext（瀏覽器的音頻政策要求）
-        console.log('AudioContext 已啟用');
-    }
 }
 
 // 根據手勢創建吉他和弦
@@ -141,7 +140,6 @@ export async function plucking(pluck, capo, velocities) {
 
         });
 
-
     } else if (outport) {
         // 發送 MIDI 訊號 (如果有 MIDI 設備)
         notes.forEach(([note, velocity]) => {
@@ -188,5 +186,5 @@ export async function strumming(direction, capo, duration) {
 export function mapRange(value, inMin, inMax, outMin, outMax) {
     value = Math.max(inMin, Math.min(value, inMax)); // 限制數值在範圍內
     const ratio = (value - inMin) / (inMax - inMin); // 計算比例
-    return outMin + (outMax - outMin) * ratio; // 返回映射後的數值
+    return outMin + (outMax - outMin) * ratio;       // 返回映射後的數值
 }
