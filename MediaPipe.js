@@ -70,14 +70,15 @@ export async function detectPose() {
     if (!poseLandmarker) return;
 
     let data = poseLandmarker.detectForVideo(video, performance.now());
-
+    
+    /** 
     if (data.landmarks) {
         // 畫身體關節連線與節點
         for (const landmarks of data.landmarks) {   
-            drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "green", lineWidth: 3 });
-            drawingUtils.drawLandmarks(landmarks, { color: "red", radius: 5 });
+            drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "#F8C3CD", lineWidth: 0 });
+            drawingUtils.drawLandmarks(landmarks, { color:"#DB4D6D", radius: 0 });
         }
-    }
+    }*/
 
     const posePoints = data.landmarks;
 
