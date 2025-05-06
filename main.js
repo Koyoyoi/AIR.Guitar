@@ -2,7 +2,7 @@ import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-visi
 import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg } from "./Draw/drawCtrl.js";
 import { initMIDIPort, buildGuitarChord, soundSample, audioCtx, mapRange } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl,  strumCtrl } from "./Controll/musicControll.js";
-import {  showAllCtrl } from "./Controll/areaControll.js";
+import { showAllCtrl } from "./Controll/areaControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
@@ -191,7 +191,7 @@ async function main() {
     await initMIDIPort();        // MIDI 設定
     buildGuitarChord('C');       // 建立預設 C 和弦
     detectLoop();                // base canva detect loop
-    midiDrawLoop();              // midi canva draw   loop
+    midiDrawLoop();              // midi canva  draw  loop
 }
 
 // 等待 HTML 載入完成後啟動主程式 
