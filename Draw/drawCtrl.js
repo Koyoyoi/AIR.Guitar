@@ -3,9 +3,9 @@ import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
 import { portCtrl, portOpen, sampleCtrl, settingCtrl, showAllCtrl, sampleName } from "../Controll/areaControll.js";
 
- // 載入並顯示圖片
- let IMGs = {}
+let IMGs = {}
 
+// 載入圖片
 export async function loadImg(){
     const res = await fetch('./IMG/list.json');
     const fileList = await res.json(); 
@@ -20,9 +20,9 @@ export async function loadImg(){
         });
         IMGs[key] = img;
     }
-
 }
 
+// Setting 控制區域
 export function draw_setting(){
      // 區域的位置與大小
      let Area = {
@@ -46,9 +46,9 @@ export function draw_setting(){
             settingCtrl();
         }
     }
-
 }
 
+// Mode 控制區域
 export function draw_ModeCtrl(){
     let Area = {
         x: canvas['base'].cvs.width / 2 - canvas['base'].cvs.width * 0.1,
@@ -99,7 +99,7 @@ export function draw_midiPortArea() {
         }
     }
 }
-
+// 畫出 SoundFont 控制區域
 export function draw_sampleNameArea() {
 
     // 區域的位置與大小
@@ -131,13 +131,9 @@ export function draw_sampleNameArea() {
         h: buttonHeight
     };
 
-
-    // 畫圓角矩形區域
-    drawRect(Area, 10);
-    // 畫右箭頭（實心三角形）
-    drawTriangle(RButton, "right");
-    // 畫左箭頭（實心三角形）
-    drawTriangle(LButton, "left");
+    drawRect(Area, 10);              // 畫圓角矩形區域
+    drawTriangle(RButton, "right");  // 畫右箭頭（實心三角形）
+    drawTriangle(LButton, "left");   // 畫左箭頭（實心三角形）
 
     // 顯示 sample name 
     canvas['base'].ctx.font = `700 ${Area.h * 0.5}px Arial`;
