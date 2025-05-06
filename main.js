@@ -7,6 +7,7 @@ import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
+import { drawRect } from "./Draw/drawGraph.js";
 
 //  全域變數宣告區 
 export let canvas = { base: {}, midi: {} };
@@ -166,6 +167,9 @@ async function detectLoop() {
     // 執行 MediaPipe 偵測
     await detectHand();
     await detectPose();
+
+    drawRect({x: poseData[0].x, y: poseData[0].y, w: 200, h: 200}, 10)
+
 
     // 音樂控制
     await chordCtrl();
