@@ -1,6 +1,5 @@
-import { portOpen, sampleName } from "./Controll/musicControll.js";  // 載入 MIDI 端口狀態與音色樣本名稱
 import { animateSeq } from "./Draw/drawMIDI.js";
-
+import {portOpen, sampleNum } from "./Controll/areaControll.js";
 
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放
 export let soundSample;                                                           // 儲存音色樣本
@@ -59,17 +58,17 @@ export async function initMIDIPort() {
 
 // Load the sound font
 export async function loadSamples() {
+    // 等待樂器載入完成
+    soundSample = await Soundfont.instrument(audioCtx, instruments[sampleNum], {
+        soundfont: 'FluidR3_GM',
+    });
+
     if (audioCtx.state === 'suspended') {
         await audioCtx.resume(); // 等待 AudioContext 恢復
         console.log('AudioContext 已啟用');
     }
-
-    // 等待樂器載入完成
-    soundSample = await Soundfont.instrument(audioCtx, instruments[sampleName], {
-        soundfont: 'FluidR3_GM',
-    });
-
-    console.log(`${instruments[sampleName]} loaded.`);
+    
+    console.log(`${instruments[sampleNum]} loaded.`);
 }
 
 // 根據手勢創建吉他和弦

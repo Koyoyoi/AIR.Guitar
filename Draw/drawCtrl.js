@@ -1,9 +1,11 @@
 import { drawRect, drawTriangle } from "./drawGraph.js";
 import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
-import { portCtrl, portOpen, sampleCtrl, settingCtrl, showAllCtrl, sampleName } from "../Controll/areaControll.js";
+import { portCtrl, portOpen, sampleCtrl, settingCtrl, showAllCtrl, sampleNum } from "../Controll/areaControll.js";
 
 let IMGs = {}
+const modeName = ["自由模式", "歌曲演奏"];
+
 
 // 載入圖片
 export async function loadImg(){
@@ -56,8 +58,31 @@ export function draw_ModeCtrl(){
         w: canvas['base'].cvs.width * 0.2,
         h: canvas['base'].cvs.height * 0.08
     };
+    
+    // 繪製左右箭頭按鈕
+    const buttonWidth = Area.h * 0.8;
+    const buttonHeight = Area.h;
+    const buttonY = Area.y + (Area.h - buttonHeight) / 2;
 
-    drawRect(Area, 15)
+    // 左側按鈕（三角形）
+    let LButton = {
+        x: Area.x - 60,
+        y: buttonY,
+        w: buttonWidth,
+        h: buttonHeight
+    };
+
+    // 右側按鈕（三角形）
+    let RButton = {
+        x: Area.x + Area.w - buttonWidth + 60,
+        y: buttonY,
+        w: buttonWidth,
+        h: buttonHeight
+    };
+
+    drawRect(Area, 10);              // 畫圓角矩形區域
+    drawTriangle(RButton, "right");  // 畫右箭頭（實心三角形）
+    drawTriangle(LButton, "left");   // 畫左箭頭（實心三角形）
 
     // 區域的狀態
     canvas['base'].ctx.font = `700 ${Area.h * 0.5}px Arial`;
@@ -140,7 +165,7 @@ export function draw_sampleNameArea() {
     canvas['base'].ctx.fillStyle = "#787d7b";
     canvas['base'].ctx.textAlign = "center";
     canvas['base'].ctx.textBaseline = "middle";
-    canvas['base'].ctx.fillText(`${instruments[sampleName]}`, Area.x + Area.w / 2, Area.y + Area.h / 2);
+    canvas['base'].ctx.fillText(`${instruments[sampleNum]}`, Area.x + Area.w / 2, Area.y + Area.h / 2);
 
     // 檢查是否點擊在按鈕上
     if (mouse.X != 0 && mouse.Y != 0) {
