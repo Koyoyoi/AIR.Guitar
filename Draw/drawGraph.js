@@ -2,7 +2,7 @@ import { canvas } from "../main.js";
 
 // 畫三角形，根據方向繪製左右箭頭
 export function drawTriangle(area, direction = "left", color = "#434343") {
-    const { x, y, w, h } = area;  // 解構區域座標與尺寸
+    const { x, y, w, h } = area;           // 解構區域座標與尺寸
 
     canvas['base'].ctx.fillStyle = color;  // 設定顏色
     canvas['base'].ctx.beginPath();        // 開始繪製
