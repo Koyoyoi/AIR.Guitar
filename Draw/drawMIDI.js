@@ -14,7 +14,6 @@ export function animateSeq(midiNote, posX = null, posY = null, speed = 0) {
         note: midiNote,
         speed: speed != 0? speed : 100 + Math.random() * 50  // 隨機速度
     });
-    console.log(seq)
 }
 
 
