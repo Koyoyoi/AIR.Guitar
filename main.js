@@ -1,7 +1,7 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { initMIDI, buildGuitarChord, loadSamples, soundSample, audioCtx, mapRange } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, showCtrl, strumCtrl } from "./musicControll.js";
-import { draw_config, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea } from "./Draw/drawCtrl.js";
+import { draw_config, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg } from "./Draw/drawCtrl.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
@@ -193,6 +193,7 @@ async function detect() {
 // === 主程式：載入模組並開始偵測 ===
 async function main() {
     await loadSamples();         // 音效取樣
+    await loadImg();
     await setupMediaPipe();      // MediaPipe 模組初始化
     await load_SVM_Model();      // 載入手勢模型
     await setupCamera();         // 相機與畫布設定

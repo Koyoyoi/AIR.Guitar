@@ -1,11 +1,27 @@
 import { drawRect, drawTriangle } from "./drawGraph.js";
-import { portCtrl, portOpen, sampleCtrl, sampleName, showConfig } from "../musicControll.js";
+import { portCtrl, portOpen, sampleCtrl, sampleName, showConfig, showCtrl } from "../musicControll.js";
 import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
 
  // 載入並顯示圖片
- let img = new Image();
- img.src = './IMG/config.png';
+ let IMGs = {}
+
+export async function loadImg(){
+    const res = await fetch('./IMG/list.json');
+    const fileList = await res.json(); 
+
+    for (let filename of fileList) {
+        const key = filename; 
+        const img = await new Promise((resolve, reject) => {
+            const image = new Image();
+            image.onload = () => resolve(image);
+            image.onerror = () => reject(new Error('載入失敗: ' + filename));
+            image.src = './IMG/' + filename + '.png';
+        });
+        IMGs[key] = img;
+    }
+
+}
 
 export function draw_config(){
      // 區域的位置與大小
@@ -15,7 +31,7 @@ export function draw_config(){
         w: canvas['base'].cvs.height * 0.1,
         h: canvas['base'].cvs.height * 0.1
     };
-   
+    let img = showCtrl? IMGs['close_setting'] : IMGs['open_setting']
     canvas['base'].ctx.drawImage(img, Area.x, Area.y, Area.w, Area.h);
 
     // 檢查是否點擊在控制區域
