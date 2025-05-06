@@ -19,7 +19,7 @@ export async function sampleCtrl(c) {
     } else if (c == '+') {
         sampleNum += 1;  // 增加樣本索引
     }
-    console.log(sampleNum)
+   
     sampleNum = (instruments.length + sampleNum) % instruments.length;  // 確保樣本索引在範圍內
     loadSamples();  // 加載對應的樣本
 }
