@@ -6,13 +6,19 @@ let imgH = 0, imgW = 0;
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
-    const aspectRatio = video.videoWidth / video.videoHeight; // 影片的寬高比
-    const windowWidth = window.innerWidth;                    // 取得視窗寬度
-    const windowHeight = window.innerHeight;                  // 取得視窗高度
+    const aspectRatio = video.videoWidth / video.videoHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
 
-    // 計算新的寬度和高度
-    let newWidth = windowWidth;
-    let newHeight = newWidth / aspectRatio;
+    // 計算新的寬度和高度，並限制最大高度為 900px
+    let newHeight = Math.min(windowHeight, 900);
+    let newWidth = newHeight * aspectRatio;
+
+    // 如果新寬度超出視窗寬度，則以視窗寬度為主重新計算
+    if (newWidth > windowWidth) {
+        newWidth = windowWidth;
+        newHeight = newWidth / aspectRatio;
+    }
 
     // 設置影片和畫布的寬高
     video.style.width = `${newWidth}px`;
@@ -24,8 +30,8 @@ export function reCanva() {
     canvas['midi'].cvs.style.width = video.style.width;
     canvas['midi'].cvs.style.height = video.style.height;
 
-    // 計算並確保畫面垂直居中顯示，避免被遮擋
-    const verticalOffset = Math.max(0, (windowHeight - newHeight) / 2);  // 確保偏移量不為負數
+    // 垂直置中
+    const verticalOffset = Math.max(0, (windowHeight - newHeight) / 2);
     video.style.position = 'absolute';
     video.style.top = `${verticalOffset}px`;
 
@@ -35,16 +41,13 @@ export function reCanva() {
     canvas['midi'].cvs.style.position = 'absolute';
     canvas['midi'].cvs.style.top = `${verticalOffset}px`;
 
-    // 檢查影片的高度是否與標題重疊，若重疊則隱藏標題
+    // 標題遮擋判斷
     const title = document.getElementById("title");
     if (title) {
-        if (verticalOffset < 100) {      
-            title.style.display = 'none';  // 隱藏標題
-        } else {
-            title.style.display = 'block'; // 顯示標題
-        }
+        title.style.display = verticalOffset < 100 ? 'none' : 'block';
     }
 }
+
 
 // 繪製手勢與轉調資訊，顯示在畫布上
 export function drawGesture(gesture, capo) {
