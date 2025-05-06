@@ -132,11 +132,10 @@ export async function plucking(pluck, capo, velocities) {
     if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
         notes.forEach(([note, velocity]) => {
-            const midiNote = note + capo; // 計算實際的 MIDI 音符
-            soundSample.play(midiNote, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
-            console.log(`音符：${midiNote}, 音量：${velocity}`);
+            soundSample.play(note + capo, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
+            console.log(`音符：${note + capo}, 音量：${velocity}`);
            
-            animateSeq(midiNote);
+            animateSeq(note + capo);
 
         });
 
@@ -167,6 +166,8 @@ export async function strumming(direction, capo, duration) {
         for (let n of sturmOrder) {
             soundSample.play(n + capo, audioCtx.currentTime, { gain: 4, duration: 1 });
             await sleep(duration);
+
+            animateSeq(n + capo);
         }
     } else if (outport) {
         // 如果有 MIDI 設備，發送 MIDI 訊號
