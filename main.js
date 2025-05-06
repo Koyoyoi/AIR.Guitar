@@ -5,7 +5,7 @@ import { draw_midiPortArea, draw_sampleNameArea } from "./Draw/drawCtrl.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
-import { draw_midiAnimation, animatePluck } from "./Draw/drawMIDI.js";
+import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
 
 //  全域變數宣告區 
 export let canvas = { base: {}, midi: {} };
@@ -124,7 +124,7 @@ window.onload = async function () {
                 let midifile = await mm.blobToNoteSequence(blob);
 
                 noteSequence = midifile.notes.map(note => (
-                    animatePluck(
+                    animateSeq(
                         note.pitch,
                         mapRange(note.pitch, 21, 108, 0, canvas['midi'].cvs.width),
                         0 - note.startTime * 100,
@@ -194,7 +194,7 @@ async function main() {
     await initMIDI();            // MIDI 設定
     buildGuitarChord('C');       // 建立預設 C 和弦
     detect();                    // 開始主偵測循環
-    draw_midiAnimation();
+    midiDrawLoop();
 }
 
 

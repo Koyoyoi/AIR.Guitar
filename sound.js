@@ -1,5 +1,5 @@
 import { portOpen, sampleName } from "./musicControll.js";  // 載入 MIDI 端口狀態與音色樣本名稱
-import { animatePluck } from "./Draw/drawMIDI.js";
+import { animateSeq } from "./Draw/drawMIDI.js";
 
 // 創建音頻上下文，處理音頻的播放
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -130,8 +130,8 @@ export async function plucking(pluck, capo, velocities) {
             const midiNote = note + capo; // 計算實際的 MIDI 音符
             soundSample.play(midiNote, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
             console.log(`播放音符：${midiNote}, 音量：${velocity}`);
-            // 原始撥弦流程中這段加入即可（在 notes.forEach 裡）：
-            animatePluck(midiNote);
+           
+            animateSeq(midiNote);
 
         });
 
