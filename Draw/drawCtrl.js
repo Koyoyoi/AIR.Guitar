@@ -1,7 +1,7 @@
 import { drawRect, drawTriangle } from "./drawGraph.js";
-import { portCtrl, portOpen, sampleCtrl, sampleName, settingCtrl, showAllCtrl } from "../Controll/musicControll.js";
 import { instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
+import { portCtrl, portOpen, sampleCtrl, settingCtrl, showAllCtrl, sampleName } from "../Controll/areaControll.js";
 
  // 載入並顯示圖片
  let IMGs = {}

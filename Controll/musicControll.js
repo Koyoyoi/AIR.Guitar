@@ -1,4 +1,4 @@
-import { buildGuitarChord, plucking, strumming, mapRange, initMIDIPort, instruments, loadSamples } from "../sound.js";
+import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
 import { handData, poseData, video } from "../main.js";
 import { predict } from "../SVM.js";
@@ -105,25 +105,3 @@ export async function capoCtrl() {
     drawCapo(capo);  // 更新畫面上的品位顯示
 }
 
-// MIDI Port 控制
-export async function portCtrl() {
-    portOpen = !portOpen;
-    if (portOpen) {
-        await initMIDIPort();  // 初始化 MIDI
-    }
-}
-
-// sound font控制
-export async function sampleCtrl(c) {
-    if (c == '-') {
-        sampleName -= 1;  // 減少樣本索引
-    } else if (c == '+') {
-        sampleName += 1;  // 增加樣本索引
-    }
-    sampleName = (instruments.length + sampleName) % instruments.length;  // 確保樣本索引在範圍內
-    loadSamples();  // 加載對應的樣本
-}
-
-export async function settingCtrl() {
-    showAllCtrl = !showAllCtrl
-}
