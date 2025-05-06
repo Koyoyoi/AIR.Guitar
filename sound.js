@@ -24,7 +24,6 @@ export const rootTab = {
 export const revRootTab = Object.fromEntries(
     Object.entries(rootTab).map(([k, v]) => [v, k])
 );
-
 // 和弦類型表
 const chordTab = {
     "": [0, 4, 7],   // Major 大調
