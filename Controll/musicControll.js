@@ -3,15 +3,16 @@ import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.
 import { handData, poseData, video } from "../main.js";
 import { predict } from "../SVM.js";
 import { drawCapo, drawGesture } from "../Draw/drawInfo.js";
+import { modeNum } from "./blockControll.js";
 
 // 設定全域變數
 export let capo = 0;
 
-let gesture = '', prevGesture = '';  // 手勢相關
-let armAngles = [];  // 手臂角度
-let action = '', prevAction = '';  // 動作狀態
+let gesture = '', prevGesture = '';               // 手勢相關
+let armAngles = [];                               // 手臂角度
+let action = '', prevAction = '';                 // 動作狀態
 let pluck = [], prevPluck = [], velocities = [];  // 撥弦狀態與速度
-let timeCnt = 0;  // 計時器
+let timeCnt = 0;                                  // 計時器
 
 // 和弦控制
 export async function chordCtrl() {
@@ -65,9 +66,9 @@ export async function strumCtrl() {
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
 
             // 根據角度變化和位置來判斷掃弦方向
-            if (diffAngle > 3 && position > 5) {
-                action = 'Down';
-            } else if (diffAngle < -3 && position < -15) {
+            if (diffAngle > 3 && (position > 5 || modeNum == 1)) {
+                action = 'Dn';
+            } else if (diffAngle < -3 && (position < -15 || modeNum == 1)) {
                 action = 'Up';
             } else {
                 action = 'Stop';

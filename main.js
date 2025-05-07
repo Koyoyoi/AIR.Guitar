@@ -1,8 +1,7 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg } from "./Controll/blockControll.js";
+import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg, showAllCtrl } from "./Controll/blockControll.js";
 import { initMIDIPort, buildGuitarChord, soundSample, audioCtx, mapRange } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
-import { showAllCtrl } from "./Controll/areaControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";

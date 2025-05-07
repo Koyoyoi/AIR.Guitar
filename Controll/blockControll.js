@@ -1,13 +1,20 @@
 import { drawRect, drawTriangle } from "../Draw/drawGraph.js";
-import { initMIDIPort, instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
+export let modeNum = 0, portOpen = false,   sampleNum = 0, showAllCtrl = false;;
 
 let IMGs = {}
-let modeNum = 0, portOpen = false,   sampleNum = 0, showAllCtrl = false;;
-const modeName = ["自由模式", "歌曲演奏"];
+const modeName = ["自由演奏", "簡單演奏", "歌曲演奏"];
 
+function isInside(mouse, area) {
+    return (
+        mouse.X >= area.x &&
+        mouse.X <= area.x + area.w &&
+        mouse.Y >= area.y &&
+        mouse.Y <= area.y + area.h
+    );
+}
 
 // 載入圖片
 export async function loadImg(){
@@ -40,12 +47,7 @@ export function draw_setting(){
 
     // 檢查是否點擊在控制區域
     if (mouse.X != 0 && mouse.Y != 0) {
-        if (
-            mouse.X >= Area.x &&
-            mouse.X <= Area.x + Area.w &&
-            mouse.Y >= Area.y &&
-            mouse.Y <= Area.y + Area.h
-        ) {
+        if (isInside(mouse, Area)) {
             console.log("✅ confing 控制區被點擊！");
             showAllCtrl = !showAllCtrl
         }
@@ -95,20 +97,10 @@ export function draw_ModeCtrl(){
 
      // 檢查是否點擊在按鈕上
      if (mouse.X != 0 && mouse.Y != 0) {
-        if (
-            mouse.X >= LButton.x &&
-            mouse.X <= LButton.x + LButton.w &&
-            mouse.Y >= LButton.y &&
-            mouse.Y <= LButton.y + LButton.h
-        ) {
+        if (isInside(mouse, LButton)) {
             console.log("✅ mode Left 被點擊！");
             modeNum -= 1
-        } else if (
-            mouse.X >= RButton.x &&
-            mouse.X <= RButton.x + RButton.w &&
-            mouse.Y >= RButton.y &&
-            mouse.Y <= RButton.y + RButton.h
-        ) {
+        } else if (isInside(mouse, RButton)) {
             console.log("✅ mode Right 被點擊！");
             modeNum += 1
         }
@@ -138,12 +130,7 @@ export function draw_midiPortArea() {
 
     // 檢查是否點擊在控制區域
     if (mouse.X != 0 && mouse.Y != 0) {
-        if (
-            mouse.X >= Area.x &&
-            mouse.X <= Area.x + Area.w &&
-            mouse.Y >= Area.y &&
-            mouse.Y <= Area.y + Area.h
-        ) {
+        if (isInside(mouse, Area)) {
             console.log("✅ MIDI port 控制區被點擊！");
             portOpen = !portOpen;
             if (portOpen) { initMIDIPort(); }
@@ -198,21 +185,11 @@ export async function draw_sampleNameArea() {
     // 檢查是否點擊在按鈕上
     if (mouse.X != 0 && mouse.Y != 0) {
         let change = false
-        if (
-            mouse.X >= LButton.x &&
-            mouse.X <= LButton.x + LButton.w &&
-            mouse.Y >= LButton.y &&
-            mouse.Y <= LButton.y + LButton.h
-        ) {
+        if (isInside(mouse, LButton)) {
             console.log("✅ sample Left 被點擊！");
             sampleNum -= 1;  // 減少樣本索引
             change = true
-        } else if (
-            mouse.X >= RButton.x &&
-            mouse.X <= RButton.x + RButton.w &&
-            mouse.Y >= RButton.y &&
-            mouse.Y <= RButton.y + RButton.h
-        ) {
+        } else if (isInside(mouse, RButton)) {
             console.log("✅ sample Right 被點擊！");
             sampleNum += 1;  // 增加樣本索引
             change = true
