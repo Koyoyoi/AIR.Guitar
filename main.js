@@ -1,13 +1,12 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg } from "./Draw/drawCtrl.js";
+import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg } from "./Controll/blockControll.js";
 import { initMIDIPort, buildGuitarChord, soundSample, audioCtx, mapRange } from "./sound.js";
-import { capoCtrl, chordCtrl, pluckCtrl,  strumCtrl } from "./Controll/musicControll.js";
+import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { showAllCtrl } from "./Controll/areaControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
-import { drawRect } from "./Draw/drawGraph.js";
 
 //  全域變數宣告區 
 export let canvas = { base: {}, midi: {} };
@@ -125,21 +124,25 @@ window.onload = async function () {
 
             // 使用 Magenta.js 解析 MIDI
             let midifile = await mm.blobToNoteSequence(blob);
-
+            
+            console.log(midifile)
             // 播放所有音符
             midifile.notes.forEach(note => {
-                animateSeq(
-                    note.pitch,
-                    mapRange(note.pitch, 21, 108, 0, canvas['midi'].cvs.width),
-                    0 - note.startTime * 100,
-                    100
-                );
-                soundSample.play(
-                    note.pitch,
-                    audioCtx.currentTime + note.startTime,    // 延後播放
-                    { velocity: note.velocity, duration: note.endTime - note.startTime }
-                );
+                if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
+                    animateSeq(
+                        note.pitch,
+                        mapRange(note.pitch, 21, 108, 0, canvas['midi'].cvs.width),
+                        0 - note.startTime * 100,
+                        100
+                    )
+                    soundSample.play(
+                        note.pitch,
+                        audioCtx.currentTime + note.startTime,    // 延後播放
+                        { velocity: note.velocity, duration: note.endTime - note.startTime }
+                    );
+                };
             });
+            
         }
 
         //  非支援格式 

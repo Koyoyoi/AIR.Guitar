@@ -5,7 +5,7 @@ import { predict } from "../SVM.js";
 import { drawCapo, drawGesture } from "../Draw/drawInfo.js";
 
 // 設定全域變數
-export let capo = 0, portOpen = false, sampleName = 0, showAllCtrl = false;
+export let capo = 0;
 
 let gesture = '', prevGesture = '';  // 手勢相關
 let armAngles = [];  // 手臂角度

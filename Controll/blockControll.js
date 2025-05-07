@@ -1,10 +1,11 @@
-import { drawRect, drawTriangle } from "./drawGraph.js";
-import { instruments } from "../sound.js";
+import { drawRect, drawTriangle } from "../Draw/drawGraph.js";
+import { initMIDIPort, instruments } from "../sound.js";
 import { mouse, canvas  } from "../main.js";
-import { portCtrl, portOpen, sampleCtrl, settingCtrl, showAllCtrl, sampleNum } from "../Controll/areaControll.js";
+import { initMIDIPort, instruments, loadSamples } from "../sound.js";
+
 
 let IMGs = {}
-let modeNum = 0;
+let modeNum = 0, portOpen = false,   sampleNum = 0, showAllCtrl = false;;
 const modeName = ["自由模式", "歌曲演奏"];
 
 
@@ -46,7 +47,7 @@ export function draw_setting(){
             mouse.Y <= Area.y + Area.h
         ) {
             console.log("✅ confing 控制區被點擊！");
-            settingCtrl();
+            showAllCtrl = !showAllCtrl
         }
     }
 }
@@ -144,12 +145,15 @@ export function draw_midiPortArea() {
             mouse.Y <= Area.y + Area.h
         ) {
             console.log("✅ MIDI port 控制區被點擊！");
-            portCtrl();
+            portOpen = !portOpen;
+            if (portOpen) { initMIDIPort(); }
         }
     }
+
+
 }
 // 畫出 SoundFont 控制區域
-export function draw_sampleNameArea() {
+export async function draw_sampleNameArea() {
 
     // 區域的位置與大小
     let Area = {
@@ -193,6 +197,7 @@ export function draw_sampleNameArea() {
 
     // 檢查是否點擊在按鈕上
     if (mouse.X != 0 && mouse.Y != 0) {
+        let change = false
         if (
             mouse.X >= LButton.x &&
             mouse.X <= LButton.x + LButton.w &&
@@ -200,7 +205,8 @@ export function draw_sampleNameArea() {
             mouse.Y <= LButton.y + LButton.h
         ) {
             console.log("✅ sample Left 被點擊！");
-            sampleCtrl('-');
+            sampleNum -= 1;  // 減少樣本索引
+            change = true
         } else if (
             mouse.X >= RButton.x &&
             mouse.X <= RButton.x + RButton.w &&
@@ -208,7 +214,13 @@ export function draw_sampleNameArea() {
             mouse.Y <= RButton.y + RButton.h
         ) {
             console.log("✅ sample Right 被點擊！");
-            sampleCtrl('+');
+            sampleNum += 1;  // 增加樣本索引
+            change = true
+        }
+        
+        if(change){
+            sampleNum = (instruments.length + sampleNum) % instruments.length;  // 確保樣本索引在範圍內
+            await loadSamples();                                                      // 加載對應的樣本
         }
     }
 

@@ -6,16 +6,15 @@ export let seq = [];
 
 let lastTime = performance.now();
 
-export function animateSeq(midiNote, posX = null, posY = null, speed = 0) {
+export function animateSeq(midiNote, posX = null, posY = 0, speed = 0) {
     // 將音符加入動畫隊列
     seq.push({
-        x: posX != null ? posX : mapRange(midiNote, 21, 108, 0, canvas['midi'].cvs.width),  
-        y: posY != null ? posY : 0,
+        x: posX != null ? posX : mapRange(midiNote, 24, 96, 0, canvas['midi'].cvs.width),  
+        y: posY + 50,
         note: midiNote,
         speed: speed != 0 ? speed : 100 + Math.random() * 50  // 隨機速度
     });
 }
-
 
 export async function midiDrawLoop(now) {
     const dt = (now - lastTime) / 1000;

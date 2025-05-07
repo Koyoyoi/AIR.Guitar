@@ -1,5 +1,5 @@
 import { animateSeq } from "./Draw/drawMIDI.js";
-import {portOpen, sampleNum } from "./Controll/areaControll.js";
+import { portOpen, sampleNum} from "./Controll/blockControll.js"
 
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放
 export let soundSample;                                                           // 儲存音色樣本
