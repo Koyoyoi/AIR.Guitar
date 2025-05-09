@@ -123,25 +123,27 @@ window.onload = async function () {
 
             // 使用 Magenta.js 解析 MIDI
             let midifile = await mm.blobToNoteSequence(blob);
-            
+
             console.log(midifile)
             // 播放所有音符
             midifile.notes.forEach(note => {
                 if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
                     animateSeq(
                         note.pitch,
-                        mapRange(note.pitch, 21, 108, 0, canvas['midi'].cvs.width),
-                        0 - note.startTime * 100,
+                        canvas['midi'].cvs.width * 0.8 + note.startTime * 100,
+                        mapRange(note.pitch, 21, 108, canvas['midi'].cvs.height, 0),
                         100
                     )
+                    /**
                     soundSample.play(
                         note.pitch,
                         audioCtx.currentTime + note.startTime,    // 延後播放
                         { velocity: note.velocity, duration: note.endTime - note.startTime }
                     );
+                     */
                 };
             });
-            
+
         }
 
         //  非支援格式 
@@ -156,6 +158,9 @@ async function detectLoop() {
     canvas['base'].ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
     canvas['base'].ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
+    // 加上低透明度的黑色覆蓋
+    canvas['base'].ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';  // 調整透明度數值來控制暗化程度
+    canvas['base'].ctx.fillRect(0, 0, video.videoWidth, video.videoHeight);
     // 若有上傳圖片則顯示
     if (uploadedImage) drawImg();
 
