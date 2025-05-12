@@ -54,12 +54,11 @@ export function drawRect(area, radius, color = "#434343") {
 
 // 畫圓形的輔助函式
 export function drawCircle(area, color) {
-    const centerX = area.x + area.w / 2;   // 圓心 X 座標
-    const centerY = area.y + area.h / 2;   // 圓心 Y 座標
-    const radius = area.h / 2;             // 圓的半徑
+    const centerX = area.x + area.r / 2;   // 圓心 X 座標
+    const centerY = area.y + area.r / 2;   // 圓心 Y 座標
 
     canvas['midi'].ctx.beginPath();        // 開始繪製圓形
-    canvas['midi'].ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);  // 計算圓形範圍
+    canvas['midi'].ctx.arc(centerX, centerY, area.r / 2, 0, 2 * Math.PI);  // 計算圓形範圍
     canvas['midi'].ctx.fillStyle = color;  // 設定顏色
     canvas['midi'].ctx.fill();             // 填充顏色
 }

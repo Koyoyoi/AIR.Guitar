@@ -1,4 +1,4 @@
-import { animateSeq } from "./Draw/drawMIDI.js";
+import { animateSeq, rollSeq } from "./Draw/drawMIDI.js";
 import { modeNum, portOpen, sampleNum } from "./Controll/blockControll.js"
 
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放
@@ -132,8 +132,9 @@ export async function plucking(pluck, capo, velocities) {
 
         cnt += 1
     }
-    
-    if (!portOpen) {
+    if(modeNum == 2){
+        await rollSeq();
+    } else if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
         notes.forEach(([note, velocity]) => {
             soundSample.play(note + capo, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });

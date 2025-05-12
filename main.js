@@ -1,9 +1,9 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg, showAllCtrl } from "./Controll/blockControll.js";
-import { initMIDIPort, buildGuitarChord, soundSample, audioCtx, mapRange } from "./sound.js";
+import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
+import { initMIDIPort, buildGuitarChord, mapRange } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { midiDrawLoop, animateSeq } from "./Draw/drawMIDI.js";
+import { midiDrawLoop, animateSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { reCanva, drawImg } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
 
@@ -118,34 +118,38 @@ window.onload = async function () {
 
         //  處理 MIDI 檔 
         if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
+            resetSeq();
+
             const arrayBuffer = await file.arrayBuffer();
             const blob = new Blob([arrayBuffer], { type: "audio/midi" });
 
             // 使用 Magenta.js 解析 MIDI
             let midifile = await mm.blobToNoteSequence(blob);
 
-            console.log(midifile)
-            // 播放所有音符
-            midifile.notes.forEach(note => {
+            const xMap = new Map();
+            let i = 0;
+
+            midifile.notes.sort((a, b) => a.startTime - b.startTime);
+
+            midifile.notes.forEach((note) => {
                 if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
+                    // col controll
+                    if (!xMap.has(note.startTime)) {
+                        xMap.set(note.startTime, i * 185);
+                        i++;
+                    }
+                    // add to animate sequence
                     animateSeq(
                         note.pitch,
-                        canvas['midi'].cvs.width * 0.8 + note.startTime * 100,
-                        mapRange(note.pitch, 21, 108, canvas['midi'].cvs.height, 0),
-                        100
+                        note.velocity,
+                        (note.endTime - note.startTime),
+                        modeNum == 2 ? xMap.get(note.startTime ) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200,
+                        mapRange(note.pitch, 30, 90, canvas['midi'].cvs.height, 0),
                     )
-                    /**
-                    soundSample.play(
-                        note.pitch,
-                        audioCtx.currentTime + note.startTime,    // 延後播放
-                        { velocity: note.velocity, duration: note.endTime - note.startTime }
-                    );
-                     */
                 };
             });
-
+            console.log(xMap)
         }
-
         //  非支援格式 
         else {
             alert("請上傳圖片或 MIDI 檔案！");
@@ -158,9 +162,16 @@ async function detectLoop() {
     canvas['base'].ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
     canvas['base'].ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
+    // 執行 MediaPipe 偵測
+    await detectHand();
+    await detectPose();
+
     // 加上低透明度的黑色覆蓋
-    canvas['base'].ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';  // 調整透明度數值來控制暗化程度
-    canvas['base'].ctx.fillRect(0, 0, video.videoWidth, video.videoHeight);
+    if (modeNum == 2) {
+        canvas['base'].ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        canvas['base'].ctx.fillRect(0, 0, video.videoWidth, video.videoHeight);
+    }
+
     // 若有上傳圖片則顯示
     if (uploadedImage) drawImg();
 
@@ -172,15 +183,14 @@ async function detectLoop() {
     }
     draw_setting();
 
-    // 執行 MediaPipe 偵測
-    await detectHand();
-    await detectPose();
-
     // 音樂控制
-    await chordCtrl();
+    if (modeNum != 2) {
+        await chordCtrl();
+        await capoCtrl();
+    }
     await pluckCtrl();
     await strumCtrl();
-    await capoCtrl();
+    
 
     // 重置追蹤資料
     handData["Left"] = [];
