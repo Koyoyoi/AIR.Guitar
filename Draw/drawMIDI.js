@@ -1,7 +1,7 @@
 import { canvas } from "../main.js";
 import { drawCircle, drawLine } from "./drawGraph.js";
 import { mapRange, guitarChord, soundSample } from "../sound.js";
-import { modeNum } from "../Controll/blockControll.js";
+import { modeNum, isPlay } from "../Controll/blockControll.js";
 
 // 儲存目前畫面上的音符序列
 export let seq = [];
@@ -65,6 +65,7 @@ export function midiDrawLoop(now) {
     if (modeNum == 2) {
         drawLine(200, 0, 200, canvas['midi'].cvs.height, '#888'); // 擊中線
         seq.forEach(n => {
+            if (isPlay) {}
             if (n.x > 180) {
                 const color = pitchToColor(n.note);
                 drawCircle({ x: n.x, y: n.y, r: n.r }, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.6)`);

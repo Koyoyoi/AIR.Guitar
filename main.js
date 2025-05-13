@@ -146,7 +146,7 @@ window.onload = async function () {
                         note.pitch,
                         note.velocity,
                         (note.endTime - note.startTime),
-                        modeNum == 2 ? xMap.get(note.startTime) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200,
+                        modeNum == 2 ? xMap.get(note.startTime) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200 * 10,
                     )
                 };
             });
