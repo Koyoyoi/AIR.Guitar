@@ -66,9 +66,9 @@ export async function strumCtrl() {
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
 
             // 根據角度變化和位置來判斷掃弦方向
-            if (diffAngle > 3 && (position > 5 || modeNum == 1)) {
+            if (diffAngle > 3 && position > 5 ) {
                 action = 'Dn';
-            } else if (diffAngle < -3 && (position < -15 || modeNum == 1)) {
+            } else if (diffAngle < -3 && position < -15 ) {
                 action = 'Up';
             } else {
                 action = 'Stop';

@@ -172,14 +172,6 @@ export async function strumming(direction, capo, duration) {
 
     cnt = cnt % strumP.length
 
-    if (strumP[cnt] == ' ') {
-        cnt += 1
-        return;
-    } else if (strumP[cnt] == direction) {
-        cnt += 1
-    } else {
-        return;
-    }
     duration = Math.floor(duration) * 4 / sturmOrder.length;
 
     if (!portOpen) {

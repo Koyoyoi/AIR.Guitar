@@ -116,7 +116,7 @@ function removeSeq() {
                 soundSample.play(
                     seq[i].note,
                     0,
-                    { velocity: seq[i].v, duration: seq[i].d }
+                    { gain: seq[i].v / 127 * 3, duration: modeNum == 2 ? 2 : seq[i].d }
                 );
             }
 
