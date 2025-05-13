@@ -3,6 +3,8 @@ import { modeNum, portOpen, sampleNum } from "./Controll/blockControll.js"
 
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放
 export let soundSample;                                                           // 儲存音色樣本
+export let guitarChord = [], pluckNotes = [];                                     // 儲存吉他和弦與挑弦音符
+
 // 預設的樂器列表
 export const instruments = [
     "acoustic_guitar_nylon",
@@ -31,7 +33,6 @@ const chordTab = {
 };
 const guitarStandard = [40, 45, 50, 55, 59, 64]; // 標準吉他音高（從低音弦到高音弦）
 let outport = null, cnt = 0;                              // 儲存 MIDI 輸出端口
-let guitarChord = [], pluckNotes = [];           // 儲存吉他和弦與挑弦音符
 let strumP = ['Dn', ' ', 'Dn', ' ', 'Dn', ' ', 'Dn', 'Up']
 let pluckP = [[0], [1], [2, 3], [1]]
 
@@ -142,7 +143,7 @@ export async function plucking(pluck, capo, velocities) {
             soundSample.play(note + capo, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
             console.log(`音符：${note + capo}, 音量：${velocity}`);
             // 加入動畫隊列
-            animateSeq(note + capo);
+            animateSeq(note);
 
         });
 
@@ -187,7 +188,7 @@ export async function strumming(direction, capo, duration) {
             soundSample.play(n + capo, audioCtx.currentTime, { gain: 4, duration: 1 });
             await sleep(duration);
             // 加入動畫隊列
-            animateSeq(n + capo);
+            animateSeq(n);
         }
     } else if (outport) {
         // 如果有 MIDI 設備，發送 MIDI 訊號

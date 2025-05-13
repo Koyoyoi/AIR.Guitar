@@ -143,7 +143,7 @@ window.onload = async function () {
                         note.pitch,
                         note.velocity,
                         (note.endTime - note.startTime),
-                        modeNum == 2 ? xMap.get(note.startTime ) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200,
+                        modeNum == 2 ? xMap.get(note.startTime) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200,
                     )
                 };
             });
@@ -166,10 +166,8 @@ async function detectLoop() {
     await detectPose();
 
     // 加上低透明度的黑色覆蓋
-    if (modeNum == 2) {
-        canvas['base'].ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        canvas['base'].ctx.fillRect(0, 0, video.videoWidth, video.videoHeight);
-    }
+    canvas['base'].ctx.fillStyle = `rgba(0, 0, 0, ${modeNum == 2 ? 0.8 : 0.4})`;
+    canvas['base'].ctx.fillRect(0, 0, video.videoWidth, video.videoHeight);
 
     // 若有上傳圖片則顯示
     if (uploadedImage) drawImg();
@@ -189,7 +187,7 @@ async function detectLoop() {
     }
     await pluckCtrl();
     await strumCtrl();
-    
+
 
     // 重置追蹤資料
     handData["Left"] = [];

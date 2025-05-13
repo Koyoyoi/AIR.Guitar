@@ -79,11 +79,11 @@ export function drawGesture(gesture, capo) {
 
 // 繪製 capo 設定資訊，顯示在畫布的右上角
 export function drawCapo(capo) {
-    canvas['base'].ctx.font = "700 80px Arial";  // 設定字型大小
+    canvas['base'].ctx.font = "700 70px Arial";  // 設定字型大小
     canvas['base'].ctx.fillStyle = "#00AA90";    // 設定顏色
     canvas['base'].ctx.textAlign = "right";      // 文字對齊右邊
     canvas['base'].ctx.textBaseline = "top";     // 文字基準線為上端
-    canvas['base'].ctx.fillText(`Capo: ${capo}`, canvas['base'].cvs.width - 50, 50);  // 顯示 capo 設定資訊
+    canvas['base'].ctx.fillText(`Capo: ${capo}`, canvas['base'].cvs.width - 50, 25);  // 顯示 capo 設定資訊
 }
 
 // 繪製上傳的圖片，並根據畫布大小調整圖片的大小
