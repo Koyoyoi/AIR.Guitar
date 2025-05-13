@@ -21,7 +21,7 @@ export async function rollSeq() {
 
             if (n.x > 180) {
                 const color = pitchToColor(n.note);  // color 是 [r, g, b]
-                drawCircle({ x: n.x, y: n.y, r: n.r }, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.7)`)
+                drawCircle({ x: n.x, y: n.y, r: n.r }, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.6)`)
             }
         });
 
@@ -40,18 +40,14 @@ export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = canvas
     });
 }
 
+// 將 pitch 轉為 RGB 數組
 function pitchToColor(pitch) {
     // pitch: MIDI 音高 (0~127)
     // 將其映射為色相 hue (0~360)，例如 40~100 會落在彩虹範圍
-    const hue = Math.floor((pitch / 127) * 360);  // 0~360
-    const saturation = 100;  // %，飽和度
-    const lightness = 60;    // %，亮度
+    let h = Math.floor((pitch / 127) * 360);  // 0~360
+    let s = 100;                              // %，飽和度
+    let l = 60;                               // %，亮度
 
-    return hslToRgb(hue, saturation, lightness);
-}
-
-// 將 HSL 轉為 RGB 數組
-function hslToRgb(h, s, l) {
     s /= 100;
     l /= 100;
     const k = n => (n + h / 30) % 12;
@@ -60,8 +56,6 @@ function hslToRgb(h, s, l) {
         l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
     return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
 }
-
-
 
 export function midiDrawLoop(now) {
     const dt = (now - lastTime) / 1000;
@@ -84,7 +78,7 @@ export function midiDrawLoop(now) {
         if (modeNum != 2) { n.x -= speed * dt; }
         if (n.x > 180) {
             const color = pitchToColor(n.note);  // color 是 [r, g, b]
-            drawCircle({ x: n.x, y: n.y, r: n.r }, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.7)`)
+            drawCircle({ x: n.x, y: n.y, r: n.r }, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.6)`)
         }
     });
 
