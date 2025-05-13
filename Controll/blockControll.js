@@ -2,7 +2,8 @@ import { drawRect, drawTriangle } from "../Draw/drawGraph.js";
 import { mouse, canvas  } from "../main.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
-export let modeNum = 0, portOpen = false,   sampleNum = 0, showAllCtrl = false;;
+export let modeNum = 0, portOpen = false, sampleNum = 0;
+export let showAllCtrl = false, isPlay = false;
 
 let IMGs = {}
 const modeName = ["自由演奏", "簡單演奏", "歌曲演奏"];
@@ -201,4 +202,25 @@ export async function sampleNameArea() {
         }
     }
 
+}
+
+export async function playCtrl(){
+    // 區域的位置與大小
+    let Area = {
+        x: 10,
+        y: 10,
+        w: 80,
+        h: 80
+    };
+   
+    let img = !isPlay? IMGs['play_button'] : IMGs['stop_button']
+    canvas['base'].ctx.drawImage(img, Area.x, Area.y, Area.w, Area.h);
+
+    // 檢查是否點擊在控制區域
+    if (mouse.X != 0 && mouse.Y != 0) {
+        if (isInside(mouse, Area)) {
+            console.log("✅ play 控制區被點擊！");
+            isPlay = !isPlay
+        }
+    }
 }

@@ -1,5 +1,5 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { settingArea, midiPortArea, ModeCtrl, sampleNameArea, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
+import { settingArea, midiPortArea, ModeCtrl, sampleNameArea, loadImg, showAllCtrl, modeNum, playCtrl } from "./Controll/blockControll.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
@@ -60,7 +60,10 @@ async function setupCamera() {
                 if (showAllCtrl) {
                     midiPortArea();
                     sampleNameArea();
-                    ModeCtrl()
+                    ModeCtrl();
+                }
+                if (modeNum == 2){
+                    playCtrl();
                 }
                 settingArea();
 
@@ -177,6 +180,9 @@ async function detectLoop() {
         midiPortArea();
         sampleNameArea();
         ModeCtrl();
+    }
+    if( modeNum == 2){
+        playCtrl();
     }
     settingArea();
 

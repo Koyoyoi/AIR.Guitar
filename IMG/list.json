@@ -1,5 +1,7 @@
 [
     "open_setting",
-    "close_setting"
+    "close_setting",
+    "play_button",
+    "stop_button"
   ]
   
