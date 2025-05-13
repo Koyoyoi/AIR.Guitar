@@ -128,6 +128,13 @@ export function midiDrawLoop(now) {
     }
     // mode 0~1 
     else {
+        seq.forEach(n => {
+                n.x -= speed * 10 * dt;
+                if (n.x > 180) {
+                    const color = pitchToColor(n.note);  // color 是 [r, g, b]
+                }
+            });
+
         guitarChord.forEach(n => {
             const baseY = mapRange(n, 36, 68, canvas['midi'].cvs.height, 100);
             const color = pitchToColor(n);
@@ -136,20 +143,12 @@ export function midiDrawLoop(now) {
             canvas['midi'].ctx.lineWidth = 10;
             canvas['midi'].ctx.beginPath();
 
-            seq.forEach(n => {
-                n.x -= speed * dt;
-                if (n.x > 180) {
-                    const color = pitchToColor(n.note);  // color 是 [r, g, b]
-                }
-            });
-
-
             if (seq.some(s => s.note === n)) {
                 const segments = 100;
                 const segmentWidth = canvas['midi'].cvs.width / segments;
 
-                const waveFreq = 10;         // 抖動頻率
-                const maxJitter = 12;       // 抖動幅度
+                const waveFreq = mapRange(n, 36, 68, 2, 12);         // 抖動頻率
+                const maxJitter = mapRange(n, 36, 68, 20, 2);       // 抖動幅度
                 const time = performance.now() * 0.01; // 時間動畫（秒）
 
                 canvas['midi'].ctx.beginPath();
