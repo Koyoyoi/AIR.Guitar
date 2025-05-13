@@ -39,22 +39,24 @@ let pluckP = [[0], [1], [2, 3], [1]]
 export async function initMIDIPort() {
     await loadSamples();                                    // 等待音色樣本載入
 
-    const midiAccess = await navigator.requestMIDIAccess(); // 若失敗會自動 throw，可選擇不捕捉
+    try {
+        midiAccess = await navigator.requestMIDIAccess();
+        console.log("✅ MIDI ready!");
 
-    console.log("MIDI ready!");
+        const outputs = midiAccess.outputs;
 
-    let outputs = midiAccess.outputs;
-    if (outputs.size > 0) {
-        console.log("MIDI Output Devices:");
-        outputs.forEach((outputDevice, key) => {
-            console.log(key, outputDevice.name);
-        });
+        if (outputs.size > 0) {
+            console.log("🎹 MIDI Output Devices:");
+            outputs.forEach((outputDevice, key) => {
+                console.log(`- [${key}] ${outputDevice.name}`);
+            });
 
-        outport = outputs.values().next().value;
-        return true;
-    } else {
-        console.log("No MIDI output devices found.");
-        return false;
+            // 取得第一個輸出裝置作為預設 outport
+            outport = outputs.values().next().value;
+            console.log(`🎵 Using output: ${outport.name}`);
+        }
+    } catch (error) {
+       console.log("⚠️ No MIDI output devices found.");
     }
 }
 
@@ -109,12 +111,12 @@ export function buildGuitarChord(gesture) {
     pluckNotes.push(guitarChord[guitarChord.length - 1]); // 第六弦音符
 }
 
-// 延遲函數，使用 Promise 模擬延遲時間
+// 延遲函數
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 撥弦函數，根據指定的音符與力度來播放音符
+// 撥弦函數
 export async function plucking(pluck, capo, velocities) {
     let notes = [];
 
@@ -123,7 +125,7 @@ export async function plucking(pluck, capo, velocities) {
             notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
         });
     }
-    else if(modeNum == 1){
+    else if (modeNum == 1) {
         cnt = cnt % pluckP.length;
 
         pluckP[cnt].forEach((n) => {
@@ -132,7 +134,7 @@ export async function plucking(pluck, capo, velocities) {
 
         cnt += 1
     }
-    if(modeNum == 2){
+    if (modeNum == 2) {
         await rollSeq();
     } else if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
@@ -162,18 +164,19 @@ export async function plucking(pluck, capo, velocities) {
 
 // 掃弦函數
 export async function strumming(direction, capo, duration) {
+    if(modeNum == 2) { return }
 
     let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
     console.log(`方向: ${direction}，持續時間: ${duration}ms`);
-    
+
     cnt = cnt % strumP.length
-    
-    if(strumP[cnt] == ' '){
+
+    if (strumP[cnt] == ' ') {
         cnt += 1
         return;
-    }else if(strumP[cnt] == direction){
+    } else if (strumP[cnt] == direction) {
         cnt += 1
-    }else{
+    } else {
         return;
     }
     duration = Math.floor(duration) * 4 / sturmOrder.length;

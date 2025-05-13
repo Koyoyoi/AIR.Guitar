@@ -6,6 +6,8 @@ import { modeNum } from "../Controll/blockControll.js";
 
 export let seq = [], isRoll = false;
 
+let effects = [];
+
 let lastTime = performance.now();
 
 export function resetSeq() {
@@ -15,9 +17,14 @@ export function resetSeq() {
 export async function rollSeq() {
     for (let i = 0; i < 10; i++) {
         seq.forEach(n => {
-            n.x -= 185 / 10;
-            drawCircle({ x: n.x, y: n.y, w: 20, h: 20 }, "#EEA9A9");
+            n.x -= 100 / 10;
+
+            if (n.x > 180) {
+                const color = pitchToColor(n.note);  // color 是 [r, g, b]
+                drawCircle({ x: n.x, y: n.y, r: n.r }, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.7)`)
+            }
         });
+
     }
 }
 
@@ -28,11 +35,35 @@ export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = canvas
         v: velocity,
         d: duration,
         x: posX,
-        y: posY == 0 ? mapRange(midiNote, 24, 96, canvas['midi'].cvs.height, 0) : posY,
+        y: mapRange(midiNote, 24, 84, canvas['midi'].cvs.height, 0),
+        r: mapRange(velocity, 60, 127, 20, 50)
     });
 }
 
-export async function midiDrawLoop(now) {
+function pitchToColor(pitch) {
+    // pitch: MIDI 音高 (0~127)
+    // 將其映射為色相 hue (0~360)，例如 40~100 會落在彩虹範圍
+    const hue = Math.floor((pitch / 127) * 360);  // 0~360
+    const saturation = 100;  // %，飽和度
+    const lightness = 60;    // %，亮度
+
+    return hslToRgb(hue, saturation, lightness);
+}
+
+// 將 HSL 轉為 RGB 數組
+function hslToRgb(h, s, l) {
+    s /= 100;
+    l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n =>
+        l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+}
+
+
+
+export function midiDrawLoop(now) {
     const dt = (now - lastTime) / 1000;
     const speed = 200
     lastTime = now;
@@ -51,7 +82,10 @@ export async function midiDrawLoop(now) {
 
     seq.forEach(n => {
         if (modeNum != 2) { n.x -= speed * dt; }
-        drawCircle({ x: n.x, y: n.y, r: modeNum == 2? 30 : 20 }, "#EEA9A9")
+        if (n.x > 180) {
+            const color = pitchToColor(n.note);  // color 是 [r, g, b]
+            drawCircle({ x: n.x, y: n.y, r: n.r }, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.7)`)
+        }
     });
 
 
@@ -65,10 +99,39 @@ export async function midiDrawLoop(now) {
                     { velocity: seq[i].v, duration: seq[i].d }
                 );
             }
+
+            // ✨ 加入動畫效果（例如漣漪）
+            effects.push({
+                x: 185,
+                y: seq[i].y,
+                radius: 0,
+                alpha: 1.0  // 1.0 表示完全不透明
+            });
+
             seq.splice(i, 1);
         }
 
     }
+
+    // 畫特效動畫
+    for (let i = effects.length - 1; i >= 0; i--) {
+        let e = effects[i];
+
+        canvas['midi'].ctx.beginPath();
+        canvas['midi'].ctx.arc(e.x, e.y, e.radius, 0, 2 * Math.PI);
+        canvas['midi'].ctx.strokeStyle = `rgba(255, 255, 255, ${e.alpha})`;
+        canvas['midi'].ctx.lineWidth = 5;
+        canvas['midi'].ctx.stroke();
+
+        // 更新動畫狀態
+        e.radius += Math.random() * (10 - 3) + 3;
+        e.alpha -= 0.05;
+
+        if (e.alpha <= 0) {
+            effects.splice(i, 1);
+        }
+    }
+
 
     requestAnimationFrame(midiDrawLoop);
 }

@@ -135,7 +135,7 @@ window.onload = async function () {
                 if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
                     // col controll
                     if (!xMap.has(note.startTime)) {
-                        xMap.set(note.startTime, i * 185);
+                        xMap.set(note.startTime, 185 + i * 100);
                         i++;
                     }
                     // add to animate sequence
@@ -144,11 +144,10 @@ window.onload = async function () {
                         note.velocity,
                         (note.endTime - note.startTime),
                         modeNum == 2 ? xMap.get(note.startTime ) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200,
-                        mapRange(note.pitch, 30, 90, canvas['midi'].cvs.height, 0),
                     )
                 };
             });
-            console.log(xMap)
+
         }
         //  非支援格式 
         else {
