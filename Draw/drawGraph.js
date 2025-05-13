@@ -62,3 +62,12 @@ export function drawCircle(area, color) {
     canvas['midi'].ctx.fillStyle = color;  // 設定顏色
     canvas['midi'].ctx.fill();             // 填充顏色
 }
+
+export function drawLine(ax, ay, bx, by, color) {
+    canvas['midi'].ctx.beginPath();
+    canvas['midi'].ctx.moveTo(ax, ay);
+    canvas['midi'].ctx.lineTo(bx, by);
+    canvas['midi'].ctx.strokeStyle = color;
+    canvas['midi'].ctx.lineWidth = 5;
+    canvas['midi'].ctx.stroke();
+}
