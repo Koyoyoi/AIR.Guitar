@@ -34,7 +34,7 @@ export async function loadImg(){
 }
 
 // Setting 控制區域
-export function draw_setting(){
+export function settingArea(){
      // 區域的位置與大小
      let Area = {
         x: canvas['base'].cvs.width - canvas['base'].cvs.height * 0.1,
@@ -55,7 +55,7 @@ export function draw_setting(){
 }
 
 // Mode 控制區域
-export function draw_ModeCtrl(){
+export function ModeCtrl(){
     let Area = {
         x: canvas['base'].cvs.width / 2 - canvas['base'].cvs.width * 0.1,
         y: 0,
@@ -109,7 +109,7 @@ export function draw_ModeCtrl(){
     modeNum = (modeName.length + modeNum) % modeName.length;
 }
 // 畫出 MIDI 控制區域
-export function draw_midiPortArea() {
+export function midiPortArea() {
     // 定義 MIDI 控制區域的位置與大小
     let Area = {
         x: 30,
@@ -140,7 +140,7 @@ export function draw_midiPortArea() {
 
 }
 // 畫出 SoundFont 控制區域
-export async function draw_sampleNameArea() {
+export async function sampleNameArea() {
 
     // 區域的位置與大小
     let Area = {

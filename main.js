@@ -1,5 +1,5 @@
 import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { draw_setting, draw_midiPortArea, draw_ModeCtrl, draw_sampleNameArea, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
+import { settingArea, midiPortArea, ModeCtrl, sampleNameArea, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
@@ -58,11 +58,11 @@ async function setupCamera() {
                 mouse.Y = (e.clientY - rect.top) * scaleY;
 
                 if (showAllCtrl) {
-                    draw_midiPortArea();
-                    draw_sampleNameArea();
-                    draw_ModeCtrl()
+                    midiPortArea();
+                    sampleNameArea();
+                    ModeCtrl()
                 }
-                draw_setting();
+                settingArea();
 
                 // 重置滑鼠位置
                 mouse.X = 0;
@@ -174,11 +174,11 @@ async function detectLoop() {
 
     // 顯示控制區
     if (showAllCtrl) {
-        draw_midiPortArea();
-        draw_sampleNameArea();
-        draw_ModeCtrl();
+        midiPortArea();
+        sampleNameArea();
+        ModeCtrl();
     }
-    draw_setting();
+    settingArea();
 
     // 音樂控制
     if (modeNum != 2) {
