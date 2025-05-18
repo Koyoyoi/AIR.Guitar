@@ -1,25 +1,23 @@
-import { DrawingUtils } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { settingArea, midiPortArea, ModeCtrl, sampleNameArea, loadImg, showAllCtrl, modeNum, playCtrl } from "./Controll/blockControll.js";
+import { settingCtrl, midiPortCtrl, ModeCtrl, sampleNameArea, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { midiDrawLoop, animateSeq, resetSeq } from "./Draw/drawMIDI.js";
-import { reCanva, drawImg } from "./Draw/drawInfo.js";
+import { reCanva } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
 
 //  全域變數宣告區 
-export let canvas = { base: {}, midi: {} };
 export let video, drawingUtils;
 export let midiCanvas, midiCtx;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
-export let uploadedImage = null;
-export let mouse = { X: 0, Y: 0 };
+export let baseApp, midiApp, uiApp;
+
+let videoSprite;
 
 // 相機設定與畫布初始化 
 async function setupCamera() {
     video = document.createElement("video");
     video.style.display = "none";
-    document.body.appendChild(video);
 
     // 啟動相機串流
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -29,11 +27,35 @@ async function setupCamera() {
     video.srcObject = stream;
 
     // 設定畫布與繪圖環境
-    canvas['base'] = { cvs: document.getElementById("baseCanvas"), ctx: {} }
-    canvas['base'].ctx = canvas.base.cvs.getContext("2d")
-    drawingUtils = new DrawingUtils(canvas.base.ctx);
-    canvas['midi'] = { cvs: document.getElementById("midiCanvas"), ctx: {} }
-    canvas['midi'].ctx = canvas.midi.cvs.getContext("2d");
+    baseApp = new PIXI.Application()
+    await baseApp.init({
+        backgroundColor: 0x1c1c1c,
+        width: 1280,
+        height: 720,
+    });
+
+    midiApp = new PIXI.Application()
+    await midiApp.init({
+        backgroundAlpha: 0,
+        width: 1280,
+        height: 720,
+    });
+    midiApp.stage.sortableChildren = true;
+    midiApp.canvas.style.pointerEvents = 'none';
+
+    uiApp = new PIXI.Application()
+    await uiApp.init({
+        backgroundAlpha: 0,
+        width: 1280,
+        height: 720,
+    });
+
+    // 確保 midiApp初始化完成後再操作 canvas
+    document.querySelector('.canvas-wrapper').appendChild(baseApp.canvas);
+    document.querySelector('.canvas-wrapper').appendChild(midiApp.canvas);
+    document.querySelector('.canvas-wrapper').appendChild(uiApp.canvas);
+
+    // drawingUtils = new DrawingUtils(baseApp.canvas.ctx);
 
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
@@ -48,31 +70,21 @@ async function setupCamera() {
             // 顯示上傳介面
             document.querySelector(".upload-section")?.classList.add("show");
 
-            // 點擊畫布時的事件：取得滑鼠座標並顯示 MIDI 控制
-            canvas['base'].cvs.addEventListener("click", (e) => {
-                const rect = canvas['base'].cvs.getBoundingClientRect();
-                const scaleX = canvas['base'].cvs.width / rect.width;
-                const scaleY = canvas['base'].cvs.height / rect.height;
+            const texture = PIXI.Texture.from(video);
+            videoSprite = new PIXI.Sprite(texture);
 
-                mouse.X = (e.clientX - rect.left) * scaleX;
-                mouse.Y = (e.clientY - rect.top) * scaleY;
+            // 設定原始寬高
+            videoSprite.width = video.videoWidth;
+            videoSprite.height = video.videoHeight;
 
-                if (showAllCtrl) {
-                    midiPortArea();
-                    sampleNameArea();
-                    ModeCtrl();
-                }
-                if (modeNum == 2){
-                    playCtrl();
-                }
-                settingArea();
+            // 水平翻轉
+            videoSprite.scale.x = -1;
 
-                // 重置滑鼠位置
-                mouse.X = 0;
-                mouse.Y = 0;
-            });
+            // 因為翻轉後會往左邊跑掉，要調整 x 讓它顯示在畫面內
+            videoSprite.x = video.videoWidth;
 
-            video.play();
+            videoSprite.zIndex = 0;
+
 
             // 設定畫布尺寸調整事件
             reCanva();
@@ -95,29 +107,6 @@ window.onload = async function () {
         const file = event.target.files[0];
         if (!file) return;
         console.log("檔案名稱:", file.name);
-
-        //  處理圖片檔 
-        if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                const uploadedImage = new Image();
-
-                uploadedImage.onload = function () {
-                    console.log("圖片成功加載，準備繪製到畫布");
-                    const canvas = document.getElementById("canvas");
-                    const ctx = canvas.getContext("2d");
-                    canvas.width = uploadedImage.width;
-                    canvas.height = uploadedImage.height;
-                    ctx.drawImage(uploadedImage, 0, 0);
-                };
-
-                uploadedImage.onerror = () => console.error("圖片加載錯誤");
-                uploadedImage.src = e.target.result;
-            };
-
-            reader.readAsDataURL(file);
-        }
 
         //  處理 MIDI 檔 
         if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
@@ -146,7 +135,7 @@ window.onload = async function () {
                         note.pitch,
                         note.velocity,
                         (note.endTime - note.startTime),
-                        modeNum == 2 ? xMap.get(note.startTime) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200 * 10,
+                        modeNum == 1 ? xMap.get(note.startTime) : canvas['midi'].cvs.width * 0.8 + note.startTime * 200 * 5,
                     )
                 };
             });
@@ -161,33 +150,24 @@ window.onload = async function () {
 
 // 主偵測函式：處理即時畫面、偵測、與音樂互動 
 async function detectLoop() {
-    canvas['base'].ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
-    canvas['base'].ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+    baseApp.stage.removeChildren();
+    uiApp.stage.removeChildren();
+    baseApp.stage.addChild(videoSprite);
 
     // 執行 MediaPipe 偵測
     await detectHand();
     await detectPose();
 
-    // 加上低透明度的黑色覆蓋
-    canvas['base'].ctx.fillStyle = `rgba(0, 0, 0, ${modeNum == 2 ? 0.8 : 0.4})`;
-    canvas['base'].ctx.fillRect(0, 0, video.videoWidth, video.videoHeight);
-
-    // 若有上傳圖片則顯示
-    if (uploadedImage) drawImg();
-
     // 顯示控制區
     if (showAllCtrl) {
-        midiPortArea();
+        midiPortCtrl();
         sampleNameArea();
         ModeCtrl();
     }
-    if( modeNum == 2){
-        playCtrl();
-    }
-    settingArea();
+    settingCtrl()
 
     // 音樂控制
-    if (modeNum != 2) {
+    if (modeNum != 1) {
         await chordCtrl();
         await capoCtrl();
     }
@@ -211,9 +191,12 @@ async function main() {
     await load_SVM_Model();      // 載入手勢模型
     await setupCamera();         // 相機與畫布設定
     await initMIDIPort();        // MIDI 設定
+
     buildGuitarChord('C');       // 建立預設 C 和弦
     detectLoop();                // base canva detect loop
     midiDrawLoop();              // midi canva  draw  loop
+
+
 }
 
 // 等待 HTML 載入完成後啟動主程式 

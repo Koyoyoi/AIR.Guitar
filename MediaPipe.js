@@ -1,5 +1,5 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { drawingUtils, handData, poseData } from './main.js';
+import { handData, poseData } from './main.js';
 import { video } from "./main.js";
 
 // 全域變數：用來儲存模型實例
@@ -40,8 +40,9 @@ export async function setupMediaPipe() {
 export async function detectHand() {
     if (!handLandmarker) return;
 
-    let data = handLandmarker.detectForVideo(video, performance.now());
+    let data = handLandmarker.detectForVideo(video, performance.now(),  { width: video.videoWidth, height: video.videoHeight });
 
+    /** 
     if (data.landmarks) {
         // 畫手部關節連線與節點
         for (const landmarks of data.landmarks) {
@@ -49,6 +50,7 @@ export async function detectHand() {
             drawingUtils.drawLandmarks(landmarks, { color: "#DB4D6D", radius: 4 });
         }
     }
+    */
 
     const handPoints = data.landmarks;
     const handednesses = data.handednesses;
@@ -69,8 +71,8 @@ export async function detectHand() {
 export async function detectPose() {
     if (!poseLandmarker) return;
 
-    let data = poseLandmarker.detectForVideo(video, performance.now());
-    
+    let data = poseLandmarker.detectForVideo(video, performance.now(), { width: video.videoWidth, height: video.videoHeight });
+
     /** 
     if (data.landmarks) {
         // 畫身體關節連線與節點

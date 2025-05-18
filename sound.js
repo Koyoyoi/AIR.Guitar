@@ -31,10 +31,8 @@ const chordTab = {
     "m": [0, 3, 7],  // minor 小調
     "dim": [0, 3, 6] // Dim 減和弦
 };
-const guitarStandard = [40, 45, 50, 55, 59, 64]; // 標準吉他音高（從低音弦到高音弦）
+export const guitarStandard = [40, 45, 50, 55, 59, 64]; // 標準吉他音高（從低音弦到高音弦）
 let outport = null, cnt = 0;                              // 儲存 MIDI 輸出端口
-let strumP = ['Dn', ' ', 'Dn', ' ', 'Dn', ' ', 'Dn', 'Up']
-let pluckP = [[0], [1], [2, 3], [1]]
 
 // 初始化 MIDI 端口，獲取並設置第一個可用的 MIDI 輸出端口
 export async function initMIDIPort() {
@@ -126,16 +124,7 @@ export async function plucking(pluck, capo, velocities) {
             notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
         });
     }
-    else if (modeNum == 1) {
-        cnt = cnt % pluckP.length;
-
-        pluckP[cnt].forEach((n) => {
-            notes.push([pluckNotes[n], 90]);
-        })
-
-        cnt += 1
-    }
-    if (modeNum == 2) {
+    if (modeNum == 1) {
         await rollSeq();
     } else if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
@@ -165,12 +154,10 @@ export async function plucking(pluck, capo, velocities) {
 
 // 掃弦函數
 export async function strumming(direction, capo, duration) {
-    if(modeNum == 2) { return }
+    if(modeNum == 1) { return }
 
     let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
     console.log(`方向: ${direction}，持續時間: ${duration}ms`);
-
-    cnt = cnt % strumP.length
 
     duration = Math.floor(duration) * 4 / sturmOrder.length;
 

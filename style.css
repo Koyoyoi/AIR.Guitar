@@ -24,27 +24,6 @@ body {
     z-index: 10;                              /* 位於其他元素之上 */
 }
 
-/* === 畫布通用樣式 === */
-canvas {
-    position: absolute;
-    top: 100px;                               /* 畫布距離上方標題的間距 */
-    left: 50%;                                /* 水平置中 */
-    transform: translateX(-50%);              /* 精確水平置中 */
-    background-color: #1c1c1c;
-}
-
-/* 主畫布（顯示手勢與背景） */
-#baseCanvas {
-    z-index: 0; 
-}
-
-/* MIDI 視覺化畫布（透明） */
-#midiCanvas {
-    z-index: 1; 
-    pointer-events: none;          /* 不攔截滑鼠事件 */
-    background-color: transparent; /* 保持透明 */
-}
-
 /* === Loading 畫面樣式 === */
 #loading {
     position: fixed;
