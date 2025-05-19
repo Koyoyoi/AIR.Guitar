@@ -17,7 +17,7 @@ export function resetSeq() {
 
 // 播放序列時，將音符往左移動，並畫出可見的圓形
 export async function rollSeq() {
-    if (!isRolling) { isRolling = true; }
+    if (!isRolling && mode == 1) { isRolling = true; }
 }
 
 // 當音符觸發時，加入畫面序列中（位置、速度、大小等資訊）
@@ -87,40 +87,43 @@ export function midiDrawLoop(now) {
     // mode 0 可視化音符與吉他和弦線條
     else {
         seq.forEach(n => {
-            n.x -= modeNum == 1 ? speed * dt : speed * dt * 5;  // 快速流動
+            n.x -= speed * dt * 5;  // 快速流動
         });
-        drawChordLine(); // 畫吉他和弦線條
+        drawString(); // 畫吉他線條
     }
 
     removeSeq();    // 播放音效、刪除舊音符
     requestAnimationFrame(midiDrawLoop); // 呼叫下一幀
 }
 
-// 畫出動畫效果（如漣漪圈）
+// 畫出擊中動畫效果
 function drawEffects() {
 
     for (let i = effects.length - 1; i >= 0; i--) {
         let e = effects[i];
 
         if (e.type === "particle") {
+            e.vy += 0.2; // 模擬重力
             e.x += e.vx;
             e.y += e.vy;
-            e.alpha -= 0.05;
+            e.alpha -= 0.03;
+            e.radius *= 0.96; // 粒子慢慢變小
             e.life--;
 
             const g = new PIXI.Graphics();
-            g.beginFill(e.color, e.alpha);
-            g.drawCircle(e.x, e.y, 3); // 粒子大小
+            g.beginFill(e.color || 0xffcc33, e.alpha);
+            g.drawCircle(e.x, e.y, e.radius || 5);
             g.endFill();
             midiApp.stage.addChild(g);
 
-            if (e.life <= 0 || e.alpha <= 0) {
+            if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
                 effects.splice(i, 1);
             }
         }
 
-        // 其他特效也可以加在這裡，例如 circle、ripple 等
+        // 其他特效邏輯 ...
     }
+
 }
 
 // 移除掉出畫面的音符，並觸發音效與特效
@@ -138,25 +141,28 @@ function removeSeq() {
 
             // 若為動畫模式，觸發擊中特效
             if (modeNum == 1) {
-                effects.push({
-                    type: "particle",
-                    x: 185,
-                    y: seq[i].y,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 0.5) * 6,
-                    alpha: 1.0,
-                    life: 20 + Math.random() * 10,
-                    color: 0xffcc33
-                });
-            }
+                for (let j = 0; j < 10; j++) {
+                    effects.push({
+                        type: "particle",
+                        x: 185,
+                        y: seq[i].y,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8,
+                        alpha: 1.0,
+                        life: 20 + Math.random() * 10,
+                        radius: 5 + Math.random() * 5,
+                        color: Math.random() < 0.5 ? 0xffcc33 : 0xff6666
+                    });
+                }
 
-            seq.splice(i, 1); // 移除已播放的音符
+                seq.splice(i, 1); // 移除已播放的音符
+            }
         }
     }
 }
 
 // 根據 guitarChord 中的音高畫出對應橫線
-function drawChordLine() {
+function drawString() {
     for (let i = seq.length - 1; i >= 0; i--) {
         const n = seq[i];
         n.alpha -= 0.04;
