@@ -8,21 +8,21 @@ let IMGs = {}
 let textStyle = {
     'normal': new PIXI.TextStyle({
         fontFamily: "Arial",
-        fontSize: 50,
+        fontSize: 30,
         fontWeight: "bold",
         fill: 0xBDC0BA,
         align: "center"
     }),
     'gesture': new PIXI.TextStyle({
         fontFamily: "Arial",
-        fontSize: 50,
+        fontSize: 30,
         fontWeight: "bold",
         fill: 0xe87a90,
         align: "center"
     }),
     'soundCtrl': new PIXI.TextStyle({
         fontFamily: "Arial",
-        fontSize: 50,
+        fontSize: 30,
         fontWeight: "bold",
         fill: 0x5dac81,
         align: "center"
