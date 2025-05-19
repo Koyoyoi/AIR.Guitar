@@ -1,4 +1,4 @@
-import { settingCtrl, midiPortCtrl, ModeCtrl, sampleCtrl, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
+import { settingCtrl, midiPortCtrl, ModeCtrl, sampleCtrl, loadImg, showAllCtrl, modeNum, handCtrl } from "./Controll/blockControll.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
@@ -143,7 +143,7 @@ window.onload = async function () {
         }
         //  非支援格式 
         else {
-            alert("請上傳圖片或 MIDI 檔案！");
+            alert("請上傳 MIDI 檔案！");
         }
     });
 };
@@ -163,6 +163,7 @@ async function detectLoop() {
         midiPortCtrl();
         sampleCtrl();
         ModeCtrl();
+        handCtrl();
     } else {
         await pluckCtrl();
         await strumCtrl();

@@ -2,9 +2,32 @@ import { uiApp } from "../main.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
 export let modeNum = 0, portOpen = false, sampleNum = 0;
-export let showAllCtrl = false, isPlay = false;
+export let showAllCtrl = false, isPlay = false, isSwitch;
 
 let IMGs = {}
+let textStyle = {
+    'normal': new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: 50,
+        fontWeight: "bold",
+        fill: 0xBDC0BA,
+        align: "center"
+    }),
+    'gesture': new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: 50,
+        fontWeight: "bold",
+        fill: 0xe87a90,
+        align: "center"
+    }),
+    'soundCtrl': new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: 50,
+        fontWeight: "bold",
+        fill: 0x5dac81,
+        align: "center"
+    })
+}
 const modeName = ["自由演奏", "歌曲演奏"];
 
 // 載入圖片
@@ -122,11 +145,11 @@ export function ModeCtrl() {
     uiApp.stage.addChild(RBtn);
 }
 
-// 畫出 MIDI 控制區域
+// MIDI 控制區域
 export function midiPortCtrl() {
     const Area = {
-        x: 30,
-        y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
+        x: 25,
+        y: 10,
         w: uiApp.screen.width * 0.2,
         h: uiApp.screen.height * 0.08
     };
@@ -167,7 +190,7 @@ export function midiPortCtrl() {
     });
 
 }
-// 畫出 SoundFont 控制區域
+// SoundFont 控制區域
 export async function sampleCtrl() {
 
     // 區域大小設定
@@ -187,17 +210,8 @@ export async function sampleCtrl() {
     labelBG.roundRect(Area.x, Area.y, Area.w, Area.h, 10).fill(0x434343);
     uiApp.stage.addChild(labelBG);
 
-    // 建立文字樣式
-    const labelStyle = new PIXI.TextStyle({
-        fontFamily: "Arial",
-        fontSize: Area.h * 0.5,
-        fontWeight: "bold",
-        fill: 0xBDC0BA,
-        align: "center"
-    });
-
     // 顯示 sample 名稱
-    const sampleLabel = new PIXI.Text({ text: instruments[sampleNum], style: labelStyle });
+    const sampleLabel = new PIXI.Text({ text: instruments[sampleNum], style: textStyle['normal'] });
     sampleLabel.anchor.set(0.5);
     sampleLabel.x = Area.x + Area.w / 2;
     sampleLabel.y = Area.y + Area.h / 2;
@@ -238,4 +252,108 @@ export async function sampleCtrl() {
         await loadSamples();
     });
     uiApp.stage.addChild(RBtn);
+}
+
+// hand 控制區域
+export function handCtrl() {
+    const Area = {
+        x: 25,
+        y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
+        w: uiApp.screen.width * 0.25,
+        h: uiApp.screen.height * 0.08
+    };
+
+    // 背景區域
+    const bg = new PIXI.Graphics()
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 50)
+        .fill(0x434343)
+        .roundRect(Area.x + Area.w / 2 - 40, Area.y + 5, 4, Area.h - 10)
+        .fill(0x656765)
+        .roundRect(Area.x + Area.w / 2 + 40, Area.y + 5, 4, Area.h - 10)
+        .fill(0x656765)
+    uiApp.stage.addChild(bg);
+
+    // 顯示目前模式文字
+    const ChordStyle = new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: Area.h * 0.5,
+        fontWeight: "bold",
+        fill: 0xe87a90,
+        align: "center"
+    });
+    const CtrlStyle = new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: Area.h * 0.5,
+        fontWeight: "bold",
+        fill: 0x5dac81,
+        align: "center"
+    });
+
+    const swBtn = new PIXI.Sprite(IMGs['switch']);
+    swBtn.hitArea = new PIXI.Rectangle(Area.x + Area.w / 2 - 40, Area.y, 80, Area.h); // 限定互動範圍（可調整）
+    swBtn.x = Area.x + Area.w / 2 - 25;
+    swBtn.y = Area.y + 5;
+    swBtn.width = 50;
+    swBtn.height = 50;
+
+    // 互動
+    swBtn.interactive = true;
+    swBtn.buttonMode = true;
+
+    // 點擊事件
+    swBtn.on('pointerdown', () => {
+        console.log("✅ switch hand 控制區被點擊！");
+        isSwitch = !isSwitch;
+    });
+    uiApp.stage.addChild(swBtn);
+
+    // left hand 
+    const left = new PIXI.Text({
+        text: '左',
+        style: isSwitch ? CtrlStyle : ChordStyle
+    });
+    left.anchor.set(0.5);
+    left.x = Area.x + 30;
+    left.y = Area.y + Area.h / 2;
+    uiApp.stage.addChild(left);
+
+    const LHand = new PIXI.Sprite(IMGs['left_hand']);
+    LHand.x = left.x + 20;
+    LHand.y = Area.y + 5;
+    LHand.width = 50;
+    LHand.height = 50;
+
+    // 互動
+    LHand.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w / 2 - 40, Area.h); // 限定互動範圍（可調整）
+    LHand.interactive = true;
+    LHand.buttonMode = true;
+
+    // 點擊事件
+    LHand.on('pointerdown', () => { console.log("✅ left hand 控制區被點擊！"); });
+    uiApp.stage.addChild(LHand);
+
+    // right hand
+    const right = new PIXI.Text({
+        text: '右',
+        style: isSwitch ? ChordStyle : CtrlStyle
+    });
+    right.anchor.set(0.5);
+    right.x = Area.x + Area.w - 30;
+    right.y = Area.y + Area.h / 2;
+    uiApp.stage.addChild(right);
+
+    const RHand = new PIXI.Sprite(IMGs['right_hand']);
+    RHand.x = right.x - 70;
+    RHand.y = Area.y + 5;
+    RHand.width = 50;
+    RHand.height = 50;
+
+    // 互動
+    RHand.hitArea = new PIXI.Rectangle(Area.x + Area.w / 2 + 40, Area.y, Area.w / 2 - 40, Area.h); // 限定互動範圍（可調整）
+    RHand.interactive = true;
+    RHand.buttonMode = true;
+
+    // 點擊事件
+    RHand.on('pointerdown', () => { console.log("✅ right hand 控制區被點擊！"); });
+    uiApp.stage.addChild(RHand);
 }
