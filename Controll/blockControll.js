@@ -53,7 +53,7 @@ export function settingCtrl() {
 export function ModeCtrl() {
     const Area = {
         x: uiApp.screen.width / 2 - uiApp.screen.width * 0.1,
-        y: 0,
+        y: 10,
         w: uiApp.screen.width * 0.2,
         h: uiApp.screen.height * 0.08
     };
