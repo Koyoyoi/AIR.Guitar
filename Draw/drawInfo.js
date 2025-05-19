@@ -7,8 +7,6 @@ export function reCanva() {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    console.log(baseApp.canvas.style.width, baseApp.canvas.style.height)
-
     // 計算新的寬度和高度，並限制最大高度為 900px
     let newHeight = Math.min(windowHeight, 900);
     let newWidth = newHeight * aspectRatio;

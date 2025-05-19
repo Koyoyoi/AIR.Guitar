@@ -1,4 +1,4 @@
-import { settingCtrl, midiPortCtrl, ModeCtrl, sampleNameArea, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
+import { settingCtrl, midiPortCtrl, ModeCtrl, sampleCtrl, loadImg, showAllCtrl, modeNum } from "./Controll/blockControll.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
@@ -158,22 +158,22 @@ async function detectLoop() {
     await detectHand();
     await detectPose();
 
-    // 顯示控制區
+    // 控制區
     if (showAllCtrl) {
         midiPortCtrl();
-        sampleNameArea();
+        sampleCtrl();
         ModeCtrl();
+    } else {
+        await pluckCtrl();
+        await strumCtrl();
     }
     settingCtrl()
 
     // 音樂控制
-    if (modeNum != 1) {
+    if (modeNum == 0) {
         await chordCtrl();
         await capoCtrl();
     }
-    await pluckCtrl();
-    await strumCtrl();
-
 
     // 重置追蹤資料
     handData["Left"] = [];
@@ -191,12 +191,9 @@ async function main() {
     await load_SVM_Model();      // 載入手勢模型
     await setupCamera();         // 相機與畫布設定
     await initMIDIPort();        // MIDI 設定
-
     buildGuitarChord('C');       // 建立預設 C 和弦
     detectLoop();                // base canva detect loop
     midiDrawLoop();              // midi canva  draw  loop
-
-
 }
 
 // 等待 HTML 載入完成後啟動主程式 

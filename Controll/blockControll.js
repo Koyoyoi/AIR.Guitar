@@ -168,7 +168,7 @@ export function midiPortCtrl() {
 
 }
 // 畫出 SoundFont 控制區域
-export async function sampleNameArea() {
+export async function sampleCtrl() {
 
     // 區域大小設定
     const Area = {
