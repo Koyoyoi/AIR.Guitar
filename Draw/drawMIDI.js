@@ -17,7 +17,7 @@ export function resetSeq() {
 
 // 播放序列時，將音符往左移動，並畫出可見的圓形
 export async function rollSeq() {
-    if (!isRolling && mode == 1) { isRolling = true; }
+    if (!isRolling && modeNum == 1) { isRolling = true; }
 }
 
 // 當音符觸發時，加入畫面序列中（位置、速度、大小等資訊）
