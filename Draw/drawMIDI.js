@@ -217,8 +217,7 @@ function drawWavyLine(stringNumber, note, alpha) {
         const rectWidth = segmentWidth * 1.1; // 加寬讓它們重疊
         const rectHeight = 10;
 
-        g.drawRoundedRect(x, y - rectHeight / 2, rectWidth, rectHeight);
-        g.fill({ color: pitchToHexColor(note), alpha: alpha });
+        g.roundRect(x, y - rectHeight / 2, rectWidth, rectHeight).fill({ color: pitchToHexColor(note), alpha: alpha });
     }
 
     midiApp.stage.addChild(g);
