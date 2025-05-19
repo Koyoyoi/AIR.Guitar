@@ -73,7 +73,7 @@ export function drawGesture(gesture, capo) {
     // 設定位置（等同 textAlign: 'left', textBaseline: 'top'）
     text.anchor.set(0, 0);  // (0, 0) 是左上角對齊
     text.x = 50;            // 設定 x 座標
-    text.y = 50;            // 設定 y 座標
+    text.y = 25;            // 設定 y 座標
 
     baseApp.stage.addChild(text);
 }
