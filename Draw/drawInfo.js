@@ -102,4 +102,3 @@ export function drawCapo(capo) {
     // 把文字加入舞台
     baseApp.stage.addChild(text);
 }
-
