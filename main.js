@@ -158,7 +158,7 @@ async function detectLoop() {
     await detectHand();
     await detectPose();
 
-    // 控制區
+    // 顯示控制區
     if (showAllCtrl) {
         midiPortCtrl();
         sampleCtrl();
@@ -170,7 +170,7 @@ async function detectLoop() {
     settingCtrl()
 
     // 音樂控制
-    if (modeNum == 0) {
+    if (modeNum == 0 && !showAllCtrl) {
         await chordCtrl();
         await capoCtrl();
     }
@@ -191,9 +191,12 @@ async function main() {
     await load_SVM_Model();      // 載入手勢模型
     await setupCamera();         // 相機與畫布設定
     await initMIDIPort();        // MIDI 設定
+
     buildGuitarChord('C');       // 建立預設 C 和弦
     detectLoop();                // base canva detect loop
     midiDrawLoop();              // midi canva  draw  loop
+
+
 }
 
 // 等待 HTML 載入完成後啟動主程式 
