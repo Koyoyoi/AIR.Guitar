@@ -18,19 +18,34 @@ export async function rollSeq() {
 
 // 當音符觸發時，加入畫面序列中（位置、速度、大小等資訊）
 export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = midiApp.canvas.width * 0.8) {
+    const x = posX;
+    const y = mapRange(midiNote, 24, 84, midiApp.canvas.height - 200, 200);
+    const r = mapRange(velocity, 60, 127, 10, 25);
+
+    const glow = new PIXI.Graphics()
+        .circle(x, y, r * 1.2 * 1)
+        .fill({ color: pitchToHexColor(midiNote), alpha: 0.2 });
+
+    const gfx = new PIXI.Graphics()
+        .circle(x, y, r * 1)
+        .fill({ color: pitchToHexColor(midiNote), alpha: 0.7 });
+
     seq.push({
         note: midiNote,
         v: velocity,
         d: duration,
-        x: posX,
-        y: mapRange(midiNote, 24, 84, midiApp.canvas.height - 200, 200),
-        r: mapRange(velocity, 60, 127, 10, 25),
+        x,
+        y,
+        r,
         alpha: 1,
         scale: 1,
-        hit: false,      // 是否已擊中
-        hitTime: 0       // 擊中後顯示幾幀
+        hit: false,
+        hitTime: 0,
+        gfx,     // 主圖形
+        glow     // 光暈圖形
     });
 }
+
 
 // 將 MIDI 音高對應為 PIXI 支援的十六進位顏色
 function pitchToHexColor(pitch, tone = 'G') {
@@ -38,9 +53,9 @@ function pitchToHexColor(pitch, tone = 'G') {
 
     // 根據 tone 調整色相偏移
     switch (tone) {
-        case 'G': baseHue = (baseHue + 0) % 360; break;   // 紅調（不變）
-        case 'B': baseHue = (baseHue + 120) % 360; break; // 綠調
-        case 'R': baseHue = (baseHue + 240) % 360; break; // 藍調
+        case 'G': baseHue = (baseHue + 0) % 360; break;   // 綠調
+        case 'B': baseHue = (baseHue + 120) % 360; break; // 藍調
+        case 'R': baseHue = (baseHue + 240) % 360; break; // 紅調
     }
 
     let h = Math.floor(baseHue);
@@ -97,35 +112,36 @@ function drawNote() {
         }
 
         if ((n.x > 180 && n.x < midiApp.canvas.width) || n.hit) {
-            // glow layer
-            const glow = new PIXI.Graphics()
+            // 更新位置與樣式
+            n.glow.clear()
                 .circle(n.x, n.y, n.r * 1.2 * nScale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.2 });
-            glow.filters = [new PIXI.BlurFilter({ strength: 8, quality: 4, resolution: 1, kernelSize: 5 })];
-            midiApp.stage.addChild(glow);
+            midiApp.stage.addChild(n.glow);
 
-            // main circle
-            const g = new PIXI.Graphics()
+            n.gfx.clear()
                 .circle(n.x, n.y, n.r * nScale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.7 });
-            midiApp.stage.addChild(g);
+            midiApp.stage.addChild(n.gfx);
         }
 
-        // 處理擊中動畫的縮小與刪除
+        // 擊中動畫與移除
         if (n.hit) {
             n.hitTime--;
             if (n.hitTime <= 0) {
-                seq.splice(i, 1); // 動畫結束移除
+                midiApp.stage.removeChild(n.gfx);
+                midiApp.stage.removeChild(n.glow);
+                seq.splice(i, 1);
             }
         }
     }
 }
 
+
 // 畫出擊中動畫效果
 function drawEffects() {
     for (let i = effects.length - 1; i >= 0; i--) {
         let e = effects[i];
-
+        const g = new PIXI.Graphics()
         if (e.type === "particle") {
             e.x += e.vx;
             e.y += e.vy;
@@ -133,8 +149,8 @@ function drawEffects() {
             e.radius *= 0.96; // 粒子慢慢變小
             e.life--;
 
-            const g = new PIXI.Graphics()
-                .circle(e.x, e.y, e.radius || 5)
+
+            g.circle(e.x, e.y, e.radius || 5)
                 .fill({ color: e.color || 0xffcc33, alpha: e.alpha });
             midiApp.stage.addChild(g);
 
@@ -159,7 +175,7 @@ function removeSeq() {
 
             if (modeNum == 1) {
                 // 播放特效
-                for (let j = 0; j < 10; j++) {
+                for (let j = 0; j < 5; j++) {
                     effects.push({
                         type: "particle",
                         x: 185,
