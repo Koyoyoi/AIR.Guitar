@@ -39,7 +39,7 @@ export async function initMIDIPort() {
     await loadSamples();                                    // 等待音色樣本載入
 
     try {
-        midiAccess = await navigator.requestMIDIAccess();
+        const midiAccess = await navigator.requestMIDIAccess();
         console.log("✅ MIDI ready!");
 
         const outputs = midiAccess.outputs;
@@ -111,9 +111,7 @@ export function buildGuitarChord(gesture) {
 }
 
 // 延遲函數
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 // 撥弦函數
 export async function plucking(pluck, capo, velocities) {
@@ -133,7 +131,6 @@ export async function plucking(pluck, capo, velocities) {
             console.log(`音符：${note + capo}, 音量：${velocity}`);
             // 加入動畫隊列
             animateSeq(note);
-
         });
 
     } else if (outport) {
@@ -141,6 +138,7 @@ export async function plucking(pluck, capo, velocities) {
         // note_on
         notes.forEach(([note, velocity]) => {
             outport.send([0x90, note + capo, velocity]);
+            animateSeq(note);
         });
 
         // note_off 
@@ -175,6 +173,7 @@ export async function strumming(direction, capo, duration) {
         for (let n of sturmOrder) {
             outport.send([0x90, n + capo, 127]);
             await sleep(duration);
+            animateSeq(n);
         }
         // note_off 
         for (let n of sturmOrder) {
