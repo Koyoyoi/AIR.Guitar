@@ -33,7 +33,6 @@ async function setupCamera() {
         width: 1280,
         height: 720,
     });
-
     midiApp = new PIXI.Application()
     await midiApp.init({
         backgroundAlpha: 0,
@@ -76,15 +75,11 @@ async function setupCamera() {
             // 設定原始寬高
             videoSprite.width = video.videoWidth;
             videoSprite.height = video.videoHeight;
-
             // 水平翻轉
             videoSprite.scale.x = -1;
-
             // 因為翻轉後會往左邊跑掉，要調整 x 讓它顯示在畫面內
             videoSprite.x = video.videoWidth;
-
             videoSprite.zIndex = 0;
-
 
             // 設定畫布尺寸調整事件
             reCanva();
@@ -123,6 +118,7 @@ window.onload = async function () {
 
             midifile.notes.sort((a, b) => a.startTime - b.startTime);
 
+            const initPosX = midifile.notes[0].startTime
             midifile.notes.forEach((note) => {
                 if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
                     // col controll
@@ -135,7 +131,8 @@ window.onload = async function () {
                         note.pitch,
                         note.velocity,
                         (note.endTime - note.startTime),
-                        modeNum == 1 ? xMap.get(note.startTime) : video.videoWidth * 0.8 + note.startTime * 200 * 10,
+                        xMap.get(note.startTime)
+                        // modeNum == 1 ? xMap.get(note.startTime) : video.videoWidth * 0.8 + note.startTime * 200 * 10,
                     )
                 };
             });
@@ -157,7 +154,7 @@ async function detectLoop() {
     if (modeNum == 1) {
         const overlay = new PIXI.Graphics()
             .rect(0, 0, baseApp.canvas.width, baseApp.canvas.height)
-            .fill({color: 0x1c1c1c, alpha: 0.8});
+            .fill({ color: 0x1c1c1c, alpha: 0.8 });
         baseApp.stage.addChild(overlay);
     }
 

@@ -6,12 +6,10 @@ import { modeNum } from "../Controll/blockControll.js";
 export let seq = [];
 let effects = [];                 // 用來儲存特效動畫（例如漣漪）
 let lastTime = performance.now(); // 上一次動畫更新的時間，用來計算 dt
-let isRolling = false, rollCnt = 0;
+let isRolling = false, rollCnt = 0, nScale = 1;
 
 // 重設音符序列
-export function resetSeq() {
-    seq = [];
-}
+export function resetSeq() { seq = []; }
 
 // 播放序列時，將音符往左移動，並畫出可見的圓形
 export async function rollSeq() {
@@ -25,9 +23,12 @@ export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = midiAp
         v: velocity,
         d: duration,
         x: posX,
-        y: mapRange(midiNote, 24, 84, midiApp.canvas.height, 0),
+        y: mapRange(midiNote, 24, 84, midiApp.canvas.height - 200, 200),
         r: mapRange(velocity, 60, 127, 10, 25),
-        alpha: 1
+        alpha: 1,
+        scale: 1,
+        hit: false,      // 是否已擊中
+        hitTime: 0       // 擊中後顯示幾幀
     });
 }
 
@@ -51,7 +52,7 @@ function pitchToHexColor(pitch) {
 }
 
 // 主動畫迴圈
-export function midiDrawLoop(now) {  
+export function midiDrawLoop(now) {
     const dt = (now - lastTime) / 1000;  // 計算每幀時間差
     const speed = 10;
     lastTime = now;
@@ -65,37 +66,58 @@ export function midiDrawLoop(now) {
             .fill('#BDC0BA');
         midiApp.stage.addChild(hitLine);
 
-        seq.forEach(n => {
-            if (isRolling) {
-                n.x -= 20
-            }
-            if (n.x > 180 && n.x < midiApp.canvas.width) {
-                const g = new PIXI.Graphics()
-                    .circle(n.x, n.y, n.r)
-                    .fill({ color: pitchToHexColor(n.note), alpha: 0.6 });
-                midiApp.stage.addChild(g);
-            }
-        });
+        drawEffects();  // 畫特效
+        drawNote();
         if (isRolling) { rollCnt += 1; }
         if (rollCnt == 5) { isRolling = false; rollCnt = 0 }
-
-        drawEffects();  // 畫特效漣漪
     }
     // mode 0 可視化音符與吉他和弦線條
     else {
         seq.forEach(n => {
             n.x -= speed * dt;  // 快速流動
         });
-        drawString(); // 畫吉他線條
+        drawString();           // 畫吉他線條
     }
-
-    removeSeq();    // 播放音效、刪除舊音符
+    nScale += (1 - nScale) * 0.15;
+    removeSeq();                         // 播放音效、刪除舊音符
     requestAnimationFrame(midiDrawLoop); // 呼叫下一幀
+}
+
+function drawNote() {
+    for (let i = seq.length - 1; i >= 0; i--) {
+        const n = seq[i];
+
+        if (isRolling && !n.hit) {
+            n.x -= 20;
+        }
+
+        if ((n.x > 180 && n.x < midiApp.canvas.width) || n.hit) {
+            // glow layer
+            const glow = new PIXI.Graphics()
+                .circle(n.x, n.y, n.r * 1.2 * nScale)
+                .fill({ color: pitchToHexColor(n.note), alpha: 0.2 });
+            glow.filters = [new PIXI.BlurFilter({ strength: 8, quality: 4, resolution: 1, kernelSize: 5 })];
+            midiApp.stage.addChild(glow);
+
+            // main circle
+            const g = new PIXI.Graphics()
+                .circle(n.x, n.y, n.r * nScale)
+                .fill({ color: pitchToHexColor(n.note), alpha: 0.7 });
+            midiApp.stage.addChild(g);
+        }
+
+        // 處理擊中動畫的縮小與刪除
+        if (n.hit) {
+            n.hitTime--;
+            if (n.hitTime <= 0) {
+                seq.splice(i, 1); // 動畫結束移除
+            }
+        }
+    }
 }
 
 // 畫出擊中動畫效果
 function drawEffects() {
-
     for (let i = effects.length - 1; i >= 0; i--) {
         let e = effects[i];
 
@@ -108,7 +130,7 @@ function drawEffects() {
 
             const g = new PIXI.Graphics()
                 .circle(e.x, e.y, e.radius || 5)
-                .fill({color: e.color || 0xffcc33, alpha: e.alpha});
+                .fill({ color: e.color || 0xffcc33, alpha: e.alpha });
             midiApp.stage.addChild(g);
 
             if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
@@ -116,14 +138,12 @@ function drawEffects() {
             }
         }
     }
-
 }
 
 // 移除掉出畫面的音符，並觸發音效與特效
 function removeSeq() {
     for (let i = seq.length - 1; i >= 0; i--) {
-        if (seq[i].x < 180) {
-            // 音量大於 0 時才播放聲音
+        if (seq[i].x < 180 && !seq[i].hit) {
             if (seq[i].v > 0) {
                 soundSample.play(
                     seq[i].note,
@@ -132,8 +152,8 @@ function removeSeq() {
                 );
             }
 
-            // 若為動畫模式，觸發擊中特效
             if (modeNum == 1) {
+                // 播放特效
                 for (let j = 0; j < 10; j++) {
                     effects.push({
                         type: "particle",
@@ -148,7 +168,11 @@ function removeSeq() {
                     });
                 }
 
-                seq.splice(i, 1); // 移除已播放的音符
+                // 標記為已擊中
+                seq[i].hit = true;
+                seq[i].hitTime = 10; // 保留顯示 10 幀
+                nScale = 2;  // 放大
+                seq[i].x = 185;      // 固定在擊中位置
             }
         }
     }
@@ -184,10 +208,8 @@ function drawString() {
                     ? curr : prev;
             }).idx;
         }
-
         drawWavyLine(closestIndex, guitarStandard[closestIndex], n.alpha);
     }
-
 }
 
 function drawWavyLine(stringNumber, note, alpha) {
