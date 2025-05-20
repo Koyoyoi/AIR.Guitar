@@ -1,6 +1,6 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { handData, poseData } from './main.js';
-import { video } from "./main.js";
+import { handData, poseData,video } from './main.js';
+import { isSwitch } from "./Controll/blockControll.js";
 
 // 全域變數：用來儲存模型實例
 let handLandmarker, poseLandmarker;
@@ -65,6 +65,8 @@ export async function detectHand() {
         }
         handData[left_or_right] = points;
     }
+
+    if (isSwitch) {[handData['Left'], handData['Right']] = [handData['Right'], handData['Left']]}
 }
 
 // 偵測身體關鍵點並繪製圖像，同時更新 poseData
