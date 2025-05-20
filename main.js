@@ -105,7 +105,7 @@ window.onload = async function () {
 
     document.getElementById("file-upload").addEventListener("change", async function (event) {
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file || modeNum == 0) return;
         console.log("檔案名稱:", file.name);
 
         //  處理 MIDI 檔 
@@ -153,6 +153,13 @@ async function detectLoop() {
     baseApp.stage.removeChildren();
     uiApp.stage.removeChildren();
     baseApp.stage.addChild(videoSprite);
+
+    if (modeNum == 1) {
+        const overlay = new PIXI.Graphics()
+            .rect(0, 0, baseApp.canvas.width, baseApp.canvas.height)
+            .fill({color: 0x1c1c1c, alpha: 0.8});
+        baseApp.stage.addChild(overlay);
+    }
 
     // 執行 MediaPipe 偵測
     await detectHand();

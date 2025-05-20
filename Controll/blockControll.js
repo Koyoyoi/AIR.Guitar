@@ -1,3 +1,4 @@
+import { resetSeq } from "../Draw/drawMIDI.js";
 import { uiApp } from "../main.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
@@ -91,19 +92,10 @@ export function ModeCtrl() {
         .fill(0x434343);
     uiApp.stage.addChild(labelBase);
 
-    // 顯示目前模式文字
-    const labelStyle = new PIXI.TextStyle({
-        fontFamily: "Arial",
-        fontSize: Area.h * 0.5,
-        fontWeight: "bold",
-        fill: 0xBDC0BA,
-        align: "center"
-    });
-
-    // 修改文字創建方式，使用對象傳遞 `text` 和 `style`
+    // 文字創建方式`
     const label = new PIXI.Text({
-        text: `${modeName[modeNum]}`,  // 這裡放置文字內容
-        style: labelStyle               // 使用先前定義的樣式
+        text: `${modeName[modeNum]}`,  
+        style: textStyle['normal']     
     });
     label.anchor.set(0.5);
     label.x = Area.x + Area.w / 2;
@@ -163,19 +155,10 @@ export function midiPortCtrl() {
     midiBg.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h); // 確保互動區範圍正確
     uiApp.stage.addChild(midiBg);
 
-    // 文字樣式
-    const labelStyle = new PIXI.TextStyle({
-        fontFamily: "Arial",
-        fontSize: Area.h * 0.5,
-        fontWeight: "bold",
-        fill: 0xBDC0BA,
-        align: "center"
-    });
-
     // 顯示狀態文字
     const midiLabel = new PIXI.Text({
         text: `MIDI port : ${portOpen ? 'on' : 'off'}`,
-        style: labelStyle
+        style: textStyle['normal']
     });
     midiLabel.anchor.set(0.5);
     midiLabel.x = Area.x + Area.w / 2;
@@ -211,7 +194,10 @@ export async function sampleCtrl() {
     uiApp.stage.addChild(labelBG);
 
     // 顯示 sample 名稱
-    const sampleLabel = new PIXI.Text({ text: instruments[sampleNum], style: textStyle['normal'] });
+    const sampleLabel = new PIXI.Text({
+        text: instruments[sampleNum],
+        style: textStyle['normal']
+    });
     sampleLabel.anchor.set(0.5);
     sampleLabel.x = Area.x + Area.w / 2;
     sampleLabel.y = Area.y + Area.h / 2;
@@ -273,22 +259,6 @@ export function handCtrl() {
         .fill(0x656765)
     uiApp.stage.addChild(bg);
 
-    // 顯示目前模式文字
-    const ChordStyle = new PIXI.TextStyle({
-        fontFamily: "Arial",
-        fontSize: Area.h * 0.5,
-        fontWeight: "bold",
-        fill: 0xe87a90,
-        align: "center"
-    });
-    const CtrlStyle = new PIXI.TextStyle({
-        fontFamily: "Arial",
-        fontSize: Area.h * 0.5,
-        fontWeight: "bold",
-        fill: 0x5dac81,
-        align: "center"
-    });
-
     const swBtn = new PIXI.Sprite(IMGs['switch']);
     swBtn.hitArea = new PIXI.Rectangle(Area.x + Area.w / 2 - 40, Area.y, 80, Area.h); // 限定互動範圍（可調整）
     swBtn.x = Area.x + Area.w / 2 - 25;
@@ -310,7 +280,7 @@ export function handCtrl() {
     // left hand 
     const left = new PIXI.Text({
         text: '左',
-        style: isSwitch ? CtrlStyle : ChordStyle
+        style: isSwitch ? textStyle['soundCtrl'] : textStyle['gesture']
     });
     left.anchor.set(0.5);
     left.x = Area.x + 30;
@@ -335,7 +305,7 @@ export function handCtrl() {
     // right hand
     const right = new PIXI.Text({
         text: '右',
-        style: isSwitch ? ChordStyle : CtrlStyle
+        style: isSwitch ? textStyle['gesture'] : textStyle['soundCtrl']
     });
     right.anchor.set(0.5);
     right.x = Area.x + Area.w - 30;

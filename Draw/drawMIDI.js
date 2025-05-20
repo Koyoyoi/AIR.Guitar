@@ -4,8 +4,6 @@ import { modeNum } from "../Controll/blockControll.js";
 
 // 儲存目前畫面上的音符序列
 export let seq = [];
-// 用來存音符圖形
-const notes = [];
 let effects = [];                 // 用來儲存特效動畫（例如漣漪）
 let lastTime = performance.now(); // 上一次動畫更新的時間，用來計算 dt
 let isRolling = false, rollCnt = 0;
@@ -53,19 +51,18 @@ function pitchToHexColor(pitch) {
 }
 
 // 主動畫迴圈
-export function midiDrawLoop(now) {
+export function midiDrawLoop(now) {  
     const dt = (now - lastTime) / 1000;  // 計算每幀時間差
-    const speed = 200;
+    const speed = 10;
     lastTime = now;
 
     midiApp.stage.removeChildren(); // 清空畫布
 
     // mode 1：顯示動畫模式
     if (modeNum == 1) {
-
         const hitLine = new PIXI.Graphics()
             .roundRect(185, 0, 5, midiApp.canvas.height, 5)
-            .fill('#434343');
+            .fill('#BDC0BA');
         midiApp.stage.addChild(hitLine);
 
         seq.forEach(n => {
@@ -87,7 +84,7 @@ export function midiDrawLoop(now) {
     // mode 0 可視化音符與吉他和弦線條
     else {
         seq.forEach(n => {
-            n.x -= speed * dt * 5;  // 快速流動
+            n.x -= speed * dt;  // 快速流動
         });
         drawString(); // 畫吉他線條
     }
@@ -103,25 +100,21 @@ function drawEffects() {
         let e = effects[i];
 
         if (e.type === "particle") {
-            e.vy += 0.2; // 模擬重力
             e.x += e.vx;
             e.y += e.vy;
             e.alpha -= 0.03;
             e.radius *= 0.96; // 粒子慢慢變小
             e.life--;
 
-            const g = new PIXI.Graphics();
-            g.beginFill(e.color || 0xffcc33, e.alpha);
-            g.drawCircle(e.x, e.y, e.radius || 5);
-            g.endFill();
+            const g = new PIXI.Graphics()
+                .circle(e.x, e.y, e.radius || 5)
+                .fill({color: e.color || 0xffcc33, alpha: e.alpha});
             midiApp.stage.addChild(g);
 
             if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
                 effects.splice(i, 1);
             }
         }
-
-        // 其他特效邏輯 ...
     }
 
 }
