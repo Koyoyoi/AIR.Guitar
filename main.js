@@ -3,13 +3,13 @@ import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { midiDrawLoop, animateSeq, resetSeq } from "./Draw/drawMIDI.js";
-import { reCanva } from "./Draw/drawInfo.js";
+import { drawSongName, reCanva } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
 
 //  全域變數宣告區 
 export let video, drawingUtils;
 export let midiCanvas, midiCtx;
-export let handData = { "Left": [], "Right": [] }, poseData = [];
+export let handData = { "Left": [], "Right": [] }, poseData = [], songName;
 export let baseApp, midiApp, uiApp;
 
 let videoSprite;
@@ -101,7 +101,8 @@ window.onload = async function () {
     document.getElementById("file-upload").addEventListener("change", async function (event) {
         const file = event.target.files[0];
         if (!file || modeNum == 0) return;
-        console.log("檔案名稱:", file.name);
+        songName = `${file.name}`.replace(/\.mid$/i, "");
+        console.log("檔案名稱:", songName);
 
         //  處理 MIDI 檔 
         if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
@@ -178,6 +179,9 @@ async function detectLoop() {
     if (modeNum == 0 && !showAllCtrl) {
         await chordCtrl();
         await capoCtrl();
+    }
+    if (modeNum == 1) {
+        drawSongName();
     }
 
     // 重置追蹤資料

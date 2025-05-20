@@ -1,4 +1,4 @@
-import { video, baseApp, midiApp, uiApp } from "../main.js";
+import { video, baseApp, midiApp, uiApp, songName } from "../main.js";
 import { rootTab, revRootTab } from "../sound.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
@@ -91,7 +91,7 @@ export function drawCapo(capo) {
 
     // 顯示 capo 設定資訊的文字
     const text = new PIXI.Text({
-        text: `Capo: ${capo}`, 
+        text: `Capo: ${capo}`,
         style
     });
 
@@ -100,5 +100,27 @@ export function drawCapo(capo) {
     text.y = 25; // 文字垂直位置
 
     // 把文字加入舞台
+    baseApp.stage.addChild(text);
+}
+
+export function drawSongName() {
+    const style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 60,
+        fontWeight: 'bold',
+        fill: 0xBDC0BA,
+        align: 'left',
+        alpha: 0.6
+    });
+
+    const text = new PIXI.Text({
+        text: songName,
+        style
+    });
+
+    text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
+    text.x = baseApp.renderer.width / 2; // 畫面水平中心
+    text.y = 25;
+
     baseApp.stage.addChild(text);
 }

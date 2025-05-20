@@ -33,11 +33,21 @@ export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = midiAp
 }
 
 // 將 MIDI 音高對應為 PIXI 支援的十六進位顏色
-function pitchToHexColor(pitch) {
-    let h = Math.floor((pitch / 127) * 360); // 音高對應色相
+function pitchToHexColor(pitch, tone = 'G') {
+    let baseHue = (pitch / 127) * 360; // 基礎色相
+
+    // 根據 tone 調整色相偏移
+    switch (tone) {
+        case 'G': baseHue = (baseHue + 0) % 360; break;   // 紅調（不變）
+        case 'B': baseHue = (baseHue + 120) % 360; break; // 綠調
+        case 'R': baseHue = (baseHue + 240) % 360; break; // 藍調
+    }
+
+    let h = Math.floor(baseHue);
     let s = 100, l = 60;
     s /= 100;
     l /= 100;
+
     const k = n => (n + h / 30) % 12;
     const a = s * Math.min(l, 1 - l);
     const f = n =>
@@ -47,9 +57,9 @@ function pitchToHexColor(pitch) {
     const g = Math.round(f(8) * 255);
     const b = Math.round(f(4) * 255);
 
-    // 回傳十六進位整數，例如 0xFF3366
     return (r << 16) + (g << 8) + b;
 }
+
 
 // 主動畫迴圈
 export function midiDrawLoop(now) {
@@ -61,11 +71,6 @@ export function midiDrawLoop(now) {
 
     // mode 1：顯示動畫模式
     if (modeNum == 1) {
-        const hitLine = new PIXI.Graphics()
-            .roundRect(185, 0, 5, midiApp.canvas.height, 5)
-            .fill('#BDC0BA');
-        midiApp.stage.addChild(hitLine);
-
         drawEffects();  // 畫特效
         drawNote();
         if (isRolling) { rollCnt += 1; }
@@ -159,8 +164,8 @@ function removeSeq() {
                         type: "particle",
                         x: 185,
                         y: seq[i].y,
-                        vx: (Math.random() - 0.5) * 8,
-                        vy: (Math.random() - 0.5) * 8,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
                         alpha: 1.0,
                         life: 20 + Math.random() * 10,
                         radius: 5 + Math.random() * 5,
@@ -232,7 +237,7 @@ function drawWavyLine(stringNumber, note, alpha) {
         const rectWidth = segmentWidth * 1.1; // 加寬讓它們重疊
         const rectHeight = 10;
 
-        g.roundRect(x, y - rectHeight / 2, rectWidth, rectHeight).fill({ color: pitchToHexColor(note), alpha: alpha });
+        g.roundRect(x, y - rectHeight / 2, rectWidth, rectHeight).fill({ color: pitchToHexColor(note, 'R'), alpha: alpha });
     }
 
     midiApp.stage.addChild(g);
