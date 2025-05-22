@@ -19,16 +19,8 @@ export async function rollSeq() {
 // 當音符觸發時，加入畫面序列中（位置、速度、大小等資訊）
 export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = midiApp.canvas.width * 0.8) {
     const x = posX;
-    const y = mapRange(midiNote, 24, 84, midiApp.canvas.height - 200, 200);
+    const y = mapRange(midiNote, 24, 84, midiApp.canvas.height - 100, 100);
     const r = mapRange(velocity, 60, 127, 10, 25);
-
-    const glow = new PIXI.Graphics()
-        .circle(x, y, r * 1.2 * 1)
-        .fill({ color: pitchToHexColor(midiNote), alpha: 0.2 });
-
-    const gfx = new PIXI.Graphics()
-        .circle(x, y, r * 1)
-        .fill({ color: pitchToHexColor(midiNote), alpha: 0.7 });
 
     seq.push({
         note: midiNote,
@@ -41,8 +33,6 @@ export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = midiAp
         scale: 1,
         hit: false,
         hitTime: 0,
-        gfx,     // 主圖形
-        glow     // 光暈圖形
     });
 }
 
@@ -104,32 +94,32 @@ export function midiDrawLoop(now) {
 }
 
 function drawNote() {
+    const gfx = new PIXI.Graphics()
+    const glow = new PIXI.Graphics()
     for (let i = seq.length - 1; i >= 0; i--) {
         const n = seq[i];
 
         if (isRolling && !n.hit) {
-            n.x -= 20;
+            n.x -= 40;
         }
 
         if ((n.x > 180 && n.x < midiApp.canvas.width) || n.hit) {
             // 更新位置與樣式
-            n.glow.clear()
-                .circle(n.x, n.y, n.r * 1.2 * nScale)
+            glow.circle(n.x, n.y, n.r * 1.3 * nScale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.2 });
-            midiApp.stage.addChild(n.glow);
 
-            n.gfx.clear()
-                .circle(n.x, n.y, n.r * nScale)
-                .fill({ color: pitchToHexColor(n.note), alpha: 0.7 });
-            midiApp.stage.addChild(n.gfx);
+
+            gfx.circle(n.x, n.y, n.r * nScale)
+                .fill({ color: pitchToHexColor(n.note), alpha: 0.6 });
+
         }
+        midiApp.stage.addChild(glow);
+        midiApp.stage.addChild(gfx);
 
         // 擊中動畫與移除
         if (n.hit) {
             n.hitTime--;
             if (n.hitTime <= 0) {
-                midiApp.stage.removeChild(n.gfx);
-                midiApp.stage.removeChild(n.glow);
                 seq.splice(i, 1);
             }
         }
@@ -139,26 +129,24 @@ function drawNote() {
 
 // 畫出擊中動畫效果
 function drawEffects() {
+    const g = new PIXI.Graphics()
     for (let i = effects.length - 1; i >= 0; i--) {
         let e = effects[i];
-        const g = new PIXI.Graphics()
+
         if (e.type === "particle") {
             e.x += e.vx;
             e.y += e.vy;
             e.alpha -= 0.03;
             e.radius *= 0.96; // 粒子慢慢變小
             e.life--;
-
-
             g.circle(e.x, e.y, e.radius || 5)
                 .fill({ color: e.color || 0xffcc33, alpha: e.alpha });
-            midiApp.stage.addChild(g);
-
             if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
                 effects.splice(i, 1);
             }
         }
     }
+    midiApp.stage.addChild(g);
 }
 
 // 移除掉出畫面的音符，並觸發音效與特效
@@ -184,7 +172,7 @@ function removeSeq() {
                         vy: (Math.random() - 0.5) * 10,
                         alpha: 1.0,
                         life: 20 + Math.random() * 10,
-                        radius: 5 + Math.random() * 5,
+                        radius: 10 + Math.random() * 5,
                         color: Math.random() < 0.5 ? 0xffcc33 : 0xff6666
                     });
                 }
@@ -192,7 +180,7 @@ function removeSeq() {
                 // 標記為已擊中
                 seq[i].hit = true;
                 seq[i].hitTime = 10; // 保留顯示 10 幀
-                nScale = 2;  // 放大
+                nScale = 2.5;  // 放大
                 seq[i].x = 185;      // 固定在擊中位置
             }
         }

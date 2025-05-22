@@ -109,22 +109,23 @@ window.onload = async function () {
             resetSeq();
 
             const arrayBuffer = await file.arrayBuffer();
-            const blob = new Blob([arrayBuffer], { type: "audio/midi" });
 
             // 使用 Magenta.js 解析 MIDI
+            const blob = new Blob([arrayBuffer], { type: "audio/midi" });
             let midifile = await mm.blobToNoteSequence(blob);
 
             const xMap = new Map();
             let i = 0;
+            let lyrics = midifile.textAnnotations?.filter(t => t.annotationType === 'LYRIC');
+            console.log(lyrics)
 
             midifile.notes.sort((a, b) => a.startTime - b.startTime);
 
-            const initPosX = midifile.notes[0].startTime
             midifile.notes.forEach((note) => {
                 if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
                     // col controll
                     if (!xMap.has(note.startTime)) {
-                        xMap.set(note.startTime, 185 + i * 100);
+                        xMap.set(note.startTime, 185 + i * 200);
                         i++;
                     }
                     // add to animate sequence
@@ -204,8 +205,6 @@ async function main() {
     buildGuitarChord('C');       // 建立預設 C 和弦
     detectLoop();                // base canva detect loop
     midiDrawLoop();              // midi canva  draw  loop
-
-
 }
 
 // 等待 HTML 載入完成後啟動主程式 
