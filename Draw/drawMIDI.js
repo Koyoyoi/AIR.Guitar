@@ -2,11 +2,16 @@ import { midiApp } from "../main.js";
 import { mapRange, soundSample, guitarStandard } from "../sound.js";
 import { modeNum } from "../Controll/blockControll.js";
 
-// 儲存目前畫面上的音符序列
-export let seq = [];
-let effects = [];                 // 用來儲存特效動畫（例如漣漪）
-let lastTime = performance.now(); // 上一次動畫更新的時間，用來計算 dt
+
+export let seq = [];                // 儲存目前畫面上的音符序列
+let effectSeq = [];                 // 用來儲存特效動畫
+let lastTime = performance.now();   // 上一次動畫更新的時間，用來計算 dt
 let isRolling = false, rollCnt = 0, nScale = 1;
+// draw graphics
+const note = new PIXI.Graphics()
+const blur = new PIXI.Graphics()
+const effect = new PIXI.Graphics()
+
 
 // 重設音符序列
 export function resetSeq() { seq = []; }
@@ -35,7 +40,6 @@ export function animateSeq(midiNote, velocity = 0, duration = 1.5, posX = midiAp
         hitTime: 0,
     });
 }
-
 
 // 將 MIDI 音高對應為 PIXI 支援的十六進位顏色
 function pitchToHexColor(pitch, tone = 'G') {
@@ -72,14 +76,14 @@ export function midiDrawLoop(now) {
     const speed = 10;
     lastTime = now;
 
-    midiApp.stage.removeChildren(); // 清空畫布
+    midiApp.stage.removeChildren(); // 清空畫布 
 
     // mode 1：顯示動畫模式
     if (modeNum == 1) {
         drawEffects();  // 畫特效
         drawNote();
         if (isRolling) { rollCnt += 1; }
-        if (rollCnt == 5) { isRolling = false; rollCnt = 0 }
+        if (rollCnt == 4) { isRolling = false; rollCnt = 0 }
     }
     // mode 0 可視化音符與吉他和弦線條
     else {
@@ -94,27 +98,27 @@ export function midiDrawLoop(now) {
 }
 
 function drawNote() {
-    const gfx = new PIXI.Graphics()
-    const glow = new PIXI.Graphics()
+    note.clear();
+    blur.clear();
     for (let i = seq.length - 1; i >= 0; i--) {
         const n = seq[i];
 
         if (isRolling && !n.hit) {
-            n.x -= 40;
+            n.x -= 50;
         }
 
         if ((n.x > 180 && n.x < midiApp.canvas.width) || n.hit) {
             // 更新位置與樣式
-            glow.circle(n.x, n.y, n.r * 1.3 * nScale)
+            blur.circle(n.x, n.y, n.r * 1.3 * nScale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.2 });
 
 
-            gfx.circle(n.x, n.y, n.r * nScale)
+            note.circle(n.x, n.y, n.r * nScale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.6 });
 
         }
-        midiApp.stage.addChild(glow);
-        midiApp.stage.addChild(gfx);
+        midiApp.stage.addChild(blur);
+        midiApp.stage.addChild(note);
 
         // 擊中動畫與移除
         if (n.hit) {
@@ -129,9 +133,9 @@ function drawNote() {
 
 // 畫出擊中動畫效果
 function drawEffects() {
-    const g = new PIXI.Graphics()
-    for (let i = effects.length - 1; i >= 0; i--) {
-        let e = effects[i];
+    effect.clear();
+    for (let i = effectSeq.length - 1; i >= 0; i--) {
+        let e = effectSeq[i];
 
         if (e.type === "particle") {
             e.x += e.vx;
@@ -139,18 +143,19 @@ function drawEffects() {
             e.alpha -= 0.03;
             e.radius *= 0.96; // 粒子慢慢變小
             e.life--;
-            g.circle(e.x, e.y, e.radius || 5)
+            effect.circle(e.x, e.y, e.radius || 5)
                 .fill({ color: e.color || 0xffcc33, alpha: e.alpha });
             if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
-                effects.splice(i, 1);
+                effectSeq.splice(i, 1);
             }
         }
     }
-    midiApp.stage.addChild(g);
+    midiApp.stage.addChild(effect);
 }
 
 // 移除掉出畫面的音符，並觸發音效與特效
 function removeSeq() {
+
     for (let i = seq.length - 1; i >= 0; i--) {
         if (seq[i].x < 180 && !seq[i].hit) {
             if (seq[i].v > 0) {
@@ -164,7 +169,7 @@ function removeSeq() {
             if (modeNum == 1) {
                 // 播放特效
                 for (let j = 0; j < 5; j++) {
-                    effects.push({
+                    effectSeq.push({
                         type: "particle",
                         x: 185,
                         y: seq[i].y,
@@ -217,19 +222,20 @@ function drawString() {
                     ? curr : prev;
             }).idx;
         }
+
         drawWavyLine(closestIndex, guitarStandard[closestIndex], n.alpha);
+
     }
 }
 
 function drawWavyLine(stringNumber, note, alpha) {
+    const strings = new PIXI.Graphics()
     const segments = 200;
     const poseY = midiApp.canvas.height - 100 - stringNumber * 80;
     const segmentWidth = midiApp.canvas.width / segments;
     const waveFreq = 3
     const maxJitter = 10
     const time = performance.now() * 0.01;
-
-    const g = new PIXI.Graphics();
 
     for (let i = 0; i < segments; i++) {
         const x = i * segmentWidth;
@@ -241,9 +247,8 @@ function drawWavyLine(stringNumber, note, alpha) {
         const rectWidth = segmentWidth * 1.1; // 加寬讓它們重疊
         const rectHeight = 10;
 
-        g.roundRect(x, y - rectHeight / 2, rectWidth, rectHeight).fill({ color: pitchToHexColor(note, 'R'), alpha: alpha });
+        strings.roundRect(x, y - rectHeight / 2, rectWidth, rectHeight).fill({ color: pitchToHexColor(note, 'R'), alpha: alpha });
     }
 
-    midiApp.stage.addChild(g);
+    midiApp.stage.addChild(strings);
 }
-
