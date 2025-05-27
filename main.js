@@ -110,34 +110,89 @@ window.onload = async function () {
 
             const arrayBuffer = await file.arrayBuffer();
 
-            // 使用 Magenta.js 解析 MIDI
+            // ---------- 使用 Magenta 解析 NoteSequence ----------
             const blob = new Blob([arrayBuffer], { type: "audio/midi" });
-            let midifile = await mm.blobToNoteSequence(blob);
+            const noteSeq = await mm.blobToNoteSequence(blob);
+            noteSeq.notes.sort((a, b) => a.startTime - b.startTime);
 
+            // ---------- 取得 tempo 與 ticksPerQuarter
+            const tempo = (noteSeq.tempos && noteSeq.tempos.length > 0)
+                ? noteSeq.tempos[0].qpm : 120; // qpm = quarter notes per minute :  fallback 預設值
+
+            const ticksPerQuarter = noteSeq.ticksPerQuarter || 480; // 依 MIDI 標準預設
+
+            // ---------- 使用 Magenta 解析 notes 並送入動畫 ----------
             const xMap = new Map();
             let i = 0;
-            let lyrics = midifile.textAnnotations?.filter(t => t.annotationType === 'LYRIC');
-            console.log(lyrics)
+            const initX = noteSeq.notes[0].startTime;
+            const baseSpacing = 200; // 固定基本間隔
+            const timeScale = 80;    // 時間差調整倍率，可調整密度
 
-            midifile.notes.sort((a, b) => a.startTime - b.startTime);
+            let prevStartTime = initX;
 
-            midifile.notes.forEach((note) => {
+            noteSeq.notes.forEach((note) => {
                 if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
-                    // col controll
                     if (!xMap.has(note.startTime)) {
-                        xMap.set(note.startTime, 185 + i * 200);
+                        // 固定間隔 + 時間差影響
+                        const timeDiff = note.startTime - prevStartTime;
+                        const offset = timeDiff * timeScale;
+                        const xPos = 185 + i * baseSpacing + offset;
+                        xMap.set(note.startTime, xPos);
+
+                        prevStartTime = note.startTime;
                         i++;
                     }
-                    // add to animate sequence
+
                     animateSeq(
                         note.pitch,
                         note.velocity,
                         (note.endTime - note.startTime),
                         xMap.get(note.startTime)
-                        // modeNum == 1 ? xMap.get(note.startTime) : video.videoWidth * 0.8 + note.startTime * 200 * 10,
-                    )
-                };
+                    );
+                }
             });
+
+            // ---------- 使用 midi-parser-js 解析歌詞，並換算成秒 ----------
+            const midi = MidiParser.parse(new Uint8Array(arrayBuffer));
+
+            const lyrics = []; // 存放合併後的歌詞物件 {text, time}
+
+            midi.track.forEach(track => {
+                let absoluteTicks = 0;
+                track.event.forEach(event => {
+                    absoluteTicks += event.deltaTime;
+
+                    if (event.type === 0xFF && event.metaType === 0x05) {
+                        let lyric = "";
+                        if (typeof event.data === "string") {
+                            lyric = event.data;
+                        } else if (event.data instanceof Uint8Array || Array.isArray(event.data)) {
+                            lyric = new TextDecoder("utf-8").decode(new Uint8Array(event.data));
+                        } else {
+                            lyric = String(event.data);
+                        }
+
+                        // 計算秒數
+                        const seconds = (absoluteTicks / ticksPerQuarter) * (60 / tempo);
+
+                        // 如果前一筆資料和這筆時間差小於0.3秒，就合併
+                        if (lyrics.length > 0 && (seconds - lyrics[lyrics.length - 1].time) < 0.3) {
+                            lyrics[lyrics.length - 1].text += lyric;
+                            // 更新時間到較晚的時間點
+                            lyrics[lyrics.length - 1].time = seconds;
+                        } else {
+                            lyrics.push({ text: lyric, time: seconds });
+                        }
+                    }
+                });
+            });
+
+            // 印出結果
+            lyrics.forEach((lyr, idx) => {
+                console.log(`Lyric #${idx}: ${lyr.text} at ${lyr.time.toFixed(3)}s`);
+                animateSeq(lyr.text, 0, 0, lyr.time * 50)
+            });
+
 
         }
         //  非支援格式 
@@ -209,5 +264,5 @@ async function main() {
 
 // 等待 HTML 載入完成後啟動主程式 
 window.addEventListener('DOMContentLoaded', async () => {
-    await main();
+    main();
 });

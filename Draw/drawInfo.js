@@ -106,7 +106,7 @@ export function drawCapo(capo) {
 export function drawSongName() {
     const style = new PIXI.TextStyle({
         fontFamily: 'Arial',
-        fontSize: 60,
+        fontSize: 50,
         fontWeight: 'bold',
         fill: 0xBDC0BA,
         align: 'left',
@@ -120,7 +120,7 @@ export function drawSongName() {
 
     text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
     text.x = baseApp.renderer.width / 2; // 畫面水平中心
-    text.y = 25;
+    text.y = 15;
 
     baseApp.stage.addChild(text);
 }
