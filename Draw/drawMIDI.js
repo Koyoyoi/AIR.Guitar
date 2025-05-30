@@ -2,8 +2,14 @@ import { midiApp } from "../main.js";
 import { soundSample, guitarStandard } from "../sound.js";
 import { modeNum } from "../Controll/blockControll.js";
 import { tempo } from "../midiEvent.js";
+import { capo } from "../Controll/musicControll.js";
+import { revRootTab } from "../sound.js";
 
-export let noteSeq = [], lyricSeq = [], stringSeq = [];  // 音符、歌詞、琴弦序列
+// 音符、歌詞、琴弦序列
+export let noteSeq = [],
+    lyricSeq = [],
+    stringSeq = new Array(6).fill(null).map(() => ({ note: null, alpha: 0 }));
+
 let effectSeq = [];  // 特效序列
 let lastTime = performance.now();
 let isRolling = false;
@@ -176,10 +182,18 @@ function drawString() {
     const waveFreq = 3, maxJitter = 10;
     const time = performance.now() * 0.01;
 
+    const style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 50,
+        fontWeight: 'bold',
+        fill: 0xBDC0BA,
+        align: 'left',
+        alpha: 0.6
+    });
+
     for (let i = 0; i < stringSeq.length; i++) {
-        if (stringSeq[i] > 0) {
+        if (stringSeq[i].alpha > 0) {
             const poseY = midiApp.canvas.height - 100 - i * 80;
-            const alpha = stringSeq[i];
             for (let j = 0; j < segments; j++) {
                 const x = j * segmentWidth;
                 const t = j / segments;
@@ -187,10 +201,23 @@ function drawString() {
                 const jitter = Math.sin(2 * Math.PI * waveFreq * t + time * 5) * envelope * maxJitter;
                 const y = poseY + jitter;
                 string.roundRect(x, y - 5, segmentWidth * 1.1, 10)
-                    .fill({ color: pitchToHexColor(guitarStandard[i], 'R'), alpha });
+                    .fill({ color: pitchToHexColor(guitarStandard[i], 'R'), alpha: stringSeq[i].alpha });
             }
-            midiApp.stage.addChild(string);
-            stringSeq[i] -= 0.03; // 漸淡消失
+             midiApp.stage.addChild(string);
+            stringSeq[i].alpha -= 0.03; // 漸淡消失
+            
+            const txt = revRootTab[(stringSeq[i].note + capo) % 12]
+            const text = new PIXI.Text({
+                text: txt,
+                style
+            });
+            text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
+            text.x = midiApp.renderer.width / 2; // 畫面水平中心
+            text.y = poseY;
+
+            midiApp.stage.addChild(text);
+
+           
         }
     }
 }

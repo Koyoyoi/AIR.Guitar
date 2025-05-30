@@ -1,6 +1,6 @@
 import { noteSeq, stringSeq, lyricSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { midiApp } from "./main.js";
-import { mapRange,  guitarStandard } from "../sound.js";
+import { mapRange, guitarStandard } from "../sound.js";
 
 export let tempo = 0;
 
@@ -42,9 +42,17 @@ export function animateSeq(context, velocity = 0, duration = 1.5, posX = midiApp
             });
         } else {
             // 琴弦擊打事件
-            const closestIndex = guitarStandard.reduce((closest, note, idx) =>
-                Math.abs(note - context) < Math.abs(guitarStandard[closest] - context) ? idx : closest, 0);
-            stringSeq[closestIndex] = 1;
+            const validIndices = guitarStandard
+                .map((note, idx) => ({ note, idx }))
+                .filter(item => context >= item.note); // 只保留 context >= note
+
+            if (validIndices.length > 0) {
+                const closestIndex = validIndices.reduce((closest, curr) =>
+                    Math.abs(curr.note - context) < Math.abs(closest.note - context) ? curr : closest
+                ).idx;
+
+                stringSeq[closestIndex] = { note: context, alpha: 1 };
+            }
         }
     } else if (typeof context === 'string') {
         // 加入歌詞

@@ -46,8 +46,6 @@ export async function pluckCtrl() {
         }
         prevPluck = pluck.slice();                  // 更新撥弦狀態
     }
-
-    drawNoteOnHand(handData['Right'])
 }
 
 // 掃弦控制
