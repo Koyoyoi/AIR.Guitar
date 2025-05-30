@@ -2,9 +2,10 @@ import { settingCtrl, midiPortCtrl, ModeCtrl, sampleCtrl, loadImg, showAllCtrl, 
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { midiDrawLoop, animateSeq, resetSeq } from "./Draw/drawMIDI.js";
+import { midiDrawLoop } from "./Draw/drawMIDI.js";
 import { drawSongName, reCanva } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
+import { midiProcess } from "./midiEvent.js"
 
 //  全域變數宣告區 
 export let video, drawingUtils;
@@ -90,115 +91,17 @@ async function setupCamera() {
     });
 }
 
-// 網頁載入完成後，處理檔案上傳邏輯（圖片或 MIDI）
+// 網頁載入完成後，處理檔案上傳 MIDI
 window.onload = async function () {
-    // 確保 Magenta.js 已載入（MIDI 用）
+    // 確保 Magenta.js 已載入
     if (typeof mm === "undefined") {
         console.error("Magenta.js 未正確載入！");
         return;
     }
-
     document.getElementById("file-upload").addEventListener("change", async function (event) {
         const file = event.target.files[0];
         if (!file || modeNum == 0) return;
-        songName = `${file.name}`.replace(/\.mid$/i, "");
-        console.log("檔案名稱:", songName);
-
-        //  處理 MIDI 檔 
-        if (file.name.endsWith(".mid") || file.name.endsWith(".midi")) {
-            resetSeq();
-
-            const arrayBuffer = await file.arrayBuffer();
-
-            // ---------- 使用 Magenta 解析 NoteSequence ----------
-            const blob = new Blob([arrayBuffer], { type: "audio/midi" });
-            const noteSeq = await mm.blobToNoteSequence(blob);
-            noteSeq.notes.sort((a, b) => a.startTime - b.startTime);
-
-            // ---------- 取得 tempo 與 ticksPerQuarter
-            const tempo = (noteSeq.tempos && noteSeq.tempos.length > 0)
-                ? noteSeq.tempos[0].qpm : 120; // qpm = quarter notes per minute :  fallback 預設值
-
-            const ticksPerQuarter = noteSeq.ticksPerQuarter || 480; // 依 MIDI 標準預設
-
-            // ---------- 使用 Magenta 解析 notes 並送入動畫 ----------
-            const xMap = new Map();
-            let i = 0;
-            const initX = noteSeq.notes[0].startTime;
-            const baseSpacing = 200; // 固定基本間隔
-            const timeScale = 80;    // 時間差調整倍率，可調整密度
-
-            let prevStartTime = initX;
-
-            noteSeq.notes.forEach((note) => {
-                if (21 <= note.pitch && note.pitch <= 108 && !note.isDrum) {
-                    if (!xMap.has(note.startTime)) {
-                        // 固定間隔 + 時間差影響
-                        const timeDiff = note.startTime - prevStartTime;
-                        const offset = timeDiff * timeScale;
-                        const xPos = 185 + i * baseSpacing + offset;
-                        xMap.set(note.startTime, xPos);
-
-                        prevStartTime = note.startTime;
-                        i++;
-                    }
-
-                    animateSeq(
-                        note.pitch,
-                        note.velocity,
-                        (note.endTime - note.startTime),
-                        xMap.get(note.startTime)
-                    );
-                }
-            });
-
-            // ---------- 使用 midi-parser-js 解析歌詞，並換算成秒 ----------
-            const midi = MidiParser.parse(new Uint8Array(arrayBuffer));
-
-            const lyrics = []; // 存放合併後的歌詞物件 {text, time}
-
-            midi.track.forEach(track => {
-                let absoluteTicks = 0;
-                track.event.forEach(event => {
-                    absoluteTicks += event.deltaTime;
-
-                    if (event.type === 0xFF && event.metaType === 0x05) {
-                        let lyric = "";
-                        if (typeof event.data === "string") {
-                            lyric = event.data;
-                        } else if (event.data instanceof Uint8Array || Array.isArray(event.data)) {
-                            lyric = new TextDecoder("utf-8").decode(new Uint8Array(event.data));
-                        } else {
-                            lyric = String(event.data);
-                        }
-
-                        // 計算秒數
-                        const seconds = (absoluteTicks / ticksPerQuarter) * (60 / tempo);
-
-                        // 如果前一筆資料和這筆時間差小於0.3秒，就合併
-                        if (lyrics.length > 0 && (seconds - lyrics[lyrics.length - 1].time) < 0.3) {
-                            lyrics[lyrics.length - 1].text += lyric;
-                            // 更新時間到較晚的時間點
-                            lyrics[lyrics.length - 1].time = seconds;
-                        } else {
-                            lyrics.push({ text: lyric, time: seconds });
-                        }
-                    }
-                });
-            });
-
-            // 印出結果
-            lyrics.forEach((lyr, idx) => {
-                console.log(`Lyric #${idx}: ${lyr.text} at ${lyr.time.toFixed(3)}s`);
-                animateSeq(lyr.text, 0, 0, lyr.time * 50)
-            });
-
-
-        }
-        //  非支援格式 
-        else {
-            alert("請上傳 MIDI 檔案！");
-        }
+        await midiProcess(file);
     });
 };
 
