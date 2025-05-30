@@ -3,7 +3,6 @@ import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.
 import { handData, poseData, video } from "../main.js";
 import { predict } from "../SVM.js";
 import { drawCapo, drawGesture } from "../Draw/drawInfo.js";
-import { modeNum } from "./blockControll.js";
 
 // 設定全域變數
 export let capo = 0;
@@ -47,6 +46,8 @@ export async function pluckCtrl() {
         }
         prevPluck = pluck.slice();                  // 更新撥弦狀態
     }
+
+    drawNoteOnHand(handData['Right'])
 }
 
 // 掃弦控制
