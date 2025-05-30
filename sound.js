@@ -1,4 +1,5 @@
-import { animateSeq, rollSeq } from "./Draw/drawMIDI.js";
+import { rollSeq } from "./Draw/drawMIDI.js";
+import { animateSeq } from "./midiEvent.js";
 import { modeNum, portOpen, sampleNum } from "./Controll/blockControll.js"
 
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放

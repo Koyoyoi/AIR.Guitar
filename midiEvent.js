@@ -1,4 +1,8 @@
-import { animateSeq, resetSeq } from "./Draw/drawMIDI.js";
+import { noteSeq, stringSeq, lyricSeq, resetSeq } from "./Draw/drawMIDI.js";
+import { midiApp } from "./main.js";
+import { mapRange,  guitarStandard } from "../sound.js";
+
+export let tempo = 0;
 
 export async function midiProcess(file) {
     if (!file.name.toLowerCase().endsWith(".mid") && !file.name.toLowerCase().endsWith(".midi")) {
@@ -15,11 +19,37 @@ export async function midiProcess(file) {
     const noteSeq = await mm.blobToNoteSequence(blob);
     noteSeq.notes.sort((a, b) => a.startTime - b.startTime);
 
-    const tempo = noteSeq.tempos?.[0]?.qpm || 120;
+    tempo = noteSeq.tempos?.[0]?.qpm || 120;
     const ticksPerQuarter = noteSeq.ticksPerQuarter || 480;
+
+    console.log(tempo)
 
     renderNotes(noteSeq);
     renderLyrics(arrayBuffer, ticksPerQuarter, tempo);
+}
+
+// 新增音符 / 歌詞 / 琴弦
+export function animateSeq(context, velocity = 0, duration = 1.5, posX = midiApp.canvas.width * 0.8) {
+    if (typeof context === 'number') {
+        // 加入音符資料
+        if (velocity > 0) {
+            noteSeq.push({
+                note: context, v: velocity, d: duration,
+                x: posX, targetX: posX, vx: 0,
+                y: mapRange(context, 24, 84, midiApp.canvas.height - 100, 100),
+                r: mapRange(velocity, 60, 127, 10, 25),
+                scale: 1, hit: false, hitTime: 0,
+            });
+        } else {
+            // 琴弦擊打事件
+            const closestIndex = guitarStandard.reduce((closest, note, idx) =>
+                Math.abs(note - context) < Math.abs(guitarStandard[closest] - context) ? idx : closest, 0);
+            stringSeq[closestIndex] = 1;
+        }
+    } else if (typeof context === 'string') {
+        // 加入歌詞
+        lyricSeq.push({ t: context, x: posX });
+    }
 }
 
 // 根據 NoteSequence 繪製音符動畫
@@ -28,7 +58,7 @@ function renderNotes(noteSeq) {
     let i = 0;
     const initX = noteSeq.notes[0]?.startTime || 0;
     const baseSpacing = 200;
-    const timeScale = 100;
+    const timeScale = 80;
     let prevStartTime = initX;
 
     for (const note of noteSeq.notes) {

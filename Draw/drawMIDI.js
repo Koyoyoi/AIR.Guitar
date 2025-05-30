@@ -1,12 +1,12 @@
 import { midiApp } from "../main.js";
-import { mapRange, soundSample, guitarStandard } from "../sound.js";
+import { soundSample, guitarStandard } from "../sound.js";
 import { modeNum } from "../Controll/blockControll.js";
+import { tempo } from "../midiEvent.js";
 
-// 全域資料序列
-export let noteSeq = [];                            // 音符序列
-let effectSeq = [], lyricSeq = [], stringSeq = [];  // 特效、歌詞、琴弦序列
+export let noteSeq = [], lyricSeq = [], stringSeq = [];  // 音符、歌詞、琴弦序列
+let effectSeq = [];  // 特效序列
 let lastTime = performance.now();
-let isRolling = false, k = 0;
+let isRolling = false;
 
 // PIXI 圖層
 const note = new PIXI.Graphics();       // 主音符
@@ -22,51 +22,26 @@ export function resetSeq() {
 // 平移畫面中的所有音符（推動音符向左）
 export async function rollSeq() {
     if (!isRolling && modeNum === 1 && noteSeq.length > 0) {
-        // 取得所有不同的 x 值，並排序
         const uniqueX = [...new Set(noteSeq.map(n => n.x))].sort((a, b) => a - b);
-
-        // 如果只有一個音符，直接用它的 x 值；否則取第二小
         const targetX = uniqueX.length >= 2 ? uniqueX[1] : uniqueX[0];
-
-        // 計算平移量（要將此音符移動到播放區域 x = 185 的位置）
         const k = targetX - 185 == 0 ? targetX : targetX - 185;
-        console.log(targetX)
 
-        // 如果需要平移，則設定每個音符的目標位置與速度
         if (noteSeq.length > 0) {
+            const baseDuration = 10;
+            // tempo越大速度越快，tempoFactor越小
+            const tempoFactor = 60 / tempo;
+            const durationFrames = Math.max(1, Math.floor(baseDuration * Math.max(1, Math.abs(k)) * tempoFactor / 100));
+            console.log("durationFrames:", durationFrames, "tempo:", tempo);
+
             noteSeq.forEach(n => {
                 if (!n.hit) {
                     n.targetX = n.x - k;
-                    n.vx = (n.targetX - n.x) / 10;
+                    n.vx = (n.targetX - n.x) / durationFrames;
                 }
             });
-            isRolling = true;
-        }
-    }
-}
 
-
-// 新增音符 / 歌詞 / 琴弦
-export function animateSeq(context, velocity = 0, duration = 1.5, posX = midiApp.canvas.width * 0.8) {
-    if (typeof context === 'number') {
-        // 加入音符資料
-        if (velocity > 0) {
-            noteSeq.push({
-                note: context, v: velocity, d: duration,
-                x: posX, targetX: posX, vx: 0,
-                y: mapRange(context, 24, 84, midiApp.canvas.height - 100, 100),
-                r: mapRange(velocity, 60, 127, 10, 25),
-                scale: 1, hit: false, hitTime: 0,
-            });
-        } else {
-            // 琴弦擊打事件
-            const closestIndex = guitarStandard.reduce((closest, note, idx) =>
-                Math.abs(note - context) < Math.abs(guitarStandard[closest] - context) ? idx : closest, 0);
-            stringSeq[closestIndex] = 1;
+            isRolling = true
         }
-    } else if (typeof context === 'string') {
-        // 加入歌詞
-        lyricSeq.push({ t: context, x: posX });
     }
 }
 
