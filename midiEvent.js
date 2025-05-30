@@ -18,14 +18,12 @@ export async function midiProcess(file) {
     const tempo = noteSeq.tempos?.[0]?.qpm || 120;
     const ticksPerQuarter = noteSeq.ticksPerQuarter || 480;
 
-    renderNotes(noteSeq, tempo);
+    renderNotes(noteSeq);
     renderLyrics(arrayBuffer, ticksPerQuarter, tempo);
 }
 
-/**
- * 根據 NoteSequence 繪製音符動畫
- */
-function renderNotes(noteSeq, tempo) {
+// 根據 NoteSequence 繪製音符動畫
+function renderNotes(noteSeq) {
     const xMap = new Map();
     let i = 0;
     const initX = noteSeq.notes[0]?.startTime || 0;
@@ -54,9 +52,7 @@ function renderNotes(noteSeq, tempo) {
     }
 }
 
-/**
- * 解析並顯示歌詞（使用 midi-parser-js）
- */
+// 解析並顯示歌詞（使用 midi-parser-js）
 function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
     const midi = MidiParser.parse(new Uint8Array(arrayBuffer));
     const lyrics = [];
