@@ -28,7 +28,7 @@ function renderNotes(noteSeq) {
     let i = 0;
     const initX = noteSeq.notes[0]?.startTime || 0;
     const baseSpacing = 200;
-    const timeScale = 80;
+    const timeScale = 100;
     let prevStartTime = initX;
 
     for (const note of noteSeq.notes) {
