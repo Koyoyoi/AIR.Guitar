@@ -10,6 +10,7 @@ body {
     overflow: hidden;
     /* 防止畫面捲動 */
 }
+
 canvas {
     position: absolute;
     top: 50%;
