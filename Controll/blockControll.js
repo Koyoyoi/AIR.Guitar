@@ -327,3 +327,31 @@ export function handCtrl() {
     RHand.on('pointerdown', () => { console.log("✅ right hand 控制區被點擊！"); });
     uiApp.stage.addChild(RHand);
 }
+
+// reload 控制區域
+export function reloadCtrl() {
+    const Area = {
+        x: uiApp.screen.width - uiApp.screen.height * 0.1,
+        y: 50,
+        w: uiApp.screen.height * 0.1,
+        h: uiApp.screen.height * 0.1,
+    };
+
+    const reloadBtn = new PIXI.Sprite(IMGs['reload']);
+    reloadBtn.x = Area.x;
+    reloadBtn.y = Area.y;
+    reloadBtn.width = Area.w;
+    reloadBtn.height = Area.h;
+
+    // 讓圖片可以互動
+    reloadBtn.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h); // 限定互動範圍（可調整）
+    reloadBtn.interactive = true;
+    reloadBtn.buttonMode = true;
+
+    // 點擊事件
+    reloadBtn.on('pointerdown', () => {
+        console.log("✅ reload 控制區被點擊！");
+    });
+
+    uiApp.stage.addChild(reloadBtn);
+}
