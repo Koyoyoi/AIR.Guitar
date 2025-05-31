@@ -1,6 +1,7 @@
 import { video, baseApp, midiApp, uiApp } from "../main.js";
 import { rootTab, revRootTab, pluckNotes } from "../sound.js";
 import { modeNum, showAllCtrl } from "../Controll/blockControll.js";
+import { capo } from "../Controll/musicControll.js";
 import { songName } from "../midiEvent.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
@@ -68,7 +69,7 @@ export function drawFinger(handData) {
         const note = pluckNotes[i] || '';        // 沒有音符就留空白
 
         const text = new PIXI.Text({
-            text: revRootTab[note % 12] + Math.floor(note / 12),
+            text: revRootTab[(note + capo) % 12], // + Math.floor(note + capo / 12)
             style: style
         });
 

@@ -182,15 +182,6 @@ function drawString() {
     const waveFreq = 3, maxJitter = 10;
     const time = performance.now() * 0.01;
 
-    const style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 50,
-        fontWeight: 'bold',
-        fill: 0xBDC0BA,
-        align: 'left',
-        alpha: 0.6
-    });
-
     for (let i = 0; i < stringSeq.length; i++) {
         if (stringSeq[i].alpha > 0) {
             const poseY = midiApp.canvas.height - 100 - i * 80;
@@ -206,17 +197,23 @@ function drawString() {
             midiApp.stage.addChild(string);
             stringSeq[i].alpha -= 0.03; // 漸淡消失
 
-            const txt = revRootTab[(stringSeq[i].note + capo) % 12]
+            const style = new PIXI.TextStyle({
+                fontFamily: 'Arial',
+                fontSize: 50,
+                fontWeight: 'bold',
+                fill: pitchToHexColor(guitarStandard[i], 'R'),
+                align: 'left',
+                alpha: stringSeq[i].alpha
+            });
             const text = new PIXI.Text({
-                text: txt,
+                text: revRootTab[(stringSeq[i].note + capo) % 12] + Math.floor((stringSeq[i].note + capo) / 12),
                 style
             });
             text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
-            text.x = midiApp.renderer.width / 2; // 畫面水平中心
-            text.y = poseY;
+            text.x = 80; // 畫面水平中心
+            text.y = poseY - 55;
 
             midiApp.stage.addChild(text);
-
 
         }
     }

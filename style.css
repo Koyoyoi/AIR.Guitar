@@ -24,6 +24,13 @@ body {
     z-index: 10;                              /* 位於其他元素之上 */
 }
 
+ #canvas-container {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    overflow: hidden;
+  }
+
 /* === Loading 畫面樣式 === */
 #loading {
     position: fixed;
