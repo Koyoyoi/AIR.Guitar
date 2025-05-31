@@ -2,7 +2,7 @@ import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
 import { handData, poseData, video } from "../main.js";
 import { predict } from "../SVM.js";
-import { drawCapo, drawGesture, drawNoteHand } from "../Draw/drawInfo.js";
+import { drawCapo, drawGesture, drawFinger } from "../Draw/drawInfo.js";
 
 // 設定全域變數
 export let capo = 0;
@@ -48,7 +48,7 @@ export async function pluckCtrl() {
         
     }
 
-    drawNoteHand(handData["Right"])
+    drawFinger(handData["Right"])
 }
 
 // 掃弦控制

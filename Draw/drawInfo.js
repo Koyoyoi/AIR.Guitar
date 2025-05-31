@@ -48,7 +48,7 @@ export function reCanva() {
 }
 
 // 繪製手勢與轉調資訊，顯示在畫布上
-export function drawNoteHand(handData) {
+export function drawFinger(handData) {
     if (handData.length == 0) return
 
     // 建立文字樣式
