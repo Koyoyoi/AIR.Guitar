@@ -5,9 +5,18 @@ body {
     padding: 0;
     width: 100%;
     height: 100%;
-    background-color: #1C1C1C; /* 背景深色主題 */
-    overflow: hidden;            /* 防止畫面捲動 */
+    background-color: #1C1C1C;
+    /* 背景深色主題 */
+    overflow: hidden;
+    /* 防止畫面捲動 */
 }
+canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+
 
 /* === 標題樣式 === */
 .title {
@@ -18,31 +27,28 @@ body {
     margin-top: 20px;
     letter-spacing: 3px;
     font-family: 'Arial Black', sans-serif;
-    position: fixed;                          /* 固定在畫面頂部 */
+    position: fixed;
+    /* 固定在畫面頂部 */
     top: 0;
     width: 100%;
-    z-index: 10;                              /* 位於其他元素之上 */
+    z-index: 10;
+    /* 位於其他元素之上 */
 }
-
- #canvas-container {
-    position: relative;
-    width: 1280px;
-    height: 720px;
-    overflow: hidden;
-  }
 
 /* === Loading 畫面樣式 === */
 #loading {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* 畫面正中央 */
+    transform: translate(-50%, -50%);
+    /* 畫面正中央 */
     z-index: 9999;
     text-align: center;
     background-color: transparent;
     padding: 40px;
     border: none;
-    transition: opacity 1s ease;      /* 淡出效果 */
+    transition: opacity 1s ease;
+    /* 淡出效果 */
     opacity: 1;
 }
 
@@ -63,7 +69,8 @@ body {
 /* Loading 動畫方塊容器（3x3） */
 .loading-container {
     display: grid;
-    grid-template-columns: repeat(3, auto); /* 3 欄 */
+    grid-template-columns: repeat(3, auto);
+    /* 3 欄 */
     justify-content: center;
     align-items: center;
 }
@@ -75,25 +82,49 @@ body {
     background-color: #434343;
     margin: 5px;
     display: inline-block;
-    animation: scaleItem 0.5s infinite ease-in-out; /* 縮放動畫 */
-    border-radius: 5px;                             /* 圓角 */
+    animation: scaleItem 0.5s infinite ease-in-out;
+    /* 縮放動畫 */
+    border-radius: 5px;
+    /* 圓角 */
 }
 
 /* === 為每個 item 設定不同的動畫延遲 === */
-.item:nth-child(1) { animation-delay: 0s; }
+.item:nth-child(1) {
+    animation-delay: 0s;
+}
+
 .item:nth-child(2),
-.item:nth-child(4) { animation-delay: 0.15s; }
+.item:nth-child(4) {
+    animation-delay: 0.15s;
+}
+
 .item:nth-child(3),
 .item:nth-child(5),
-.item:nth-child(7) { animation-delay: 0.3s; }
+.item:nth-child(7) {
+    animation-delay: 0.3s;
+}
+
 .item:nth-child(6),
-.item:nth-child(8) { animation-delay: 0.45s; }
-.item:nth-child(9) { animation-delay: 0.6s; }
+.item:nth-child(8) {
+    animation-delay: 0.45s;
+}
+
+.item:nth-child(9) {
+    animation-delay: 0.6s;
+}
 
 /* === Loading 動畫定義 === */
 @keyframes scaleItem {
-    0%, 100% { transform: scale(0.1); }
-    30%, 70% { transform: scale(1); }
+
+    0%,
+    100% {
+        transform: scale(0.1);
+    }
+
+    30%,
+    70% {
+        transform: scale(1);
+    }
 }
 
 /* === 檔案上傳區塊 === */
@@ -103,7 +134,8 @@ body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
-    display: none; /* 預設不顯示，等待條件觸發 .show 顯示 */
+    display: none;
+    /* 預設不顯示，等待條件觸發 .show 顯示 */
 }
 
 /* 顯示狀態下的 upload-section */

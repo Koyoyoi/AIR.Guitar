@@ -50,6 +50,8 @@ async function setupCamera() {
         height: 720,
     });
 
+ 
+
     // 確保 midiApp初始化完成後再操作 canvas
     document.querySelector('.canvas-wrapper').appendChild(baseApp.canvas);
     document.querySelector('.canvas-wrapper').appendChild(midiApp.canvas);
