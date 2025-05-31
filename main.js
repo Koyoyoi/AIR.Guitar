@@ -1,16 +1,16 @@
 import { settingCtrl, midiPortCtrl, ModeCtrl, sampleCtrl, loadImg, modeNum, handCtrl, reloadCtrl } from "./Controll/blockControll.js";
-import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
-import { midiDrawLoop } from "./Draw/drawMIDI.js";
+import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { drawSongName, reCanva } from "./Draw/drawInfo.js";
-import { load_SVM_Model } from "./SVM.js";
+import { midiDrawLoop } from "./Draw/drawMIDI.js";
 import { midiProcess } from "./midiEvent.js"
+import { load_SVM_Model } from "./SVM.js";
 
 //  全域變數宣告區 
 export let video, drawingUtils;
 export let midiCanvas, midiCtx;
-export let handData = { "Left": [], "Right": [] }, poseData = [], songName;
+export let handData = { "Left": [], "Right": [] }, poseData = [];
 export let baseApp, midiApp, uiApp;
 
 let videoSprite;

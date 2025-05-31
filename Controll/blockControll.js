@@ -1,8 +1,8 @@
 import { uiApp } from "../main.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
-export let modeNum = 0, portOpen = false, sampleNum = 0;
-export let showAllCtrl = false, isPlay = false, isSwitch;
+export let modeNum = 0, sampleNum = 0;
+export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false, isReload = false;
 
 let IMGs = {}
 let textStyle = {
@@ -357,6 +357,7 @@ export function reloadCtrl() {
     // 點擊事件
     reloadBtn.on('pointerdown', () => {
         console.log("✅ reload 控制區被點擊！");
+        isReload = !isReload;
     });
 
     uiApp.stage.addChild(reloadBtn);
