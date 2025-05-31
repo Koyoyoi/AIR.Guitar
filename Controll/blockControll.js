@@ -337,9 +337,9 @@ export function handCtrl() {
 
 // reload 控制區域
 export function reloadCtrl() {
-    const Area = {
-        x: uiApp.screen.width - uiApp.screen.height * 0.1,
-        y: 50,
+     const Area = {
+        x: 25,
+        y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
         w: uiApp.screen.height * 0.1,
         h: uiApp.screen.height * 0.1,
     };
