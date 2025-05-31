@@ -3,7 +3,7 @@ import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { midiDrawLoop } from "./Draw/drawMIDI.js";
-import { drawSongName, reCanva } from "./Draw/drawInfo.js";
+import { drawNoteHand, drawSongName, reCanva } from "./Draw/drawInfo.js";
 import { load_SVM_Model } from "./SVM.js";
 import { midiProcess } from "./midiEvent.js"
 
@@ -133,6 +133,7 @@ async function detectLoop() {
         await strumCtrl();
     }
     settingCtrl()
+    
 
     // 音樂控制
     if (modeNum == 0 && !showAllCtrl) {

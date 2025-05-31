@@ -203,9 +203,9 @@ function drawString() {
                 string.roundRect(x, y - 5, segmentWidth * 1.1, 10)
                     .fill({ color: pitchToHexColor(guitarStandard[i], 'R'), alpha: stringSeq[i].alpha });
             }
-             midiApp.stage.addChild(string);
+            midiApp.stage.addChild(string);
             stringSeq[i].alpha -= 0.03; // 漸淡消失
-            
+
             const txt = revRootTab[(stringSeq[i].note + capo) % 12]
             const text = new PIXI.Text({
                 text: txt,
@@ -217,7 +217,7 @@ function drawString() {
 
             midiApp.stage.addChild(text);
 
-           
+
         }
     }
 }

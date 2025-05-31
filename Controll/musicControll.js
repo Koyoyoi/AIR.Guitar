@@ -2,7 +2,7 @@ import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
 import { handData, poseData, video } from "../main.js";
 import { predict } from "../SVM.js";
-import { drawCapo, drawGesture } from "../Draw/drawInfo.js";
+import { drawCapo, drawGesture, drawNoteHand } from "../Draw/drawInfo.js";
 
 // 設定全域變數
 export let capo = 0;
@@ -33,9 +33,9 @@ export async function chordCtrl() {
 
 // 撥弦控制
 export async function pluckCtrl() {
-    if (handData['Right'].length != 0) {
-        [pluck, velocities] = await fingerPlay(handData['Right']);  // 計算撥弦與速度
-    }
+    if (handData['Right'].length == 0) return
+
+    [pluck, velocities] = await fingerPlay(handData['Right']);  // 計算撥弦與速度
 
     // 檢查是否有新的撥弦，並執行撥弦動作
     if (!pluck.includes(4)) {
@@ -45,7 +45,10 @@ export async function pluckCtrl() {
             plucking(diffPluck, capo, velocities);  // 撥弦
         }
         prevPluck = pluck.slice();                  // 更新撥弦狀態
+        
     }
+
+    drawNoteHand(handData["Right"])
 }
 
 // 掃弦控制

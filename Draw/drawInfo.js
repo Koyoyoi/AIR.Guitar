@@ -1,5 +1,5 @@
 import { video, baseApp, midiApp, uiApp, songName } from "../main.js";
-import { rootTab, revRootTab } from "../sound.js";
+import { rootTab, revRootTab, pluckNotes } from "../sound.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
@@ -45,6 +45,37 @@ export function reCanva() {
     if (title) {
         title.style.display = verticalOffset < 100 ? 'none' : 'block';
     }
+}
+
+// 繪製手勢與轉調資訊，顯示在畫布上
+export function drawNoteHand(handData) {
+    if (handData.length == 0) return
+
+    // 建立文字樣式
+    const style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 50,
+        fontWeight: 'bold',
+        fill: '#00AA90',
+        align: 'center',
+    });
+
+    // landmark 對應到五指尖端
+    const fingerTips = [handData[4], handData[8], handData[12], handData[16]];
+    for (let i = 0; i < fingerTips.length; i++) {
+        const note = pluckNotes[i] || '';        // 沒有音符就留空白
+
+        const text = new PIXI.Text({
+            text: revRootTab[note % 12] + Math.floor(note / 12),
+            style: style
+        });
+
+        text.anchor.set(0.5);
+        text.x = baseApp.renderer.width - fingerTips[i][0];        
+        text.y = fingerTips[i][1] - 50;    
+        baseApp.stage.addChild(text);
+    }
+
 }
 
 // 繪製手勢與轉調資訊，顯示在畫布上
