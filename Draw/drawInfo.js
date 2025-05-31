@@ -1,6 +1,7 @@
-import { video, baseApp, midiApp, uiApp, songName } from "../main.js";
+import { video, baseApp, midiApp, uiApp } from "../main.js";
 import { rootTab, revRootTab, pluckNotes } from "../sound.js";
 import { modeNum, showAllCtrl } from "../Controll/blockControll.js";
+import { songName } from "../midiEvent.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {

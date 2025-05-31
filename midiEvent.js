@@ -2,30 +2,35 @@ import { noteSeq, stringSeq, lyricSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { midiApp } from "./main.js";
 import { mapRange, guitarStandard } from "./sound.js";
 
-export let tempo = 0;
+export let tempo = 0, songName = "";
+
+let noteData, aryBuffer, tPerQuarter;
 
 export async function midiProcess(file) {
-    if (!file.name.toLowerCase().endsWith(".mid") && !file.name.toLowerCase().endsWith(".midi")) {
-        alert("請上傳 MIDI 檔案！");
-        return;
+    resetSeq();
+    if (file != undefined) {
+        if (!file.name.toLowerCase().endsWith(".mid") && !file.name.toLowerCase().endsWith(".midi")) {
+            alert("請上傳 MIDI 檔案！");
+            return;
+        }
+
+        songName = file.name.replace(/\.mid(i)?$/i, "");
+        console.log("檔案名稱:", songName);
+
+
+        aryBuffer = await file.arrayBuffer();
+        const blob = new Blob([aryBuffer], { type: "audio/midi" });
+        noteData = await mm.blobToNoteSequence(blob);
+        noteData.notes.sort((a, b) => a.startTime - b.startTime);
+
+        tempo = noteData.tempos?.[0]?.qpm || 120;
+        tPerQuarter = noteData.ticksPerQuarter || 480;
+
+        console.log(tempo)
     }
 
-    const songName = file.name.replace(/\.mid(i)?$/i, "");
-    console.log("檔案名稱:", songName);
-    resetSeq();
-
-    const arrayBuffer = await file.arrayBuffer();
-    const blob = new Blob([arrayBuffer], { type: "audio/midi" });
-    const noteSeq = await mm.blobToNoteSequence(blob);
-    noteSeq.notes.sort((a, b) => a.startTime - b.startTime);
-
-    tempo = noteSeq.tempos?.[0]?.qpm || 120;
-    const ticksPerQuarter = noteSeq.ticksPerQuarter || 480;
-
-    console.log(tempo)
-
-    renderNotes(noteSeq);
-    renderLyrics(arrayBuffer, ticksPerQuarter, tempo);
+    renderNotes(noteData);
+    renderLyrics(aryBuffer, tPerQuarter, tempo);
 }
 
 // 新增音符 / 歌詞 / 琴弦
