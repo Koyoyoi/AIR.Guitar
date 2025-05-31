@@ -1,6 +1,6 @@
 import { noteSeq, stringSeq, lyricSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { midiApp } from "./main.js";
-import { mapRange, guitarStandard } from "../sound.js";
+import { mapRange, guitarStandard } from "./sound.js";
 
 export let tempo = 0;
 
