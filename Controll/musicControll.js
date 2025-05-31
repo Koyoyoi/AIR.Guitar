@@ -3,6 +3,7 @@ import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.
 import { handData, poseData, video } from "../main.js";
 import { predict } from "../SVM.js";
 import { drawCapo, drawGesture, drawFinger } from "../Draw/drawInfo.js";
+import { showAllCtrl } from "./blockControll.js";
 
 // 設定全域變數
 export let capo = 0;
@@ -33,7 +34,7 @@ export async function chordCtrl() {
 
 // 撥弦控制
 export async function pluckCtrl() {
-    if (handData['Right'].length == 0) return
+    if (handData['Right'].length == 0 || showAllCtrl) return
 
     [pluck, velocities] = await fingerPlay(handData['Right']);  // 計算撥弦與速度
 
@@ -45,7 +46,7 @@ export async function pluckCtrl() {
             plucking(diffPluck, capo, velocities);  // 撥弦
         }
         prevPluck = pluck.slice();                  // 更新撥弦狀態
-        
+
     }
 
     drawFinger(handData["Right"])
@@ -53,6 +54,8 @@ export async function pluckCtrl() {
 
 // 掃弦控制
 export async function strumCtrl() {
+    if (showAllCtrl) return
+
     if (poseData[12] != undefined && poseData[14] != undefined && poseData[16] != undefined && poseData[16][1] < video.videoHeight) {
         let angle = vectorAngle(vectorCompute(poseData[12], poseData[14]), vectorCompute(poseData[16], poseData[14]));  // 計算手臂的角度
         armAngles.push(angle);
@@ -68,9 +71,9 @@ export async function strumCtrl() {
             let diffAngle = diffs.reduce((sum, d) => sum + d, 0) / diffs.length;
 
             // 根據角度變化和位置來判斷掃弦方向
-            if (diffAngle > 3 && position > 5 ) {
+            if (diffAngle > 3 && position > 5) {
                 action = 'Dn';
-            } else if (diffAngle < -3 && position < -15 ) {
+            } else if (diffAngle < -3 && position < -15) {
                 action = 'Up';
             } else {
                 action = 'Stop';
@@ -97,11 +100,11 @@ export async function capoCtrl() {
 
         // 判斷姿勢並調整品位
         if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
-            capo = 0;   
+            capo = 0;
         } else if (poseData[16][1] < poseData[0][1]) {
-            capo = Math.min(12, capo + 1);  
+            capo = Math.min(12, capo + 1);
         } else if (poseData[15][1] < poseData[0][1]) {
-            capo = Math.max(-12, capo - 1);   
+            capo = Math.max(-12, capo - 1);
         }
     }
     timeCnt += 1;    // 計時器更新

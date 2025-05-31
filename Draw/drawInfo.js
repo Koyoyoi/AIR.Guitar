@@ -1,5 +1,6 @@
 import { video, baseApp, midiApp, uiApp, songName } from "../main.js";
 import { rootTab, revRootTab, pluckNotes } from "../sound.js";
+import { modeNum, showAllCtrl } from "../Controll/blockControll.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
@@ -49,7 +50,7 @@ export function reCanva() {
 
 // 繪製手勢與轉調資訊，顯示在畫布上
 export function drawFinger(handData) {
-    if (handData.length == 0) return
+    if (handData.length == 0 || modeNum != 0) return
 
     // 建立文字樣式
     const style = new PIXI.TextStyle({
@@ -71,8 +72,8 @@ export function drawFinger(handData) {
         });
 
         text.anchor.set(0.5);
-        text.x = baseApp.renderer.width - fingerTips[i][0];        
-        text.y = fingerTips[i][1] - 50;    
+        text.x = baseApp.renderer.width - fingerTips[i][0];
+        text.y = fingerTips[i][1] - 50;
         baseApp.stage.addChild(text);
     }
 
@@ -80,6 +81,8 @@ export function drawFinger(handData) {
 
 // 繪製手勢與轉調資訊，顯示在畫布上
 export function drawGesture(gesture, capo) {
+    if (showAllCtrl) return;
+
     let transName = "";
 
     // 如果 capo 不為 0，則顯示轉調資訊
@@ -111,6 +114,8 @@ export function drawGesture(gesture, capo) {
 
 // 繪製 capo 設定資訊，顯示在畫布的右上角
 export function drawCapo(capo) {
+    if (showAllCtrl) return;
+
     // 設定 PixiJS 文字樣式
     const style = new PIXI.TextStyle({
         fontFamily: 'Arial',

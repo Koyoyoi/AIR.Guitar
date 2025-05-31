@@ -1,4 +1,3 @@
-import { resetSeq } from "../Draw/drawMIDI.js";
 import { uiApp } from "../main.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
@@ -75,6 +74,8 @@ export function settingCtrl() {
 
 // Mode 控制區域
 export function ModeCtrl() {
+    if (!showAllCtrl) return
+
     const Area = {
         x: uiApp.screen.width / 2 - uiApp.screen.width * 0.1,
         y: 10,
@@ -94,8 +95,8 @@ export function ModeCtrl() {
 
     // 文字創建方式`
     const label = new PIXI.Text({
-        text: `${modeName[modeNum]}`,  
-        style: textStyle['normal']     
+        text: `${modeName[modeNum]}`,
+        style: textStyle['normal']
     });
     label.anchor.set(0.5);
     label.x = Area.x + Area.w / 2;
@@ -139,6 +140,8 @@ export function ModeCtrl() {
 
 // MIDI 控制區域
 export function midiPortCtrl() {
+    if (!showAllCtrl) return
+
     const Area = {
         x: 25,
         y: 10,
@@ -175,6 +178,7 @@ export function midiPortCtrl() {
 }
 // SoundFont 控制區域
 export async function sampleCtrl() {
+    if (!showAllCtrl) return
 
     // 區域大小設定
     const Area = {
@@ -242,6 +246,8 @@ export async function sampleCtrl() {
 
 // hand 控制區域
 export function handCtrl() {
+    if (!showAllCtrl) return
+
     const Area = {
         x: 25,
         y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
