@@ -338,6 +338,8 @@ export function handCtrl() {
 
 // reload 控制區域
 export function reloadCtrl() {
+    if(showAllCtrl) return
+
     const Area = {
         x: 25,
         y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
@@ -366,6 +368,8 @@ export function reloadCtrl() {
 }
 
 export function capoCtrl() {
+    if(modeNum != 0) return
+    
     const Area = {
         x: uiApp.screen.width - uiApp.screen.height * 0.4,
         y: 10,
