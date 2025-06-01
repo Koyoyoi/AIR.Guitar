@@ -8,25 +8,12 @@ import { midiProcess } from "./midiEvent.js"
 import { load_SVM_Model } from "./SVM.js";
 
 //  全域變數宣告區 
-export let video, drawingUtils;
-export let midiCanvas, midiCtx;
+export let video, baseApp, midiApp, uiApp;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
-export let baseApp, midiApp, uiApp;
 
-let videoSprite;
+let videoSprite, overlay;
 
-// 相機設定與畫布初始化 
-async function setupCamera() {
-    video = document.createElement("video");
-    video.style.display = "none";
-
-    // 啟動相機串流
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } }
-    });
-
-    video.srcObject = stream;
-
+async function initCanvas() {
     // 設定畫布與繪圖環境
     baseApp = new PIXI.Application()
     await baseApp.init({
@@ -40,9 +27,6 @@ async function setupCamera() {
         width: 1280,
         height: 720,
     });
-    midiApp.stage.sortableChildren = true;
-    midiApp.canvas.style.pointerEvents = 'none';
-
     uiApp = new PIXI.Application()
     await uiApp.init({
         backgroundAlpha: 0,
@@ -50,14 +34,27 @@ async function setupCamera() {
         height: 720,
     });
 
-
+    overlay = new PIXI.Graphics()
+        .rect(0, 0, baseApp.canvas.width, baseApp.canvas.height)
+        .fill({ color: 0x1c1c1c, alpha: 0.8 });
 
     // 確保 midiApp初始化完成後再操作 canvas
     document.querySelector('.canvas-wrapper').appendChild(baseApp.canvas);
     document.querySelector('.canvas-wrapper').appendChild(midiApp.canvas);
     document.querySelector('.canvas-wrapper').appendChild(uiApp.canvas);
+}
 
-    // drawingUtils = new DrawingUtils(baseApp.canvas.ctx);
+// 相機設定與畫布初始化 
+async function setupCamera() {
+    video = document.createElement("video");
+    video.style.display = "none";
+
+    // 啟動相機串流
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+
+    video.srcObject = stream;
 
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
@@ -82,7 +79,6 @@ async function setupCamera() {
             videoSprite.scale.x = -1;
             // 因為翻轉後會往左邊跑掉，要調整 x 讓它顯示在畫面內
             videoSprite.x = video.videoWidth;
-            videoSprite.zIndex = 0;
 
             // 設定畫布尺寸調整事件
             reCanva();
@@ -113,21 +109,16 @@ async function detectLoop() {
     uiApp.stage.removeChildren();
     baseApp.stage.addChild(videoSprite);
 
-    if (modeNum == 1) {
-        const overlay = new PIXI.Graphics()
-            .rect(0, 0, baseApp.canvas.width, baseApp.canvas.height)
-            .fill({ color: 0x1c1c1c, alpha: 0.8 });
-        baseApp.stage.addChild(overlay);
-    }
+    if (modeNum == 1) baseApp.stage.addChild(overlay);
 
     // 執行 MediaPipe 偵測
     await detectHand();
     await detectPose();
-    
+
     // 控制聲音
     await pluckCtrl(modeNum);
     await strumCtrl();
-    
+
     // 顯示控制區
     settingCtrl()
 
@@ -154,7 +145,8 @@ async function main() {
     await loadImg();             // 載入圖檔 ./IMGs
     await setupMediaPipe();      // MediaPipe 模組初始化
     await load_SVM_Model();      // 載入手勢模型
-    await setupCamera();         // 相機與畫布設定
+    await initCanvas();          // 畫布設定
+    await setupCamera();         // 相機設定
     await initMIDIPort();        // MIDI 設定
 
     buildGuitarChord('C');       // 建立預設 C 和弦
