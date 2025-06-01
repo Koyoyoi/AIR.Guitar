@@ -9,7 +9,7 @@ import { handData, poseData } from "../main.js";
 let gesture = '', prevGesture = '';               // 手勢相關
 let armAngles = [];                               // 手臂角度
 let action = '', prevAction = '';                 // 動作狀態
-let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];  // 撥弦狀態與速度
+let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];  
 
 // 和弦控制
 export async function chordCtrl() {
