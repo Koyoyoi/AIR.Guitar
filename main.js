@@ -1,4 +1,4 @@
-import { settingCtrl, midiPortCtrl, ModeCtrl, sampleCtrl, loadImg, modeNum, handCtrl, reloadCtrl } from "./Controll/blockControll.js";
+import { settingCtrl, loadImg, modeNum, reloadCtrl } from "./Controll/blockControll.js";
 import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
@@ -123,20 +123,14 @@ async function detectLoop() {
     // 執行 MediaPipe 偵測
     await detectHand();
     await detectPose();
-
-    // 顯示控制區
-    midiPortCtrl();
-    sampleCtrl();
-    ModeCtrl();
-    handCtrl();
-
+    
+    // 控制聲音
     await pluckCtrl(modeNum);
     await strumCtrl();
-
+    
+    // 顯示控制區
     settingCtrl()
 
-
-    // 音樂控制
     if (modeNum == 0) {
         await chordCtrl();
         await capoCtrl();

@@ -71,6 +71,13 @@ export function settingCtrl() {
     });
 
     uiApp.stage.addChild(settingSprite);
+
+    if(showAllCtrl){
+        ModeCtrl()
+        midiPortCtrl()
+        sampleCtrl()
+        handCtrl()
+    }
 }
 
 // Mode 控制區域
