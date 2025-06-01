@@ -65,35 +65,43 @@ export function animateSeq(context, velocity = 0, duration = 1.5, posX = midiApp
     }
 }
 
-// 根據 NoteSequence 繪製音符動畫
 function renderNotes(noteSeq) {
-    const xMap = new Map();
-    let i = 0;
-    const initX = noteSeq.notes[0]?.startTime || 0;
-    const baseSpacing = 200;
-    const timeScale = 80;
-    let prevStartTime = initX;
+    if (!noteSeq || !Array.isArray(noteSeq.notes) || noteSeq.notes.length === 0) return;
+
+    const pixelPerBeat = 200;               // 每拍的水平距離
+    const secondsPerBeat = 60 / tempo;      // tempo 是 BPM
+    const pixelPerSecond = pixelPerBeat / secondsPerBeat;
+    const minSpacing = 50;
+
+    const initTime = noteSeq.notes[0].startTime || 0;
+    const timeToX = new Map();
+    let prevX = 185;
 
     for (const note of noteSeq.notes) {
         const { pitch, velocity, startTime, endTime, isDrum } = note;
-        if (pitch < 21 || pitch > 108 || isDrum) continue;
 
-        if (!xMap.has(startTime)) {
-            const offset = (startTime - prevStartTime) * timeScale;
-            const xPos = 185 + i * baseSpacing + offset;
-            xMap.set(startTime, xPos);
-            prevStartTime = startTime;
-            i++;
+        if (pitch < 21 || pitch > 108 || isDrum) continue;
+        if (typeof startTime !== 'number' || isNaN(startTime)) continue;
+
+        // 取得該 startTime 對應的 x（若尚未紀錄，則計算新的）
+        let x;
+        if (timeToX.has(startTime)) {
+            x = timeToX.get(startTime);
+        } else {
+            const rawX = 185 + (startTime - initTime) * pixelPerSecond;
+            x = Math.max(prevX + minSpacing, rawX);  // 保證最小間距
+            timeToX.set(startTime, x);               // 記錄下來供其他相同 startTime 使用
+            prevX = x;                                // 更新上一個 X
         }
 
-        animateSeq(
-            pitch,
-            velocity,
-            endTime - startTime,
-            xMap.get(startTime)
-        );
+        const duration = endTime - startTime;
+        if (duration <= 0) continue;
+
+        animateSeq(pitch, velocity, duration, x);
     }
 }
+
+
 
 // 解析並顯示歌詞（使用 midi-parser-js）
 function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
