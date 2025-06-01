@@ -1,9 +1,8 @@
 import { midiApp } from "../main.js";
-import { soundSample, guitarStandard } from "../sound.js";
+import { soundSample, guitarStandard, revRootTab } from "../sound.js";
 import { modeNum } from "../Controll/blockControll.js";
 import { tempo } from "../midiEvent.js";
 import { capo } from "../Controll/musicControll.js";
-import { revRootTab } from "../sound.js";
 
 // 音符、歌詞、琴弦序列
 export let noteSeq = [],
