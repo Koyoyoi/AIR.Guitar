@@ -2,7 +2,7 @@ import { uiApp } from "../main.js";
 import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
-export let modeNum = 0, sampleNum = 0;
+export let modeNum = 0, sampleNum = 0, capo = 0;
 export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
 
 let IMGs = {}
@@ -72,18 +72,18 @@ export function settingCtrl() {
 
     uiApp.stage.addChild(settingSprite);
 
-    if(showAllCtrl){
-        ModeCtrl()
-        midiPortCtrl()
-        sampleCtrl()
-        handCtrl()
+    if (showAllCtrl) {
+        midiPortCtrl();
+        sampleCtrl();
+        ModeCtrl();
+        handCtrl();
+    } else {
+        capoCtrl();
     }
 }
 
 // Mode 控制區域
 export function ModeCtrl() {
-    if (!showAllCtrl) return
-
     const Area = {
         x: uiApp.screen.width / 2 - uiApp.screen.width * 0.1,
         y: 10,
@@ -148,8 +148,6 @@ export function ModeCtrl() {
 
 // MIDI 控制區域
 export function midiPortCtrl() {
-    if (!showAllCtrl) return
-
     const Area = {
         x: 25,
         y: 10,
@@ -186,8 +184,6 @@ export function midiPortCtrl() {
 }
 // SoundFont 控制區域
 export async function sampleCtrl() {
-    if (!showAllCtrl) return
-
     // 區域大小設定
     const Area = {
         x: uiApp.screen.width / 2 - uiApp.screen.width * 0.15,
@@ -254,8 +250,6 @@ export async function sampleCtrl() {
 
 // hand 控制區域
 export function handCtrl() {
-    if (!showAllCtrl) return
-
     const Area = {
         x: 25,
         y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
@@ -344,8 +338,6 @@ export function handCtrl() {
 
 // reload 控制區域
 export function reloadCtrl() {
-    if (showAllCtrl) return
-
     const Area = {
         x: 25,
         y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
@@ -371,4 +363,75 @@ export function reloadCtrl() {
     });
 
     uiApp.stage.addChild(reloadBtn);
+}
+
+export function capoCtrl() {
+    const Area = {
+        x: uiApp.screen.width - uiApp.screen.height * 0.4,
+        y: 10,
+        w: uiApp.screen.width * 0.2,
+        h: uiApp.screen.height * 0.08
+    };
+
+    // 背景區域
+    const bg = new PIXI.Graphics()
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 50)
+        .fill(0x434343)
+        .roundRect(Area.x + Area.w / 2 - 80, Area.y + 5, 4, Area.h - 10)
+        .fill(0x656765)
+        .roundRect(Area.x + Area.w / 2 + 80, Area.y + 5, 4, Area.h - 10)
+        .fill(0x656765);
+    uiApp.stage.addChild(bg);
+
+    // 左邊控制（減號或「左」）
+    const sub = new PIXI.Text({
+        text: '-',
+        style: textStyle['normal']
+    });
+    sub.anchor.set(0.5);
+    sub.x = Area.x + Area.w / 2 - 100;
+    sub.y = Area.y + Area.h / 2;
+    sub.hitArea = new PIXI.Rectangle(Area.x, Area.y, (Area.w - 160 / 2), Area.h);
+    sub.interactive = true;
+    sub.buttonMode = true;
+    sub.on('pointerdown', () => {
+        console.log("✅ - 被點擊");
+        capo -= 1
+    });
+    uiApp.stage.addChild(sub);
+
+    // 右邊控制（加號或「+」）
+    const add = new PIXI.Text({
+        text: '+',
+        style: textStyle['normal']
+    });
+    add.anchor.set(0.5);
+    add.x = Area.x + Area.w / 2 + 105;
+    add.y = Area.y + Area.h / 2;
+    add.hitArea = new PIXI.Rectangle(add.x - 10, Area.y, (Area.w - 160 / 2), Area.h);
+    add.interactive = true;
+    add.buttonMode = true;
+    add.on('pointerdown', () => {
+        console.log("✅ + 被點擊");
+        capo += 1;
+    });
+    uiApp.stage.addChild(add);
+
+    capo = Math.max(-12, Math.min(12, capo));
+
+    // capo 開關文字按鈕
+    const text = new PIXI.Text({
+        text: 'capo: ' + capo,
+        style: textStyle['normal']
+    });
+    text.x = Area.x + Area.w / 2 - 60;
+    text.y = Area.y + (Area.h - text.height) / 2;
+    text.hitArea = new PIXI.Rectangle(text.x - 20, Area.y, 160, Area.h);
+    text.interactive = true;
+    text.buttonMode = true;
+    text.on('pointerdown', () => {
+        console.log("✅ capo 被點擊");
+        capo = 0
+    });
+    uiApp.stage.addChild(text);
 }

@@ -2,22 +2,18 @@ import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
 import { video } from "../main.js";
 import { predict } from "../SVM.js";
-import { drawCapo, drawGesture, drawFinger } from "../Draw/drawInfo.js";
-import { showAllCtrl } from "./blockControll.js";
+import { drawGesture, drawFinger } from "../Draw/drawInfo.js";
+import { showAllCtrl, capo } from "./blockControll.js";
 import { handData, poseData } from "../main.js";
-
-// 設定全域變數
-export let capo = 0;
 
 let gesture = '', prevGesture = '';               // 手勢相關
 let armAngles = [];                               // 手臂角度
 let action = '', prevAction = '';                 // 動作狀態
 let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];  // 撥弦狀態與速度
-let timeCnt = 0;                                  // 計時器
 
 // 和弦控制
 export async function chordCtrl() {
-    if (handData['Left'].length == 0) return
+    if (handData['Left'].length == 0) return;
 
     let parameters = compute(handData['Left']);
     gesture = await predict(parameters);
@@ -99,22 +95,3 @@ export async function strumCtrl() {
         }
     }
 }
-
-// 品位控制
-export async function capoCtrl() {
-    if (poseData.length > 0 && timeCnt >= 30) {
-        timeCnt = 0;
-
-        // 判斷姿勢並調整品位
-        if (poseData[15][1] < poseData[0][1] && poseData[16][1] < poseData[0][1]) {
-            capo = 0;
-        } else if (poseData[16][1] < poseData[0][1]) {
-            capo = Math.min(12, capo + 1);
-        } else if (poseData[15][1] < poseData[0][1]) {
-            capo = Math.max(-12, capo - 1);
-        }
-    }
-    timeCnt += 1;    // 計時器更新
-    drawCapo(capo);  // 更新畫面上的品位顯示
-}
-

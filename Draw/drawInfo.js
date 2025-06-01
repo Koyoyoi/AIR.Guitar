@@ -1,7 +1,6 @@
 import { video, baseApp, midiApp, uiApp } from "../main.js";
 import { rootTab, revRootTab, pluckNotes } from "../sound.js";
-import { modeNum, showAllCtrl } from "../Controll/blockControll.js";
-import { capo } from "../Controll/musicControll.js";
+import { modeNum, showAllCtrl, capo } from "../Controll/blockControll.js";
 import { songName } from "../midiEvent.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
@@ -111,33 +110,6 @@ export function drawGesture(gesture, capo) {
     text.x = 50;            // 設定 x 座標
     text.y = 25;            // 設定 y 座標
 
-    baseApp.stage.addChild(text);
-}
-
-// 繪製 capo 設定資訊，顯示在畫布的右上角
-export function drawCapo(capo) {
-    if (showAllCtrl) return;
-
-    // 設定 PixiJS 文字樣式
-    const style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 70,
-        fontWeight: 'bold',
-        fill: '#00AA90', // 設定顏色
-        align: 'right',  // 文字對齊右邊
-    });
-
-    // 顯示 capo 設定資訊的文字
-    const text = new PIXI.Text({
-        text: `Capo: ${capo}`,
-        style
-    });
-
-    // 調整文字顯示位置
-    text.x = baseApp.screen.width * 0.8 - 50; // 文字右對齊
-    text.y = 25; // 文字垂直位置
-
-    // 把文字加入舞台
     baseApp.stage.addChild(text);
 }
 

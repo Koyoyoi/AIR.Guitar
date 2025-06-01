@@ -1,5 +1,5 @@
 import { settingCtrl, loadImg, modeNum, reloadCtrl } from "./Controll/blockControll.js";
-import { capoCtrl, chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
+import { chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { drawSongName, reCanva } from "./Draw/drawInfo.js";
@@ -124,7 +124,6 @@ async function detectLoop() {
 
     if (modeNum == 0) {
         await chordCtrl();
-        await capoCtrl();
     }
     if (modeNum == 1) {
         reloadCtrl();
