@@ -1,9 +1,10 @@
 import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
-import { handData, poseData, video } from "../main.js";
+import { video } from "../main.js";
 import { predict } from "../SVM.js";
 import { drawCapo, drawGesture, drawFinger } from "../Draw/drawInfo.js";
 import { showAllCtrl } from "./blockControll.js";
+import { handData, poseData } from "../main.js";
 
 // 設定全域變數
 export let capo = 0;
@@ -11,45 +12,51 @@ export let capo = 0;
 let gesture = '', prevGesture = '';               // 手勢相關
 let armAngles = [];                               // 手臂角度
 let action = '', prevAction = '';                 // 動作狀態
-let pluck = [], prevPluck = [], velocities = [];  // 撥弦狀態與速度
+let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];  // 撥弦狀態與速度
 let timeCnt = 0;                                  // 計時器
 
 // 和弦控制
 export async function chordCtrl() {
-    if (handData['Left'].length != 0) {
-        let parameters = compute(handData['Left']);
-        gesture = await predict(parameters);
+    if (handData['Left'].length == 0) return
 
-        // 若手勢改變，重新構建和弦
-        if (prevGesture != gesture) {
-            console.log(gesture);
-            prevGesture = gesture;
-            buildGuitarChord(gesture);  // 建立對應的吉他和弦
-        }
+    let parameters = compute(handData['Left']);
+    gesture = await predict(parameters);
 
-        // 繪製手勢
-        drawGesture(gesture, capo);
+    // 若手勢改變，重新構建和弦
+    if (prevGesture != gesture) {
+        console.log(gesture);
+        prevGesture = gesture;
+        buildGuitarChord(gesture);  // 建立對應的吉他和弦
     }
+
+    // 繪製手勢
+    drawGesture(gesture, capo);
 }
 
 // 撥弦控制
-export async function pluckCtrl() {
-    if (handData['Right'].length == 0 || showAllCtrl) return
+export async function pluckCtrl(mode) {
+    if (showAllCtrl) return;
 
-    [pluck, velocities] = await fingerPlay(handData['Right']);  // 計算撥弦與速度
+    let toPluck = [];
+    toPluck = mode == 1 ? ['Right', 'Left'] : ['Right'];
 
-    // 檢查是否有新的撥弦，並執行撥弦動作
-    if (!pluck.includes(4)) {
-        let diffPluck = [...pluck, ...prevPluck].filter(x => !prevPluck.includes(x));
+    for (let hand of toPluck) {
+        if (handData[hand].length == 0) continue
 
-        if (diffPluck.length > 0) {
-            plucking(diffPluck, capo, velocities);  // 撥弦
+        [pluck, velocities] = await fingerPlay(handData[hand]);  // 計算撥弦與速度
+
+        // 檢查是否有新的撥弦，並執行撥弦動作
+        if (!pluck.includes(4)) {
+            let diffPluck = [...pluck, ...prevPluck[hand]].filter(x => !prevPluck[hand].includes(x));
+
+            if (diffPluck.length > 0) {
+                plucking(diffPluck, capo, velocities);  // 撥弦
+            }
+            prevPluck[hand] = pluck.slice();                  // 更新撥弦狀態
         }
-        prevPluck = pluck.slice();                  // 更新撥弦狀態
-
     }
 
-    drawFinger(handData["Right"])
+    drawFinger(handData['Right'])
 }
 
 // 掃弦控制
