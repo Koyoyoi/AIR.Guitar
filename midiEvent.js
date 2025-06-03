@@ -74,9 +74,13 @@ function renderNotes(noteSeq) {
             note: note.pitch,
             v: note.velocity,
             d: note.endTime - note.startTime,
-            //y: mapRange(context, 24, 84, midiApp.canvas.height - 100, 100),
             r: mapRange(note.velocity, 60, 127, 10, 25),
         });
+    }
+
+    // 對每組依 note 排序
+    for (const [time, group] of groupMap.entries()) {
+        group.sort((a, b) => a.note - b.note);
     }
 
     // 依照 startTime 排序，然後加入拍數間距資訊
@@ -86,10 +90,24 @@ function renderNotes(noteSeq) {
         const group = groupMap.get(sortedTimes[i]);
         const nextTime = sortedTimes[i + 1];
         const currentTime = sortedTimes[i];
-
         const deltaBeats = nextTime !== undefined ? nextTime - currentTime : 0;
 
-        // 插入時間資訊與動畫屬性到 group 最前面
+        // 計算 Y 軸位置（poseY）
+        const noteCount = group.length;
+        const spanY = Math.min(300, (noteCount - 1) * 40);
+        const baseY = (100 + midiApp.canvas.height - 100) / 2 - spanY / 2;
+        const yList = [];
+
+        for (let j = 0; j < noteCount; j++) {
+            const y = noteCount === 1
+                ? (100 + midiApp.canvas.height - 100) / 2
+                : baseY + j * (spanY / (noteCount - 1));
+            yList.push(y);
+        }
+
+        group.sort((a, b) => a.note - b.note);
+
+        // 插入 ctrl 物件，只包含 yList
         group.unshift({
             dltB: deltaBeats,
             scale: 1,
@@ -97,14 +115,13 @@ function renderNotes(noteSeq) {
             x: 185 + i * 150 + dx,
             vx: 0,
             targetX: 185 + i * 150 + dx,
+            yList,  // <- 這裡只包含算好的 Y 座標
         });
 
-        dx = deltaBeats * 50
-        animateSeq(group)
+        dx = deltaBeats * 50;
+        animateSeq(group);
     }
 }
-
-
 
 // 解析並顯示歌詞（使用 midi-parser-js）
 function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
