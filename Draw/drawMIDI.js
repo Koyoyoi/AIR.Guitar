@@ -229,10 +229,10 @@ function drawString() {
                 align: 'left',
                 alpha: stringSeq[i].alpha
             });
-            const text = new PIXI.Text(
-                revRootTab[(stringSeq[i].note + capo) % 12] + Math.floor((stringSeq[i].note + capo) / 12),
-                style
-            );
+            const text = new PIXI.Text({
+                text: revRootTab[(stringSeq[i].note + capo) % 12] + Math.floor((stringSeq[i].note + capo) / 12),
+                style: style
+            });
             text.anchor.set(0.5, 0);
             text.x = 80;
             text.y = poseY - 55;
