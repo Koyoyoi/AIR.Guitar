@@ -17,7 +17,6 @@ export async function midiProcess(file) {
         songName = file.name.replace(/\.mid(i)?$/i, "");
         console.log("檔案名稱:", songName);
 
-
         aryBuffer = await file.arrayBuffer();
         const blob = new Blob([aryBuffer], { type: "audio/midi" });
         noteData = await mm.blobToNoteSequence(blob);
@@ -61,7 +60,6 @@ export function animateSeq(context, posX = midiApp.canvas.width * 0.8) {
 function renderNotes(noteSeq) {
     if (!noteSeq || !Array.isArray(noteSeq.notes)) return [];
 
-    const grouped = [];
     const groupMap = new Map();
 
     // 根據 startTime 分組
@@ -73,14 +71,10 @@ function renderNotes(noteSeq) {
         groupMap.get(t).push({
             note: note.pitch,
             v: note.velocity,
+            sTime: note.startTime,
             d: note.endTime - note.startTime,
             r: mapRange(note.velocity, 60, 127, 10, 25),
         });
-    }
-
-    // 對每組依 note 排序
-    for (const [time, group] of groupMap.entries()) {
-        group.sort((a, b) => a.note - b.note);
     }
 
     // 依照 startTime 排序，然後加入拍數間距資訊
@@ -141,22 +135,15 @@ function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
                     ? event.data
                     : new TextDecoder("utf-8").decode(new Uint8Array(event.data));
 
-                const time = (ticks / ticksPerQuarter) * (50 / tempo);
-                const last = lyrics[lyrics.length - 1];
+                const time = (ticks / ticksPerQuarter) * (60 / tempo); // 換算成秒
 
-                if (last && time - last.time < 0.3) {
-                    last.text += text;
-                    last.time = time;
-                } else {
-                    lyrics.push({ text, time });
-                }
+                lyrics.push({ text, time });
             }
         });
     });
 
-    for (let i = 0; i < lyrics.length; i++) {
-        const { text, time } = lyrics[i];
+    // 依時間推入動畫序列
+    lyrics.forEach(({ text, time }, i) => {
         console.log(`Lyric #${i}: ${text} at ${time.toFixed(3)}s`);
-        animateSeq(text, 0, 0, time * 50); // 可根據需求調整 time scaling
-    }
+   });
 }

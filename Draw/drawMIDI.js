@@ -89,9 +89,9 @@ function drawNote() {
         const ctrl = group[0];
 
         // 滾動時往左移
-        if (isRolling) {
-            if (ctrl.x - ctrl.targetX > 10) {
-                ctrl.x -= 10;  // 速度可調整
+        if (isRolling && !ctrl.hit) {
+            if (ctrl.x - ctrl.targetX > 20) {
+                ctrl.x -= 20;  // 速度可調整
             } else {
                 ctrl.x = ctrl.targetX
             }
