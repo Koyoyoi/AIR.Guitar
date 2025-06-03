@@ -34,31 +34,24 @@ export async function midiProcess(file) {
 }
 
 // 新增音符 / 歌詞 / 琴弦
-export function animateSeq(context, velocity = 0, duration = 1.5, posX = midiApp.canvas.width * 0.8) {
-    if (typeof context === 'number') {
-        // 加入音符資料
-        if (velocity > 0) {
-            noteSeq.push({
-                note: context, v: velocity, d: duration,
-                x: posX, targetX: posX, vx: 0,
-                y: mapRange(context, 24, 84, midiApp.canvas.height - 100, 100),
-                r: mapRange(velocity, 60, 127, 10, 25),
-                scale: 1, hit: false, hitTime: 0,
-            });
-        } else {
-            // 琴弦擊打事件
-            const validIndices = guitarStandard
-                .map((note, idx) => ({ note, idx }))
-                .filter(item => context >= item.note); // 只保留 context >= note
+export function animateSeq(context, posX = midiApp.canvas.width * 0.8) {
+    if (Array.isArray(context)) {
+        noteSeq.push(context)
+    }
+    else if (typeof context === 'number') {
+        // 琴弦擊打事件
+        const validIndices = guitarStandard
+            .map((note, idx) => ({ note, idx }))
+            .filter(item => context >= item.note); // 只保留 context >= note
 
-            if (validIndices.length > 0) {
-                const closestIndex = validIndices.reduce((closest, curr) =>
-                    Math.abs(curr.note - context) < Math.abs(closest.note - context) ? curr : closest
-                ).idx;
+        if (validIndices.length > 0) {
+            const closestIndex = validIndices.reduce((closest, curr) =>
+                Math.abs(curr.note - context) < Math.abs(closest.note - context) ? curr : closest
+            ).idx;
 
-                stringSeq[closestIndex] = { note: context, alpha: 1 };
-            }
+            stringSeq[closestIndex] = { note: context, alpha: 1 };
         }
+
     } else if (typeof context === 'string') {
         // 加入歌詞
         lyricSeq.push({ t: context, x: posX });
@@ -66,38 +59,48 @@ export function animateSeq(context, velocity = 0, duration = 1.5, posX = midiApp
 }
 
 function renderNotes(noteSeq) {
-    if (!noteSeq || !Array.isArray(noteSeq.notes) || noteSeq.notes.length === 0) return;
+    if (!noteSeq || !Array.isArray(noteSeq.notes)) return [];
 
-    const pixelPerBeat = 200;               // 每拍的水平距離
-    const secondsPerBeat = 60 / tempo;      // tempo 是 BPM
-    const pixelPerSecond = pixelPerBeat / secondsPerBeat;
-    const minSpacing = 50;
+    const grouped = [];
+    const groupMap = new Map();
 
-    const initTime = noteSeq.notes[0].startTime || 0;
-    const timeToX = new Map();
-    let prevX = 185;
-
+    // 根據 startTime 分組
     for (const note of noteSeq.notes) {
-        const { pitch, velocity, startTime, endTime, isDrum } = note;
+        if (note.isDrum || typeof note.startTime !== 'number') continue;
+        const t = note.startTime;
 
-        if (pitch < 21 || pitch > 108 || isDrum) continue;
-        if (typeof startTime !== 'number' || isNaN(startTime)) continue;
+        if (!groupMap.has(t)) groupMap.set(t, []);
+        groupMap.get(t).push({
+            note: note.pitch,
+            v: note.velocity,
+            d: note.endTime - note.startTime,
+            //y: mapRange(context, 24, 84, midiApp.canvas.height - 100, 100),
+            r: mapRange(note.velocity, 60, 127, 10, 25),
+        });
+    }
 
-        // 取得該 startTime 對應的 x（若尚未紀錄，則計算新的）
-        let x;
-        if (timeToX.has(startTime)) {
-            x = timeToX.get(startTime);
-        } else {
-            const rawX = 185 + (startTime - initTime) * pixelPerSecond;
-            x = Math.max(prevX + minSpacing, rawX);  // 保證最小間距
-            timeToX.set(startTime, x);               // 記錄下來供其他相同 startTime 使用
-            prevX = x;                                // 更新上一個 X
-        }
+    // 依照 startTime 排序，然後加入拍數間距資訊
+    const sortedTimes = [...groupMap.keys()].sort((a, b) => a - b);
+    let dx = 0
+    for (let i = 0; i < sortedTimes.length; i++) {
+        const group = groupMap.get(sortedTimes[i]);
+        const nextTime = sortedTimes[i + 1];
+        const currentTime = sortedTimes[i];
 
-        const duration = endTime - startTime;
-        if (duration <= 0) continue;
+        const deltaBeats = nextTime !== undefined ? nextTime - currentTime : 0;
 
-        animateSeq(pitch, velocity, duration, x);
+        // 插入時間資訊與動畫屬性到 group 最前面
+        group.unshift({
+            dltB: deltaBeats,
+            scale: 1,
+            hit: false,
+            x: 185 + i * 150 + dx,
+            vx: 0,
+            targetX: 185 + i * 150 + dx,
+        });
+
+        dx = deltaBeats * 50
+        animateSeq(group)
     }
 }
 

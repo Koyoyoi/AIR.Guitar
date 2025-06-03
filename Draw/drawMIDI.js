@@ -1,5 +1,5 @@
 import { midiApp } from "../main.js";
-import { soundSample, guitarStandard, revRootTab } from "../sound.js";
+import { soundSample, guitarStandard, revRootTab, mapRange } from "../sound.js";
 import { modeNum, capo } from "../Controll/blockControll.js";
 import { tempo } from "../midiEvent.js";
 
@@ -13,43 +13,32 @@ let lastTime = performance.now();
 let isRolling = false;
 
 // PIXI 圖層
-const note = new PIXI.Graphics();       // 主音符
-const blur = new PIXI.Graphics();       // 模糊圓圈
-const effect = new PIXI.Graphics();     // 音效粒子
-const string = new PIXI.Graphics();     // 琴弦波形
+const note = new PIXI.Graphics();
+const blur = new PIXI.Graphics();
+const effect = new PIXI.Graphics();
+const string = new PIXI.Graphics();
 
 // 重設音符序列
 export function resetSeq() {
     noteSeq = [];
 }
 
-// 平移畫面中的所有音符（推動音符向左）
-export async function rollSeq() {
+// 啟動滾動（外部事件呼叫）
+export function rollSeq() {
     if (!isRolling && modeNum === 1 && noteSeq.length > 0) {
-        const uniqueX = [...new Set(noteSeq.map(n => n.x))].sort((a, b) => a - b);
-        const targetX = uniqueX.length >= 2 ? uniqueX[1] : uniqueX[0];
-        const k = targetX - 185 == 0 ? targetX : targetX - 185;
-
-        if (noteSeq.length > 0) {
-            const baseDuration = 10;
-            // tempo越大速度越快，tempoFactor越小
-            const tempoFactor = 60 / tempo;
-            const durationFrames = Math.max(1, Math.floor(baseDuration * Math.max(1, Math.abs(k)) * tempoFactor / 100));
-            console.log("durationFrames:", durationFrames, "tempo:", tempo);
-
-            noteSeq.forEach(n => {
-                if (!n.hit) {
-                    n.targetX = n.x - k;
-                    n.vx = (n.targetX - n.x) / durationFrames;
-                }
-            });
-
-            isRolling = true
+        isRolling = true;
+        let offset
+        if (noteSeq.length <= 1)
+            offset = 10
+        else
+            offset = noteSeq[1][0].x - noteSeq[0][0].x
+        for (let col = 0; col < noteSeq.length; col++) {
+            noteSeq[col][0].targetX = noteSeq[col][0].x - offset
         }
     }
 }
 
-// 將 pitch 映射為 HEX 顏色
+// pitch 映射 HEX 色碼
 function pitchToHexColor(pitch, tone = 'G') {
     let baseHue = (pitch / 127) * 360;
     if (tone === 'B') baseHue += 120;
@@ -75,99 +64,138 @@ export function midiDrawLoop(now) {
     lastTime = now;
 
     midiApp.stage.removeChildren();
+
     if (modeNum === 1) {
-        drawEffects();   // 粒子特效
-        drawNote();      // 音符顯示
-        drawLyric();     // 歌詞顯示
+        drawEffects();
+        drawNote();
     } else {
-        drawString();    // 琴弦波動
+        drawString();
     }
-    removeSeq();         // 處理播放與刪除音符
+
+    removeSeq();
+
     requestAnimationFrame(midiDrawLoop);
 }
 
-// 歌詞繪製
-function drawLyric() {
-    const style = new PIXI.TextStyle({ fontFamily: 'Arial', fontSize: 50, fontWeight: 'bold', fill: 0xBDC0BA });
-    lyricSeq.forEach(n => {
-        if (n.x > 180 && n.x < midiApp.canvas.width) {
-            const text = new PIXI.Text({ text: n.t, style });
-            text.anchor.set(0.5, 0);
-            text.x = n.x;
-            text.y = midiApp.canvas.height - 100;
-            midiApp.stage.addChild(text);
-        }
-    });
-}
-
-// 音符繪製與縮放動畫
+// 音符繪製與移動動畫
 function drawNote() {
+    if (noteSeq.length <= 0) return;
+
     note.clear();
     blur.clear();
-    for (let i = noteSeq.length - 1; i >= 0; i--) {
-        const n = noteSeq[i];
-        if (isRolling && !n.hit) {
-            if (Math.abs(n.x - n.targetX) > 1) n.x += n.vx;
-            else { n.x = n.targetX; n.vx = 0; }
+
+    for (let col = 0; col < noteSeq.length; col++) {
+        const group = noteSeq[col];
+        const ctrl = group[0];
+
+        // 滾動時往左移
+        if (isRolling) {
+            if (ctrl.x - ctrl.targetX > 10) {
+                ctrl.x -= 10;  // 速度可調整
+            } else {
+                ctrl.x = ctrl.targetX
+            }
         }
-        if ((n.x > 180 && n.x < midiApp.canvas.width) || n.hit) {
-            blur.circle(n.x, n.y, n.r * 1.3 * n.scale)
+
+        // 繪製音符
+        for (let i = 1; i < group.length; i++) {
+            const n = group[i];
+            if (ctrl.x < 185 || ctrl.x > midiApp.canvas.width) continue;
+
+            const poseY = mapRange(n.note, 24, 84, midiApp.canvas.height - 100, 100);
+
+            blur.circle(ctrl.x, poseY, n.r * 1.3 * ctrl.scale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.2 });
-            note.circle(n.x, n.y, n.r * n.scale)
+
+            note.circle(ctrl.x, poseY, n.r * ctrl.scale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.6 });
-            n.scale = Math.max(1, n.scale - 0.2);
+
+            // 縮放動畫
+            if (!ctrl.hit) ctrl.scale = Math.max(1, ctrl.scale - 0.2);
         }
-        if (n.hit && --n.hitTime <= 0) noteSeq.splice(i, 1);
+        // hit 動畫處理
+        if (ctrl.hit) {
+            ctrl.x = 185;
+            ctrl.scale -= 0.3;
+        }
     }
+
+    // 移除已觸發的音符群組
+    if (noteSeq.length > 0 && noteSeq[0][0].hit && noteSeq[0][0].scale < 0) {
+        noteSeq.splice(0, 1);
+    }
+
     midiApp.stage.addChild(blur);
     midiApp.stage.addChild(note);
 
-    if (isRolling && noteSeq.every(n => Math.abs(n.x - n.targetX) < 1 || n.hit))
+    // 判斷滾動結束條件
+    if (isRolling && noteSeq.length > 0 && noteSeq[0][0].x === 185 && !noteSeq[0][0].hit) {
         isRolling = false;
+    }
 }
 
-// 特效繪製
+// 粒子特效繪製
 function drawEffects() {
     effect.clear();
+
     for (let i = effectSeq.length - 1; i >= 0; i--) {
-        let e = effectSeq[i];
+        const e = effectSeq[i];
         if (e.type === "particle") {
-            e.x += e.vx; e.y += e.vy; e.alpha -= 0.03;
-            e.radius *= 0.96; e.life--;
+            e.x += e.vx;
+            e.y += e.vy;
+            e.alpha -= 0.03;
+            e.radius *= 0.96;
+            e.life--;
+
             effect.circle(e.x, e.y, e.radius || 5)
                 .fill({ color: e.color || 0xffcc33, alpha: e.alpha });
 
-            if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5)
+            if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
                 effectSeq.splice(i, 1);
+            }
         }
     }
+
     midiApp.stage.addChild(effect);
 }
 
-// 處理音符播放與消除
+// 移除已播放音符，並播放音效、特效
 function removeSeq() {
-    for (let i = noteSeq.length - 1; i >= 0; i--) {
-        const n = noteSeq[i];
-        if (n.x < 180 && !n.hit) {
-            if (n.v > 0) {
-                soundSample.play(n.note, 0, {
-                    gain: n.v / 127 * 3,
-                    duration: modeNum === 2 ? 2 : n.d
-                });
-            }
-            if (modeNum === 1) {
+    for (let group of noteSeq) {
+        const ctrl = group[0];
+
+        if (ctrl.x < 180 && !ctrl.hit) {  // 避免重複觸發
+            for (let i = 1; i < group.length; i++) {
+                const n = group[i];
+
+                if (n.v > 0) {
+                    soundSample.play(n.note, 0, {
+                        gain: n.v / 127 * 3,
+                        duration: modeNum === 2 ? 2 : n.d
+                    });
+                }
+
                 for (let j = 0; j < 5; j++) {
                     effectSeq.push({
-                        type: "particle", x: 185, y: n.y,
+                        type: "particle",
+                        x: ctrl.x,
+                        y: mapRange(n.note, 24, 84, midiApp.canvas.height - 100, 100),
                         vx: (Math.random() - 0.5) * 10,
                         vy: (Math.random() - 0.5) * 10,
-                        alpha: 1.0, life: 20 + Math.random() * 10,
+                        alpha: 1.0,
+                        life: 20 + Math.random() * 10,
                         radius: 10 + Math.random() * 5,
                         color: Math.random() < 0.5 ? 0xffcc33 : 0xff6666
                     });
                 }
-                Object.assign(n, { hit: true, hitTime: 10, scale: 2.5, x: 185 });
             }
+
+            Object.assign(ctrl, {
+                hit: true,
+                scale: 2.5
+            });
+
+            ctrl.x = 185;  // 鎖定位置避免重複觸發
         }
     }
 }
@@ -193,7 +221,7 @@ function drawString() {
                     .fill({ color: pitchToHexColor(guitarStandard[i], 'R'), alpha: stringSeq[i].alpha });
             }
             midiApp.stage.addChild(string);
-            stringSeq[i].alpha -= 0.03; // 漸淡消失
+            stringSeq[i].alpha -= 0.03;
 
             const style = new PIXI.TextStyle({
                 fontFamily: 'Arial',
@@ -203,16 +231,16 @@ function drawString() {
                 align: 'left',
                 alpha: stringSeq[i].alpha
             });
-            const text = new PIXI.Text({
-                text: revRootTab[(stringSeq[i].note + capo) % 12] + Math.floor((stringSeq[i].note + capo) / 12),
+            const text = new PIXI.Text(
+                revRootTab[(stringSeq[i].note + capo) % 12] + Math.floor((stringSeq[i].note + capo) / 12),
                 style
-            });
-            text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
-            text.x = 80; // 畫面水平中心
+            );
+            text.anchor.set(0.5, 0);
+            text.x = 80;
             text.y = poseY - 55;
 
             midiApp.stage.addChild(text);
-
         }
     }
 }
+
