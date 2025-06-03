@@ -92,20 +92,23 @@ function renderNotes(noteSeq) {
         const currentTime = sortedTimes[i];
         const deltaBeats = nextTime !== undefined ? nextTime - currentTime : 0;
 
-        // 計算 Y 軸位置（poseY）
+        group.sort((a, b) => b.note - a.note);
+
         const noteCount = group.length;
-        const spanY = Math.min(300, (noteCount - 1) * 40);
-        const baseY = (100 + midiApp.canvas.height - 100) / 2 - spanY / 2;
+        const spanY = Math.min(300, (noteCount - 1) * 60);
+
+        // 先算出偏移量：根據最低音調整上下偏移量
+        const lowestNote = group[0].note;
+        const yOffset = mapRange(lowestNote, 24, 84, +100, -100);
+        const baseY = ((100 + midiApp.canvas.height - 100) / 2 - spanY / 2) + yOffset;
         const yList = [];
 
         for (let j = 0; j < noteCount; j++) {
             const y = noteCount === 1
-                ? (100 + midiApp.canvas.height - 100) / 2
+                ? ((100 + midiApp.canvas.height - 100) / 2) + yOffset
                 : baseY + j * (spanY / (noteCount - 1));
             yList.push(y);
         }
-
-        group.sort((a, b) => a.note - b.note);
 
         // 插入 ctrl 物件，只包含 yList
         group.unshift({
@@ -115,7 +118,7 @@ function renderNotes(noteSeq) {
             x: 185 + i * 150 + dx,
             vx: 0,
             targetX: 185 + i * 150 + dx,
-            yList,  // <- 這裡只包含算好的 Y 座標
+            yList,
         });
 
         dx = deltaBeats * 50;
@@ -138,7 +141,7 @@ function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
                     ? event.data
                     : new TextDecoder("utf-8").decode(new Uint8Array(event.data));
 
-                const time = (ticks / ticksPerQuarter) * (60 / tempo);
+                const time = (ticks / ticksPerQuarter) * (50 / tempo);
                 const last = lyrics[lyrics.length - 1];
 
                 if (last && time - last.time < 0.3) {
