@@ -102,10 +102,11 @@ function drawNote() {
             const n = group[i];
             if (ctrl.x < 185 || ctrl.x > midiApp.canvas.width) continue;
 
-            blur.circle(ctrl.x, ctrl.yList[i - 1], n.r * 1.3 * ctrl.scale)
+            let posY = mapRange(n.note, 36, 84, midiApp.canvas.height - 100, 100)
+            blur.circle(ctrl.x, posY, n.r * 1.3 * ctrl.scale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.2 });
 
-            note.circle(ctrl.x, ctrl.yList[i - 1], n.r * ctrl.scale)
+            note.circle(ctrl.x, posY, n.r * ctrl.scale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.6 });
 
             // 縮放動畫
@@ -172,12 +173,12 @@ function removeSeq() {
                         duration: modeNum === 2 ? 2 : n.d
                     });
                 }
-
+                let posY = mapRange(n.note, 36, 84, midiApp.canvas.height - 100, 100);
                 for (let j = 0; j < 5; j++) {
                     effectSeq.push({
                         type: "particle",
                         x: ctrl.x,
-                        y: ctrl.yList[i - 1],
+                        y: posY,
                         vx: (Math.random() - 0.5) * 10,
                         vy: (Math.random() - 0.5) * 10,
                         alpha: 1.0,
