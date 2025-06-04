@@ -5,6 +5,7 @@ import { mapRange, guitarStandard } from "./sound.js";
 export let tempo = 0, songName = "";
 
 let noteData, aryBuffer, tPerQuarter, groupMap;
+const offset = 4;
 
 export async function midiProcess(file) {
     resetSeq();
@@ -63,17 +64,27 @@ function renderNotes(noteSeq) {
     if (!noteSeq || !Array.isArray(noteSeq.notes)) return [];
 
     groupMap = new Map();
+    // 插入前4個預備拍，每拍為一個空陣列
+    for (let i = 0; i < 4; i++) {
+        const t = i; // 預設每拍時間為 1 秒可依 tempo 換算
+        if (!groupMap.has(t)) groupMap.set(t, []);
+        groupMap.get(t).push({
+            note: 0,
+            v: 0,
+            d: 0,
+            r: 25,
+        });
+    }
 
     // 根據 startTime 分組
     for (const note of noteSeq.notes) {
         if (note.isDrum || typeof note.startTime !== 'number') continue;
-        const t = note.startTime;
+        const t = note.startTime + offset;
 
         if (!groupMap.has(t)) groupMap.set(t, []);
         groupMap.get(t).push({
             note: note.pitch,
             v: note.velocity,
-            startTime: note.startTime,
             d: note.endTime - note.startTime,
             r: mapRange(note.velocity, 60, 127, 10, 25),
         });
@@ -138,7 +149,7 @@ function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
                     return;
                 }
 
-                const time = (ticks / ticksPerQuarter) * (60 / tempo);
+                const time = (ticks / ticksPerQuarter) * (60 / tempo) + offset;
 
                 if (groupMap.get(time) != undefined && text != '/r') {
                     groupMap.get(time)[0].lyric = text
