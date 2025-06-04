@@ -151,7 +151,7 @@ function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
 
                 const time = (ticks / ticksPerQuarter) * (60 / tempo) + offset;
 
-                if (groupMap.get(time) != undefined && text != '/r') {
+                if (groupMap.get(time) != undefined && text != '\r') {
                     groupMap.get(time)[0].lyric = text
                 }
             }
