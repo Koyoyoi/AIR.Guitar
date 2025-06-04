@@ -98,11 +98,16 @@ function drawNote() {
         }
 
         // 繪製音符
+        let textY = midiApp.canvas.height
         for (let i = 1; i < group.length; i++) {
             const n = group[i];
             if (ctrl.x < 185 || ctrl.x > midiApp.canvas.width) continue;
 
-            let posY = mapRange(n.note, 36, 84, midiApp.canvas.height - 100, 100)
+            let posY = mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150)
+            if(posY < textY)
+                textY = posY
+
+            if (i == 1) textY = posY - 25
             blur.circle(ctrl.x, posY, n.r * 1.3 * ctrl.scale)
                 .fill({ color: pitchToHexColor(n.note), alpha: 0.2 });
 
@@ -112,6 +117,26 @@ function drawNote() {
             // 縮放動畫
             if (!ctrl.hit) ctrl.scale = Math.max(1, ctrl.scale - 0.2);
         }
+
+        if (ctrl.lyric != undefined && !ctrl.hit && ctrl.x >= 185 && ctrl.x < midiApp.canvas.width) {
+            const style = new PIXI.TextStyle({
+                fontFamily: 'Arial',
+                fontSize: 40,
+                fontWeight: 'bold',
+                fill: ctrl.x == 185 ? 0xF7C242 : 0xBDC0BA,
+                align: 'left',
+            });
+            const text = new PIXI.Text({
+                text: ctrl.lyric,
+                style: style
+            });
+            text.anchor.set(0.5, 0);
+            text.x = ctrl.x;
+            text.y = textY - 40
+
+            midiApp.stage.addChild(text);
+        }
+
         // hit 動畫處理
         if (ctrl.hit) {
             ctrl.x = 185;
