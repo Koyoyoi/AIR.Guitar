@@ -1,4 +1,4 @@
-import { settingCtrl, loadImg, modeNum, reloadCtrl } from "./Controll/blockControll.js";
+import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl } from "./Controll/blockControll.js";
 import { chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
@@ -128,6 +128,7 @@ async function detectLoop() {
     if (modeNum == 1) {
         reloadCtrl();
         drawSongName();
+        touchCtrl();
     }
 
     // 重置追蹤資料

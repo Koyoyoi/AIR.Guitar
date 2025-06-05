@@ -1,4 +1,5 @@
-import { midiApp, uiApp } from "../main.js";
+import { rollSeq } from "../Draw/drawMIDI.js";
+import { uiApp } from "../main.js";
 import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
@@ -441,36 +442,26 @@ export function capoCtrl() {
 }
 
 export function touchCtrl() {
-    // click event
-    /** 
+
     const Area = {
         x: 0,
-        y: 150,
-        w: midiApp.canva.width,
-        h: midiApp.canva.height - 300
+        y: 100,
+        w: uiApp.screen.width,
+        h: uiApp.screen.height - 200
     };
 
     // 背景區域
-    const bg = new PIXI.Graphics()
+    const touch = new PIXI.Graphics()
         .roundRect(Area.x, Area.y, Area.w, Area.h, 1)
-        
-    uiApp.stage.addChild(bg);
 
-    // 左邊控制（減號或「左」）
-    const sub = new PIXI.Text({
-        text: '-',
-        style: textStyle['normal']
+    touch.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h);
+    touch.interactive = true;
+    touch.buttonMode = true;
+    touch.on('pointerdown', (event) => {
+        const pos = event.data.global;
+        console.log(`✅ Touch: x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}`);
     });
-    sub.anchor.set(0.5);
-    sub.x = Area.x + Area.w / 2 - 100;
-    sub.y = Area.y + Area.h / 2;
-    sub.hitArea = new PIXI.Rectangle(Area.x, Area.y, (Area.w - 160 / 2), Area.h);
-    sub.interactive = true;
-    sub.buttonMode = true;
-    sub.on('pointerdown', () => {
-        console.log("✅ - 被點擊");
-        capo -= 1
-    });
-    uiApp.stage.addChild(sub);
-  */
+
+    uiApp.stage.addChild(touch);
+
 }
