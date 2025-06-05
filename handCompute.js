@@ -70,7 +70,7 @@ export function compute(landmarks) {
 // 用手指角度來觸發
 export async function fingerPlay(hand) {
     const angles = fingerAngle(hand);
-    let pick = [], velocities = [], adNum = 0;
+    let pick = [], velocities = [], adNum = 20;
 
     if(modeNum == 1){
         adNum = 20;
@@ -79,7 +79,7 @@ export async function fingerPlay(hand) {
     if (angles[0] > 15 + adNum) { pick.push(0); velocities.push(mapRange(angles[0], 30, 60, 60, 127)); }
     if (angles[1] > 20 + adNum) { pick.push(1); velocities.push(mapRange(angles[1], 30, 180, 40, 127)); }
     if (angles[2] > 20 + adNum) { pick.push(2); velocities.push(mapRange(angles[2], 20, 160, 40, 127)); }
-    if (angles[3] > 20 + adNum) { pick.push(3); velocities.push(mapRange(angles[3], 20, 150, 40, 127)); }
+    if (angles[3] > 30 + adNum) { pick.push(3); velocities.push(mapRange(angles[3], 20, 150, 40, 127)); }
     if (angles[4] > 150) { pick.push(4); velocities.push(0); }
 
     return [pick, velocities];

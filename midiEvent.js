@@ -64,6 +64,7 @@ function renderNotes(noteSeq) {
     if (!noteSeq || !Array.isArray(noteSeq.notes)) return [];
 
     groupMap = new Map();
+    
     // 插入前4個預備拍，每拍為一個空陣列
     for (let i = 0; i < 4; i++) {
         const t = i; // 預設每拍時間為 1 秒可依 tempo 換算
@@ -74,7 +75,7 @@ function renderNotes(noteSeq) {
             d: 0,
             r: 25,
         });
-    }
+    } 
 
     // 根據 startTime 分組
     for (const note of noteSeq.notes) {
@@ -109,6 +110,7 @@ function renderNotes(noteSeq) {
             x: 185 + i * 240 + dx,
             vx: 0,
             targetX: 185 + i * 240 + dx,
+            lyric: sortedTimes[i] / offset < 1 ? `${sortedTimes[i]}` : ""
         });
 
         dx = deltaBeats * 80;

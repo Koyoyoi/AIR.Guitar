@@ -1,4 +1,4 @@
-import { uiApp } from "../main.js";
+import { midiApp, uiApp } from "../main.js";
 import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
@@ -338,7 +338,7 @@ export function handCtrl() {
 
 // reload 控制區域
 export function reloadCtrl() {
-    if(showAllCtrl) return
+    if (showAllCtrl) return
 
     const Area = {
         x: 25,
@@ -368,8 +368,8 @@ export function reloadCtrl() {
 }
 
 export function capoCtrl() {
-    if(modeNum != 0) return
-    
+    if (modeNum != 0) return
+
     const Area = {
         x: uiApp.screen.width - uiApp.screen.height * 0.4,
         y: 10,
@@ -438,4 +438,39 @@ export function capoCtrl() {
         capo = 0
     });
     uiApp.stage.addChild(text);
+}
+
+export function touchCtrl() {
+    // click event
+    /** 
+    const Area = {
+        x: 0,
+        y: 150,
+        w: midiApp.canva.width,
+        h: midiApp.canva.height - 300
+    };
+
+    // 背景區域
+    const bg = new PIXI.Graphics()
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 1)
+        
+    uiApp.stage.addChild(bg);
+
+    // 左邊控制（減號或「左」）
+    const sub = new PIXI.Text({
+        text: '-',
+        style: textStyle['normal']
+    });
+    sub.anchor.set(0.5);
+    sub.x = Area.x + Area.w / 2 - 100;
+    sub.y = Area.y + Area.h / 2;
+    sub.hitArea = new PIXI.Rectangle(Area.x, Area.y, (Area.w - 160 / 2), Area.h);
+    sub.interactive = true;
+    sub.buttonMode = true;
+    sub.on('pointerdown', () => {
+        console.log("✅ - 被點擊");
+        capo -= 1
+    });
+    uiApp.stage.addChild(sub);
+  */
 }
