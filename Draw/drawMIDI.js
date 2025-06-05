@@ -11,6 +11,7 @@ export let noteSeq = [],
 let effectSeq = [];  // 特效序列
 let lastTime = performance.now();
 let isRolling = false;
+let pressed_V = 0;
 
 // PIXI 圖層
 const note = new PIXI.Graphics();
@@ -24,8 +25,11 @@ export function resetSeq() {
 }
 
 // 啟動滾動（外部事件呼叫）
-export function rollSeq() {
+export function rollSeq(velocites = 0) {
     if (!isRolling && modeNum === 1 && noteSeq.length > 0) {
+        if (velocites != 0)
+            pressed_V = mapRange(velocites, 100, midiApp.canvas.height - 100, 127, 60)
+        
         isRolling = true;
         let offset
         if (noteSeq.length <= 1)
@@ -65,21 +69,23 @@ export function midiDrawLoop(now) {
 
     midiApp.stage.removeChildren();
 
-    if (modeNum === 1) {
-        drawEffects();
-        drawNote();
-    } else {
-        drawString();
-    }
+    if (noteSeq.length > 0) {
+        if (modeNum === 1) {
+            drawEffects();
+            drawNote();
+        } else {
+            drawString();
+        }
 
-    removeSeq();
+        removeSeq();
+    }
 
     requestAnimationFrame(midiDrawLoop);
 }
 
 // 音符繪製與移動動畫
 function drawNote() {
-    if (noteSeq.length <= 0) return;
+    if (noteSeq.length <= 0 || noteSeq.length == 0) return;
 
     note.clear();
     blur.clear();
@@ -90,8 +96,8 @@ function drawNote() {
 
         // 滾動時往左移
         if (isRolling && !ctrl.hit) {
-            if (ctrl.x - ctrl.targetX > 20) {
-                ctrl.x -= 20;  // 速度可調整
+            if (ctrl.x - ctrl.targetX > 40) {
+                ctrl.x -= 40;  // 速度可調整
             } else {
                 ctrl.x = ctrl.targetX
             }
@@ -186,6 +192,8 @@ function drawEffects() {
 
 // 移除已播放音符，並播放音效、特效
 function removeSeq() {
+    if (!isRolling) return
+
     for (let group of noteSeq) {
         const ctrl = group[0];
 
@@ -195,7 +203,7 @@ function removeSeq() {
 
                 if (n.v > 0) {
                     soundSample.play(n.note, 0, {
-                        gain: n.v / 127 * 3,
+                        gain: pressed_V == 0 ? n.v / 127 * 3 : pressed_V / 127 * 3,
                         duration: modeNum === 2 ? 2 : n.d
                     });
                 }
@@ -223,6 +231,8 @@ function removeSeq() {
             ctrl.x = 185;  // 鎖定位置避免重複觸發
         }
     }
+    console.log(pressed_V)
+    pressed_V = 0;
 }
 
 // 琴弦震動繪製

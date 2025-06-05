@@ -460,6 +460,7 @@ export function touchCtrl() {
     touch.on('pointerdown', (event) => {
         const pos = event.data.global;
         console.log(`✅ Touch: x: ${pos.x.toFixed(2)}, y: ${pos.y.toFixed(2)}`);
+        rollSeq(pos.y.toFixed(2))
     });
 
     uiApp.stage.addChild(touch);
