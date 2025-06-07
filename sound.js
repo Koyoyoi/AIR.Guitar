@@ -123,7 +123,7 @@ export async function plucking(pluck, capo, velocities) {
             notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
         });
     }
-    if (modeNum == 1) {
+    if (modeNum == false) {
         await rollSeq();
     } else if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符

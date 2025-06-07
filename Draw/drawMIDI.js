@@ -29,7 +29,7 @@ export function rollSeq(velocites = 0) {
     if (!isRolling && modeNum === 1 && noteSeq.length > 0) {
         if (velocites != 0)
             pressed_V = mapRange(velocites, 100, midiApp.canvas.height - 100, 127, 60)
-        
+
         isRolling = true;
         let offset
         if (noteSeq.length <= 1)
@@ -69,16 +69,15 @@ export function midiDrawLoop(now) {
 
     midiApp.stage.removeChildren();
 
-    if (noteSeq.length > 0) {
-        if (modeNum === 1) {
-            drawEffects();
-            drawNote();
-        } else {
-            drawString();
-        }
 
-        removeSeq();
+    if (modeNum === 1) {
+        drawEffects();
+        drawNote();
+    } else {
+        drawString();
     }
+
+    removeSeq();
 
     requestAnimationFrame(midiDrawLoop);
 }
@@ -109,8 +108,8 @@ function drawNote() {
             const n = group[i];
             if (ctrl.x < 185 || ctrl.x > midiApp.canvas.width) continue;
 
-            let c = n.note == 0 ? 0x828282 : pitchToHexColor(n.note)
-            let posY = n.note == 0 ? midiApp.canvas.height / 2 : mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150)
+            let c = n.isReady ? 0x828282 : pitchToHexColor(n.note)
+            let posY = n.isReady ? midiApp.canvas.height / 2 : mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150)
             if (posY < textY)
                 textY = posY
 
@@ -207,7 +206,7 @@ function removeSeq() {
                         duration: modeNum === 2 ? 2 : n.d
                     });
                 }
-                let posY = n.note == 0 ? midiApp.canvas.height / 2 : mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150)
+                let posY = n.isReady ? midiApp.canvas.height / 2 : mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150)
                 for (let j = 0; j < 5; j++) {
                     effectSeq.push({
                         type: "particle",

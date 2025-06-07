@@ -1,11 +1,10 @@
-import { noteSeq, stringSeq, lyricSeq, resetSeq } from "./Draw/drawMIDI.js";
+import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { midiApp } from "./main.js";
 import { mapRange, guitarStandard } from "./sound.js";
 
 export let tempo = 0, songName = "";
 
-let noteData, aryBuffer, tPerQuarter, groupMap;
-const offset = 4;
+let noteData, aryBuffer, tPerQuarter, groupMap, offset;
 
 export async function midiProcess(file) {
     resetSeq();
@@ -34,7 +33,7 @@ export async function midiProcess(file) {
 }
 
 // 新增音符 / 歌詞 / 琴弦
-export function animateSeq(context, posX = midiApp.canvas.width * 0.8) {
+export function animateSeq(context) {
     if (context instanceof Map) {
         for (const value of context.values()) {
             noteSeq.push(value)
@@ -54,9 +53,6 @@ export function animateSeq(context, posX = midiApp.canvas.width * 0.8) {
             stringSeq[closestIndex] = { note: context, alpha: 1 };
         }
 
-    } else if (typeof context === 'string') {
-        // 加入歌詞
-        lyricSeq.push({ t: context, x: posX });
     }
 }
 
@@ -64,18 +60,23 @@ function renderNotes(noteSeq) {
     if (!noteSeq || !Array.isArray(noteSeq.notes)) return [];
 
     groupMap = new Map();
-    
-    // 插入前4個預備拍，每拍為一個空陣列
+
+    // 插入前4個預備拍
+    offset = 0
     for (let i = 0; i < 4; i++) {
-        const t = i; // 預設每拍時間為 1 秒可依 tempo 換算
+        const t = offset;
         if (!groupMap.has(t)) groupMap.set(t, []);
         groupMap.get(t).push({
-            note: 0,
-            v: 0,
-            d: 0,
+            note: 84,
+            v: 100,
+            d: 60 / tempo,
             r: 25,
+            startTime: offset,
+            isReady: i == 3 ? '唱' : i + 1
         });
-    } 
+        offset += 60 / tempo;
+    }
+
 
     // 根據 startTime 分組
     for (const note of noteSeq.notes) {
@@ -88,11 +89,26 @@ function renderNotes(noteSeq) {
             v: note.velocity,
             d: note.endTime - note.startTime,
             r: mapRange(note.velocity, 60, 127, 10, 25),
+            startTime: note.startTime,
+            isReady: false
         });
     }
 
     // 依照 startTime 排序，然後加入拍數間距資訊
     const sortedTimes = [...groupMap.keys()].sort((a, b) => a - b);
+
+    // 計算相鄰時間的差值
+    let minDelta = Infinity;
+    for (let i = 1; i < sortedTimes.length; i++) {
+        const delta = sortedTimes[i] - sortedTimes[i - 1];
+        if (delta > 0 && delta < minDelta) {
+            minDelta = delta;
+        }
+    }
+
+    let rawN = 50 / minDelta;
+    if (rawN > 1000) rawN = 1000
+
     let dx = 0
     for (let i = 0; i < sortedTimes.length; i++) {
         const group = groupMap.get(sortedTimes[i]);
@@ -107,10 +123,10 @@ function renderNotes(noteSeq) {
             dltB: deltaBeats,
             scale: 1,
             hit: false,
-            x: 185 + i * 240 + dx,
+            x: 185 + sortedTimes[i] * rawN,
             vx: 0,
-            targetX: 185 + i * 240 + dx,
-            lyric: sortedTimes[i] / offset < 1 ? `${sortedTimes[i]}` : ""
+            targetX: 185 + sortedTimes[i] * rawN,
+            lyric: group[0].isReady ? `${group[0].isReady}` : ""
         });
 
         dx = deltaBeats * 80;

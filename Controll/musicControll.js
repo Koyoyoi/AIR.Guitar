@@ -5,11 +5,13 @@ import { predict } from "../SVM.js";
 import { drawGesture, drawFinger } from "../Draw/drawInfo.js";
 import { showAllCtrl, capo } from "./blockControll.js";
 import { handData, poseData } from "../main.js";
+import { rollSeq } from "../Draw/drawMIDI.js";
 
 let gesture = '', prevGesture = '';               // 手勢相關
 let armAngles = [];                               // 手臂角度
 let action = '', prevAction = '';                 // 動作狀態
-let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];  
+let isClip = false                                // 合掌動作
+let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];
 
 // 和弦控制
 export async function chordCtrl() {
@@ -92,6 +94,20 @@ export async function strumCtrl() {
             }
 
             armAngles.shift();  // 移除最舊的角度數據
+        }
+    }
+}
+
+export async function clipCtrl(RHand, LHand) {
+    if (RHand.length > 0 && LHand.length > 0) {
+        let len = Math.abs(LHand[8][0] - RHand[8][0])
+        if(len < 200 && !isClip){
+            
+            isClip = true
+            console.log(isClip)
+            rollSeq();
+        }else if(isClip && len > 200){
+            isClip = false
         }
     }
 }

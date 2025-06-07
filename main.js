@@ -1,5 +1,5 @@
 import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl } from "./Controll/blockControll.js";
-import { chordCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
+import { chordCtrl, clipCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { drawSongName, reCanva } from "./Draw/drawInfo.js";
@@ -118,6 +118,7 @@ async function detectLoop() {
     // 控制聲音
     await pluckCtrl(modeNum);
     await strumCtrl();
+    await clipCtrl(handData['Left'], handData['Right'])
 
     // 顯示控制區
     settingCtrl()

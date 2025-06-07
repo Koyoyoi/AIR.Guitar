@@ -70,7 +70,7 @@ export function compute(landmarks) {
 // 用手指角度來觸發
 export async function fingerPlay(hand) {
     const angles = fingerAngle(hand);
-    let pick = [], velocities = [], adNum = 20;
+    let pick = [], velocities = [], adNum = 0;
 
     if(modeNum == 1){
         adNum = 20;
