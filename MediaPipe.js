@@ -18,8 +18,8 @@ export async function setupMediaPipe() {
             delegate: "GPU"
         },
         runningMode: "VIDEO",
-        min_hand_detection_confidence: 0.3,
-        min_tracking_confidence: 0.3,
+        min_hand_detection_confidence: 0.4,
+        min_tracking_confidence: 0.4,
         numHands: 2
     });
 
@@ -41,16 +41,6 @@ export async function detectHand() {
     if (!handLandmarker) return;
 
     let data = handLandmarker.detectForVideo(video, performance.now(),  { width: video.videoWidth, height: video.videoHeight });
-
-    /** 
-    if (data.landmarks) {
-        // 畫手部關節連線與節點
-        for (const landmarks of data.landmarks) {
-            drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "#F8C3CD", lineWidth: 4 });
-            drawingUtils.drawLandmarks(landmarks, { color: "#DB4D6D", radius: 4 });
-        }
-    }
-    */
 
     const handPoints = data.landmarks;
     const handednesses = data.handednesses;
@@ -74,15 +64,6 @@ export async function detectPose() {
     if (!poseLandmarker) return;
 
     let data = poseLandmarker.detectForVideo(video, performance.now(), { width: video.videoWidth, height: video.videoHeight });
-
-    /** 
-    if (data.landmarks) {
-        // 畫身體關節連線與節點
-        for (const landmarks of data.landmarks) {   
-            drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, { color: "#F8C3CD", lineWidth: 0 });
-            drawingUtils.drawLandmarks(landmarks, { color:"#DB4D6D", radius: 0 });
-        }
-    }*/
 
     const posePoints = data.landmarks;
 
