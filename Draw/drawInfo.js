@@ -117,8 +117,8 @@ export function drawHand(handData) {
     const Rhand = handData['Right'];
     const Lhand = handData['Left'];
     const G = new PIXI.Graphics();
-    const appWidth = baseApp.canvas.width; // 或你自行設定的寬度
-
+    const appWidth = baseApp.canvas.width; 
+    
     if (playNum == 0) {
         if (Rhand[0] != undefined)
             G.circle(appWidth - Rhand[0][0], Rhand[0][1], 50)

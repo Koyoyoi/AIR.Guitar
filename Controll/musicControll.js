@@ -10,7 +10,7 @@ import { rollSeq } from "../Draw/drawMIDI.js";
 let gesture = '', prevGesture = '';               // 手勢相關
 let armAngles = [];                               // 手臂角度
 let action = '', prevAction = '';                 // 動作狀態
-let isClip = false                                // 合掌動作
+let isTouch = false                               // 指尖觸碰
 let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];
 
 // 和弦控制
@@ -98,16 +98,40 @@ export async function strumCtrl() {
     }
 }
 
-export async function clipCtrl(RHand, LHand) {
-    if (RHand.length > 0 && LHand.length > 0) {
-        let len = Math.abs(LHand[8][0] - RHand[8][0])
-        if(len < 50 && !isClip){
-            
-            isClip = true
-            console.log(isClip)
-            rollSeq();
-        }else if(isClip && len > 50){
-            isClip = false
-        }
+export async function touchPointCtrl(RHand, LHand) {
+    let shouldTrigger = false;
+
+
+    // 雙手：食指彼此靠近
+    if (RHand?.[8] && LHand?.[8]) {
+        const dx = RHand[8][0] - LHand[8][0];
+        const dy = RHand[8][1] - LHand[8][1];
+        const dist = Math.hypot(dx, dy);
+        if (dist < 50) shouldTrigger = true;
+    }
+
+    // 右手：拇指與食指靠近
+    if (RHand?.[4] && RHand?.[8]) {
+        const dx = RHand[4][0] - RHand[8][0];
+        const dy = RHand[4][1] - RHand[8][1];
+        const dist = Math.hypot(dx, dy);
+        if (dist < 50) shouldTrigger = true;
+    }
+
+    // 左手：拇指與食指靠近
+    if (LHand?.[4] && LHand?.[8]) {
+        const dx = LHand[4][0] - LHand[8][0];
+        const dy = LHand[4][1] - LHand[8][1];
+        const dist = Math.hypot(dx, dy);
+        if (dist < 50) shouldTrigger = true;
+    }
+
+
+    // 根據判斷結果觸發
+    if (shouldTrigger && !isTouch) {
+        isTouch = true;
+        rollSeq();
+    } else if (!shouldTrigger && isTouch) {
+        isTouch = false;
     }
 }
