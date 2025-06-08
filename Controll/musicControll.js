@@ -135,3 +135,36 @@ export async function touchPointCtrl(RHand, LHand) {
         isTouch = false;
     }
 }
+
+let prevRX = null;
+let prevLX = null;
+
+export async function wavingHandCtrl(RHand, LHand) {
+    const LmidX = video.videoWidth / 4 * 3;
+    const RmidX = video.videoWidth / 4
+    // 右手判斷
+    if (RHand?.[0]) {
+        const currentRX = RHand[8][0];
+        if (prevRX !== null) {
+            if ((prevRX < RmidX && currentRX >= RmidX) || (prevRX >= RmidX && currentRX < RmidX)) {
+                rollSeq();
+            }
+        }
+        prevRX = currentRX;
+    }
+    // 不再 else 清空 prevRX，保留最後已知位置
+
+    // 左手判斷
+    if (LHand?.[0]) {
+        const currentLX = LHand[8][0];
+        if (prevLX !== null) {
+            if ((prevLX < LmidX && currentLX >= LmidX) || (prevLX >= LmidX && currentLX < LmidX)) {
+                rollSeq();
+            }
+        }
+        prevLX = currentLX;
+    }
+    // 不再 else 清空 prevLX，保留最後已知位置
+}
+
+

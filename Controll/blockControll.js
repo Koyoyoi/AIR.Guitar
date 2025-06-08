@@ -31,7 +31,7 @@ let textStyle = {
     })
 }
 const modeName = ["自由演奏", "歌曲演奏"];
-const playName = ["彎曲手指", "雙指互碰"]
+const playName = ["彎曲手指", "雙指互碰", "手部揮動"]
 
 // 載入圖片
 export async function loadImg() {

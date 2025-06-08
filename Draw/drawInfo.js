@@ -117,15 +117,15 @@ export function drawHand(handData) {
     const Rhand = handData['Right'];
     const Lhand = handData['Left'];
     const G = new PIXI.Graphics();
-    const appWidth = baseApp.canvas.width; 
-    
-    if (playNum == 0) {
+    const appWidth = baseApp.renderer.width;
+
+    if (playNum == 0 || playNum == 2) {
         if (Rhand[0] != undefined)
-            G.circle(appWidth - Rhand[0][0], Rhand[0][1], 50)
+            G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 });
 
         if (Lhand[0] != undefined)
-            G.circle(appWidth - Lhand[0][0], Lhand[0][1], 50)
+            G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 });
 
         baseApp.stage.addChild(G);
