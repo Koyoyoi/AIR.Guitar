@@ -101,12 +101,12 @@ export async function strumCtrl() {
 export async function clipCtrl(RHand, LHand) {
     if (RHand.length > 0 && LHand.length > 0) {
         let len = Math.abs(LHand[8][0] - RHand[8][0])
-        if(len < 200 && !isClip){
+        if(len < 50 && !isClip){
             
             isClip = true
             console.log(isClip)
             rollSeq();
-        }else if(isClip && len > 200){
+        }else if(isClip && len > 50){
             isClip = false
         }
     }

@@ -1,6 +1,6 @@
 import { video, baseApp, midiApp, uiApp } from "../main.js";
 import { rootTab, revRootTab, pluckNotes } from "../sound.js";
-import { modeNum, showAllCtrl, capo } from "../Controll/blockControll.js";
+import { modeNum, playNum, showAllCtrl, capo } from "../Controll/blockControll.js";
 import { songName } from "../midiEvent.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
@@ -111,6 +111,41 @@ export function drawGesture(gesture, capo) {
     text.y = 25;            // 設定 y 座標
 
     baseApp.stage.addChild(text);
+}
+
+export function drawHand(handData) {
+    const Rhand = handData['Right'];
+    const Lhand = handData['Left'];
+    const G = new PIXI.Graphics();
+    const appWidth = baseApp.canvas.width; // 或你自行設定的寬度
+
+    if (playNum == 0) {
+        if (Rhand[0] != undefined)
+            G.circle(appWidth - Rhand[0][0], Rhand[0][1], 50)
+                .fill({ color: 0xffffff, alpha: 0.6 });
+
+        if (Lhand[0] != undefined)
+            G.circle(appWidth - Lhand[0][0], Lhand[0][1], 50)
+                .fill({ color: 0xffffff, alpha: 0.6 });
+
+        baseApp.stage.addChild(G);
+    }
+    else if (playNum == 1) {
+        if (Rhand[0] != undefined)
+            G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
+                .fill({ color: 0xffffff, alpha: 0.6 })
+                .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
+                .fill({ color: 0xffffff, alpha: 0.6 })
+
+        if (Lhand[0] != undefined)
+            G.circle(appWidth - Lhand[4][0], Lhand[4][1], 25)
+                .fill({ color: 0xffffff, alpha: 0.6 })
+                .circle(appWidth - Lhand[8][0], Lhand[8][1], 25)
+                .fill({ color: 0xffffff, alpha: 0.6 });
+
+        baseApp.stage.addChild(G);
+    }
+
 }
 
 export function drawSongName() {

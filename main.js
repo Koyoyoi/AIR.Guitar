@@ -1,8 +1,8 @@
-import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl } from "./Controll/blockControll.js";
+import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl, playCtrl, playNum } from "./Controll/blockControll.js";
 import { chordCtrl, clipCtrl, pluckCtrl, strumCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
-import { drawSongName, reCanva } from "./Draw/drawInfo.js";
+import { drawHand, drawSongName, reCanva } from "./Draw/drawInfo.js";
 import { midiDrawLoop } from "./Draw/drawMIDI.js";
 import { midiProcess } from "./midiEvent.js"
 import { load_SVM_Model } from "./SVM.js";
@@ -36,7 +36,7 @@ async function initCanvas() {
 
     overlay = new PIXI.Graphics()
         .rect(0, 0, baseApp.canvas.width, baseApp.canvas.height)
-        .fill({ color: 0x1c1c1c, alpha: 0.8 });
+        .fill({ color: 0x1c1c1c, alpha: 0.7 });
 
     // 確保 midiApp初始化完成後再操作 canvas
     document.querySelector('.canvas-wrapper').appendChild(baseApp.canvas);
@@ -116,9 +116,11 @@ async function detectLoop() {
     await detectPose();
 
     // 控制聲音
-    await pluckCtrl(modeNum);
     await strumCtrl();
-    await clipCtrl(handData['Left'], handData['Right'])
+    await pluckCtrl(modeNum);
+    if (playNum == 1 && modeNum == 1) {
+        await clipCtrl(handData['Left'], handData['Right'])
+    }
 
     // 顯示控制區
     settingCtrl()
@@ -127,9 +129,11 @@ async function detectLoop() {
         await chordCtrl();
     }
     if (modeNum == 1) {
+        drawHand(handData)
         reloadCtrl();
         drawSongName();
         touchCtrl();
+        playCtrl();
     }
 
     // 重置追蹤資料

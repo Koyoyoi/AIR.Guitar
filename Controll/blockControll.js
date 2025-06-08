@@ -3,7 +3,7 @@ import { uiApp } from "../main.js";
 import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
-export let modeNum = 0, sampleNum = 0, capo = 0;
+export let modeNum = 0, sampleNum = 0, capo = 0, playNum = 0;
 export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
 
 let IMGs = {}
@@ -31,6 +31,7 @@ let textStyle = {
     })
 }
 const modeName = ["自由演奏", "歌曲演奏"];
+const playName = ["彎曲手指", "雙指互碰"]
 
 // 載入圖片
 export async function loadImg() {
@@ -464,5 +465,71 @@ export function touchCtrl() {
     });
 
     uiApp.stage.addChild(touch);
+
+}
+
+export function playCtrl() {
+    if (showAllCtrl) return
+
+    const Area = {
+        x: uiApp.screen.width / 2 - uiApp.screen.width * 0.1,
+        y: uiApp.screen.height - uiApp.screen.height * 0.1,
+        w: uiApp.screen.width * 0.2,
+        h: uiApp.screen.height * 0.08
+    };
+
+    const buttonWidth = Area.h * 0.8;
+    const buttonHeight = Area.h;
+    const buttonY = Area.y + (Area.h - buttonHeight) / 2;
+
+    // 背景區域
+    const labelBase = new PIXI.Graphics()
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
+        .fill(0x434343);
+    uiApp.stage.addChild(labelBase);
+
+    // 文字創建方式`
+    const label = new PIXI.Text({
+        text: `${playName[playNum]}`,
+        style: textStyle['normal']
+    });
+    label.anchor.set(0.5);
+    label.x = Area.x + Area.w / 2;
+    label.y = Area.y + Area.h / 2;
+    uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
+
+    // 左箭頭三角形
+    const LBtn = new PIXI.Graphics()
+        .moveTo(0, buttonHeight / 2)
+        .lineTo(buttonWidth, 0)
+        .lineTo(buttonWidth, buttonHeight)
+        .fill(0x434343);
+    LBtn.x = Area.x - 60;
+    LBtn.y = buttonY;
+    LBtn.hitArea = new PIXI.Rectangle(LBtn.x, LBtn.y, buttonWidth, buttonHeight); // 設置 hitArea
+    LBtn.interactive = true;
+    LBtn.buttonMode = true;
+    LBtn.on("pointerdown", () => {
+        playNum  = (playName.length + playNum  - 1) % playName.length;
+        console.log("✅ play Left 被點擊！");
+    });
+    uiApp.stage.addChild(LBtn);
+
+    // 右箭頭三角形
+    const RBtn = new PIXI.Graphics()
+        .moveTo(0, 0)
+        .lineTo(buttonWidth, buttonHeight / 2)
+        .lineTo(0, buttonHeight)
+        .fill(0x434343);
+    RBtn.x = Area.x + Area.w + 15;
+    RBtn.y = buttonY;
+    RBtn.hitArea = new PIXI.Rectangle(RBtn.x, RBtn.y, buttonWidth, buttonHeight); // 設置 hitArea
+    RBtn.interactive = true;
+    RBtn.buttonMode = true;
+    RBtn.on("pointerdown", () => {
+        playNum = (playNum  + 1) % playName.length;
+        console.log("✅ play Right 被點擊！");
+    });
+    uiApp.stage.addChild(RBtn);
 
 }

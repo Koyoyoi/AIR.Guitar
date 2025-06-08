@@ -1,6 +1,6 @@
 import { rollSeq } from "./Draw/drawMIDI.js";
 import { animateSeq } from "./midiEvent.js";
-import { modeNum, portOpen, sampleNum } from "./Controll/blockControll.js"
+import { modeNum, portOpen, sampleNum, playNum } from "./Controll/blockControll.js"
 
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放
 export let soundSample;                                                           // 儲存音色樣本
@@ -123,7 +123,7 @@ export async function plucking(pluck, capo, velocities) {
             notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
         });
     }
-    if (modeNum == 1) {
+    if (modeNum == 1 && playNum == 0) {
         rollSeq();
     } else if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符

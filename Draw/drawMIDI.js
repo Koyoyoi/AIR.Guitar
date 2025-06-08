@@ -61,7 +61,7 @@ export function midiDrawLoop(now) {
 
     // 每秒輸出一次 FPS 到 console
     if (now - lastFpsUpdate >= 1000) {
-        console.log(`FPS: ${fps}`);
+        // console.log(`FPS: ${fps}`);
         lastFpsUpdate = now;
     }
 
