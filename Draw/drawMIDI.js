@@ -1,6 +1,7 @@
 import { midiApp } from "../main.js";
 import { soundSample, guitarStandard, revRootTab, mapRange } from "../sound.js";
 import { modeNum, capo } from "../Controll/blockControll.js";
+import { pitchToColor } from "../midiEvent.js";
 
 // 音符、歌詞、琴弦序列
 export let noteSeq = [],
@@ -9,6 +10,8 @@ export let noteSeq = [],
 
 let effectSeq = [];  // 特效序列
 let lastTime = performance.now();
+let lastFpsUpdate = lastTime;
+let fps = 0;
 let isRolling = false;
 let pressed_V = 0;
 
@@ -46,47 +49,23 @@ export function rollSeq(velocites = 0) {
     }
 }
 
-// pitch 映射 HEX 色碼
-export function pitchToHexColor(pitch, tone = 'G', range = 120) {
-    // pitch 映射到 0~360 度 hue
-    let hue = (pitch / 127) * range;
 
-    // 根據 tone 改變色相偏移
-    const toneOffsetMap = {
-        G: 0,
-        B: 120,
-        R: 240,
-        Y: 60,   // 黃色
-        C: 180,  // 青色
-        M: 300   // 洋紅
-    };
-    if (toneOffsetMap[tone]) hue += toneOffsetMap[tone];
-    hue %= 360;
-
-    // 固定 HSL 參數
-    const saturation = 1;
-    const lightness = 0.6;
-
-    // HSL 轉 RGB
-    const k = n => (n + hue / 30) % 12;
-    const a = saturation * Math.min(lightness, 1 - lightness);
-    const f = n => lightness - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-
-    const r = Math.round(f(0) * 255);
-    const g = Math.round(f(8) * 255);
-    const b = Math.round(f(4) * 255);
-
-    // 回傳 HEX 字串（如 "#FFAABB"）
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
-}
 
 // 主動畫迴圈
 export function midiDrawLoop(now) {
     const dt = (now - lastTime) / 1000;
     lastTime = now;
 
-    midiApp.stage.removeChildren();
+    const currentFPS = 1 / dt;
+    fps = Math.round(currentFPS);
 
+    // 每秒輸出一次 FPS 到 console
+    if (now - lastFpsUpdate >= 1000) {
+        console.log(`FPS: ${fps}`);
+        lastFpsUpdate = now;
+    }
+
+    midiApp.stage.removeChildren();
 
     if (modeNum === 1) {
         drawEffects();
@@ -102,7 +81,7 @@ export function midiDrawLoop(now) {
 
 // 音符繪製與移動動畫
 function drawNote() {
-    if (noteSeq.length <= 0 || noteSeq.length == 0) return;
+    if (noteSeq.length <= 0) return;
 
     note.clear();
     blur.clear();
@@ -120,8 +99,8 @@ function drawNote() {
 
         // 滾動時往左移
         if (isRolling && !ctrl.hit) {
-            if (ctrl.x - ctrl.targetX > 40) {
-                ctrl.x -= 40;  // 速度可調整
+            if (ctrl.x - ctrl.targetX > 25) {
+                ctrl.x -= 25;  // 速度可調整
             } else {
                 ctrl.x = ctrl.targetX
             }
@@ -276,7 +255,7 @@ function drawString() {
                 const jitter = Math.sin(2 * Math.PI * waveFreq * t + time * 5) * envelope * maxJitter;
                 const y = poseY + jitter;
                 string.roundRect(x, y - 5, segmentWidth * 1.1, 10)
-                    .fill({ color: pitchToHexColor(guitarStandard[i], 'M', 240), alpha: stringSeq[i].alpha });
+                    .fill({ color: pitchToColor(guitarStandard[i], 'M', 240), alpha: stringSeq[i].alpha });
             }
             midiApp.stage.addChild(string);
             stringSeq[i].alpha -= 0.03;
@@ -285,7 +264,7 @@ function drawString() {
                 fontFamily: 'Arial',
                 fontSize: 50,
                 fontWeight: 'bold',
-                fill: pitchToHexColor(guitarStandard[i], 'M', 240),
+                fill: pitchToColor(guitarStandard[i], 'M', 240),
                 align: 'left',
                 alpha: stringSeq[i].alpha
             });

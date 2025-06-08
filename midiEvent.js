@@ -1,4 +1,4 @@
-import { noteSeq, stringSeq, resetSeq, pitchToHexColor } from "./Draw/drawMIDI.js";
+import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { mapRange, guitarStandard } from "./sound.js";
 
 export let tempo = 0, songName = "";
@@ -52,6 +52,40 @@ export async function animateSeq(context) {
             stringSeq[closest.idx] = { note: context, alpha: 1 };
         }
     }
+}
+
+// pitch 映射 HEX 色碼
+export function pitchToColor(pitch, tone = 'G', range = 120) {
+    // pitch 映射到 0~360 度 hue
+    let hue = (pitch / 127) * range;
+
+    // 根據 tone 改變色相偏移
+    const toneOffsetMap = {
+        G: 0,
+        B: 120,
+        R: 240,
+        Y: 60,   // 黃色
+        C: 180,  // 青色
+        M: 300   // 洋紅
+    };
+    if (toneOffsetMap[tone]) hue += toneOffsetMap[tone];
+    hue %= 360;
+
+    // 固定 HSL 參數
+    const saturation = 1;
+    const lightness = 0.6;
+
+    // HSL 轉 RGB
+    const k = n => (n + hue / 30) % 12;
+    const a = saturation * Math.min(lightness, 1 - lightness);
+    const f = n => lightness - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+
+    const r = Math.round(f(0) * 255);
+    const g = Math.round(f(8) * 255);
+    const b = Math.round(f(4) * 255);
+
+    // 回傳 HEX 字串（如 "#FFAABB"）
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
 }
 
 async function renderNotes() {
@@ -117,12 +151,12 @@ async function renderNotes() {
             x: 185 + time * pixelPerSec,
             vx: 0,
             targetX: 185 + time * pixelPerSec,
-            lyric: group[1]?.isReady ? `${group[1].isReady}` : ""
+            lyric: group[0].isReady ? `${group[0].isReady}` : ""
         });
 
         if (time >= offset) {
             for (let j = 1; j < group.length; j++) {
-                group[j].color = pitchToHexColor(group[j].note,
+                group[j].color = pitchToColor(group[j].note,
                     deltaBeats <= 0.5 ? 'M' :
                         deltaBeats <= 1 ? 'G' :
                             deltaBeats <= 2 ? 'B' : 'C'
@@ -164,3 +198,4 @@ async function renderLyrics() {
 
     animateSeq(groupMap);
 }
+
