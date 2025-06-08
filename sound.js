@@ -56,7 +56,7 @@ export async function initMIDIPort() {
             console.log(`🎵 Using output: ${outport.name}`);
         }
     } catch (error) {
-       console.log("⚠️ No MIDI output devices found.");
+        console.log("⚠️ No MIDI output devices found.");
     }
 }
 
@@ -123,8 +123,8 @@ export async function plucking(pluck, capo, velocities) {
             notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
         });
     }
-    if (modeNum == false) {
-        await rollSeq();
+    if (modeNum == 1) {
+        rollSeq();
     } else if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
         notes.forEach(([note, velocity]) => {
@@ -153,7 +153,7 @@ export async function plucking(pluck, capo, velocities) {
 
 // 掃弦函數
 export async function strumming(direction, capo, duration) {
-    if(modeNum == 1) { return }
+    if (modeNum == 1) { return }
 
     let sturmOrder = direction === 'Up' ? guitarChord.slice().reverse() : guitarChord;
     console.log(`方向: ${direction}，持續時間: ${duration}ms`);

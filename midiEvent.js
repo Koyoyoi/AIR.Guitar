@@ -1,141 +1,140 @@
-import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
-import { midiApp } from "./main.js";
+import { noteSeq, stringSeq, resetSeq, pitchToHexColor } from "./Draw/drawMIDI.js";
 import { mapRange, guitarStandard } from "./sound.js";
 
 export let tempo = 0, songName = "";
 
-let noteData, aryBuffer, tPerQuarter, groupMap, offset;
+let noteData, arrayBuffer, ticksPerQuarter, groupMap, offset;
+const PREBEATS = 4;
+const DEFAULT_NOTE = 84;
+const DEFAULT_VELOCITY = 100;
 
 export async function midiProcess(file) {
     resetSeq();
-    if (file != undefined) {
-        if (!file.name.toLowerCase().endsWith(".mid") && !file.name.toLowerCase().endsWith(".midi")) {
-            alert("請上傳 MIDI 檔案！");
-            return;
+
+    if (file == undefined) {
+        alert("尚未載入 MIDI 檔案！");
+
+    }
+
+    else {
+        if (file != 'reload') {
+            songName = file.name.replace(/\.mid(i)?$/i, "");
+            console.log("檔案名稱:", songName);
+            arrayBuffer = await file.arrayBuffer();
         }
 
-        songName = file.name.replace(/\.mid(i)?$/i, "");
-        console.log("檔案名稱:", songName);
-
-        aryBuffer = await file.arrayBuffer();
-        const blob = new Blob([aryBuffer], { type: "audio/midi" });
+        const blob = new Blob([arrayBuffer], { type: "audio/midi" });
         noteData = await mm.blobToNoteSequence(blob);
         noteData.notes.sort((a, b) => a.startTime - b.startTime);
 
         tempo = noteData.tempos?.[0]?.qpm || 120;
-        tPerQuarter = noteData.ticksPerQuarter || 480;
+        ticksPerQuarter = noteData.ticksPerQuarter || 480;
 
-        console.log(tempo)
+        console.log("Tempo:", tempo);
+
+        await renderNotes();
+        await renderLyrics();
     }
-
-    renderNotes(noteData);
-    renderLyrics(aryBuffer, tPerQuarter, tempo);
 }
 
-// 新增音符 / 歌詞 / 琴弦
-export function animateSeq(context) {
+export async function animateSeq(context) {
     if (context instanceof Map) {
-        for (const value of context.values()) {
-            noteSeq.push(value)
+        for (const values of context.values()) {
+            noteSeq.push([...values]);  // 推入 noteSeq 中保留整組
         }
-    }
-    else if (typeof context === 'number') {
-        // 琴弦擊打事件
-        const validIndices = guitarStandard
+    } else if (typeof context === 'number') {
+        const closest = guitarStandard
             .map((note, idx) => ({ note, idx }))
-            .filter(item => context >= item.note); // 只保留 context >= note
+            .filter(item => context >= item.note)
+            .reduce((a, b) => Math.abs(context - a.note) < Math.abs(context - b.note) ? a : b, { note: Infinity });
 
-        if (validIndices.length > 0) {
-            const closestIndex = validIndices.reduce((closest, curr) =>
-                Math.abs(curr.note - context) < Math.abs(closest.note - context) ? curr : closest
-            ).idx;
-
-            stringSeq[closestIndex] = { note: context, alpha: 1 };
+        if (closest.idx !== undefined) {
+            stringSeq[closest.idx] = { note: context, alpha: 1 };
         }
-
     }
 }
 
-function renderNotes(noteSeq) {
-    if (!noteSeq || !Array.isArray(noteSeq.notes)) return [];
+async function renderNotes() {
+    if (!noteData?.notes?.length) return;
 
     groupMap = new Map();
+    offset = 0;
 
-    // 插入前4個預備拍
-    offset = 0
-    for (let i = 0; i < 4; i++) {
-        const t = offset;
-        if (!groupMap.has(t)) groupMap.set(t, []);
-        groupMap.get(t).push({
-            note: 84,
-            v: 100,
+    // 插入預備拍
+    for (let i = 0; i < PREBEATS; i++) {
+        const time = offset;
+        groupMap.set(time, [{
+            note: DEFAULT_NOTE,
+            v: DEFAULT_VELOCITY,
             d: 60 / tempo,
             r: 25,
             startTime: offset,
-            isReady: i == 3 ? '唱' : i + 1
-        });
+            isReady: i === PREBEATS - 1 ? '唱' : i + 1,
+            color: 0x828282,
+            noteType: 0.25
+        }]);
         offset += 60 / tempo;
     }
 
-
-    // 根據 startTime 分組
-    for (const note of noteSeq.notes) {
+    for (const note of noteData.notes) {
         if (note.isDrum || typeof note.startTime !== 'number') continue;
-        const t = note.startTime + offset;
+        const start = note.startTime + offset;
 
-        if (!groupMap.has(t)) groupMap.set(t, []);
-        groupMap.get(t).push({
+        if (!groupMap.has(start)) groupMap.set(start, []);
+        groupMap.get(start).push({
             note: note.pitch,
             v: note.velocity,
             d: note.endTime - note.startTime,
             r: mapRange(note.velocity, 60, 127, 10, 25),
             startTime: note.startTime,
-            isReady: false
+            isReady: false,
+            color: 0xffffff,
         });
     }
 
-    // 依照 startTime 排序，然後加入拍數間距資訊
+    // 依時間排序，添加控制資料
     const sortedTimes = [...groupMap.keys()].sort((a, b) => a - b);
+    const minDelta = sortedTimes
+        .slice(1)
+        .reduce((min, curr, i) => {
+            const delta = curr - sortedTimes[i];
+            return delta > 0 && delta < min ? delta : min;
+        }, Infinity);
 
-    // 計算相鄰時間的差值
-    let minDelta = Infinity;
-    for (let i = 1; i < sortedTimes.length; i++) {
-        const delta = sortedTimes[i] - sortedTimes[i - 1];
-        if (delta > 0 && delta < minDelta) {
-            minDelta = delta;
-        }
-    }
+    const pixelPerSec = Math.min(1000, 50 / minDelta);
 
-    let rawN = 50 / minDelta;
-    if (rawN > 1000) rawN = 1000
-
-    let dx = 0
-    for (let i = 0; i < sortedTimes.length; i++) {
-        const group = groupMap.get(sortedTimes[i]);
+    sortedTimes.forEach((time, i) => {
+        const group = groupMap.get(time);
         const nextTime = sortedTimes[i + 1];
-        const currentTime = sortedTimes[i];
-        const deltaBeats = nextTime !== undefined ? nextTime - currentTime : 0;
+        const deltaBeats = nextTime ? (nextTime - time) / 60 * tempo : 0;
 
         group.sort((a, b) => b.note - a.note);
 
-        // 插入 ctrl 物件，只包含 yList
         group.unshift({
             dltB: deltaBeats,
             scale: 1,
             hit: false,
-            x: 185 + sortedTimes[i] * rawN,
+            x: 185 + time * pixelPerSec,
             vx: 0,
-            targetX: 185 + sortedTimes[i] * rawN,
-            lyric: group[0].isReady ? `${group[0].isReady}` : ""
+            targetX: 185 + time * pixelPerSec,
+            lyric: group[1]?.isReady ? `${group[1].isReady}` : ""
         });
 
-        dx = deltaBeats * 80;
-    }
+        if (time >= offset) {
+            for (let j = 1; j < group.length; j++) {
+                group[j].color = pitchToHexColor(group[j].note,
+                    deltaBeats <= 0.5 ? 'M' :
+                        deltaBeats <= 1 ? 'G' :
+                            deltaBeats <= 2 ? 'B' : 'C'
+                );
+            }
+        }
+    });
 }
 
-// 解析並顯示歌詞（使用 midi-parser-js）
-function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
+async function renderLyrics() {
     const midi = MidiParser.parse(new Uint8Array(arrayBuffer));
+
     midi.track.forEach(track => {
         let ticks = 0;
 
@@ -146,22 +145,9 @@ function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
                 let text = "";
 
                 try {
-                    if (typeof event.data === "string") {
-                        // 可能已是錯誤編碼字串
-                        text = decodeURIComponent(escape(event.data));
-                    } else {
-                        const bytes = new Uint8Array(event.data);
-
-                        // 使用 Encoding.js
-                        text = Encoding.convert(bytes, {
-                            to: 'UNICODE',
-                            from: 'AUTO',
-                            type: 'string'
-                        });
-
-                        // 如果沒有 Encoding.js，可以嘗試以下替代解法（僅適用 UTF-8）
-                        // text = new TextDecoder('utf-8').decode(bytes);
-                    }
+                    text = typeof event.data === "string"
+                        ? decodeURIComponent(escape(event.data))
+                        : Encoding.convert(new Uint8Array(event.data), { to: 'UNICODE', from: 'AUTO', type: 'string' });
                 } catch (err) {
                     console.warn("歌詞解碼失敗，略過該段文字：", err);
                     return;
@@ -169,13 +155,12 @@ function renderLyrics(arrayBuffer, ticksPerQuarter, tempo) {
 
                 const time = (ticks / ticksPerQuarter) * (60 / tempo) + offset;
 
-                if (groupMap.get(time) != undefined && text != '\r') {
-                    groupMap.get(time)[0].lyric = text
+                if (text !== '\r' && groupMap.has(time)) {
+                    groupMap.get(time)[0].lyric = text;
                 }
             }
         });
     });
 
-    animateSeq(groupMap)
+    animateSeq(groupMap);
 }
-

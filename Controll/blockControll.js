@@ -362,7 +362,7 @@ export function reloadCtrl() {
     // 點擊事件
     reloadBtn.on('pointerdown', () => {
         console.log("✅ reload 控制區被點擊！");
-        midiProcess();
+        midiProcess('reload');
     });
 
     uiApp.stage.addChild(reloadBtn);

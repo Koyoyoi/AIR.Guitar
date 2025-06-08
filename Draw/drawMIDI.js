@@ -1,7 +1,6 @@
 import { midiApp } from "../main.js";
 import { soundSample, guitarStandard, revRootTab, mapRange } from "../sound.js";
 import { modeNum, capo } from "../Controll/blockControll.js";
-import { tempo } from "../midiEvent.js";
 
 // 音符、歌詞、琴弦序列
 export let noteSeq = [],
@@ -12,6 +11,11 @@ let effectSeq = [];  // 特效序列
 let lastTime = performance.now();
 let isRolling = false;
 let pressed_V = 0;
+
+const note7Map = {
+    0: '1', 1: '1', 2: '2', 3: '2', 4: '3', 5: '4',
+    6: '4', 7: '5', 8: '5', 9: '6', 10: '6', 11: '7'
+};
 
 // PIXI 圖層
 const note = new PIXI.Graphics();
@@ -43,23 +47,37 @@ export function rollSeq(velocites = 0) {
 }
 
 // pitch 映射 HEX 色碼
-function pitchToHexColor(pitch, tone = 'G') {
-    let baseHue = (pitch / 127) * 360;
-    if (tone === 'B') baseHue += 120;
-    else if (tone === 'R') baseHue += 240;
-    baseHue %= 360;
+export function pitchToHexColor(pitch, tone = 'G', range = 120) {
+    // pitch 映射到 0~360 度 hue
+    let hue = (pitch / 127) * range;
 
-    const h = Math.floor(baseHue);
-    const s = 1, l = 0.6;
-    const k = n => (n + h / 30) % 12;
-    const a = s * Math.min(l, 1 - l);
-    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    // 根據 tone 改變色相偏移
+    const toneOffsetMap = {
+        G: 0,
+        B: 120,
+        R: 240,
+        Y: 60,   // 黃色
+        C: 180,  // 青色
+        M: 300   // 洋紅
+    };
+    if (toneOffsetMap[tone]) hue += toneOffsetMap[tone];
+    hue %= 360;
+
+    // 固定 HSL 參數
+    const saturation = 1;
+    const lightness = 0.6;
+
+    // HSL 轉 RGB
+    const k = n => (n + hue / 30) % 12;
+    const a = saturation * Math.min(lightness, 1 - lightness);
+    const f = n => lightness - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
 
     const r = Math.round(f(0) * 255);
     const g = Math.round(f(8) * 255);
     const b = Math.round(f(4) * 255);
 
-    return (r << 16) + (g << 8) + b;
+    // 回傳 HEX 字串（如 "#FFAABB"）
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
 }
 
 // 主動畫迴圈
@@ -92,6 +110,13 @@ function drawNote() {
     for (let col = 0; col < noteSeq.length; col++) {
         const group = noteSeq[col];
         const ctrl = group[0];
+        const style = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 40,
+            fontWeight: 'bold',
+            fill: ctrl.x == 185 ? 0xF7C242 : 0xBDC0BA,
+            align: 'left',
+        });
 
         // 滾動時往左移
         if (isRolling && !ctrl.hit) {
@@ -103,44 +128,44 @@ function drawNote() {
         }
 
         // 繪製音符
-        let textY = midiApp.canvas.height
         for (let i = 1; i < group.length; i++) {
             const n = group[i];
             if (ctrl.x < 185 || ctrl.x > midiApp.canvas.width) continue;
 
-            let c = n.isReady ? 0x828282 : pitchToHexColor(n.note)
             let posY = n.isReady ? midiApp.canvas.height / 2 : mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150)
-            if (posY < textY)
-                textY = posY
 
-            if (i == 1) textY = posY - 25
             blur.circle(ctrl.x, posY, n.r * 1.3 * ctrl.scale)
-                .fill({ color: c, alpha: 0.2 });
+                .fill({ color: n.color, alpha: 0.2 });
 
             note.circle(ctrl.x, posY, n.r * ctrl.scale)
-                .fill({ color: c, alpha: 0.6 });
+                .fill({ color: n.color, alpha: 0.6 });
 
+            if (!n.isReady && !ctrl.hit) {
+                const text = new PIXI.Text({
+                    text: note7Map[n.note % 12],
+                    style: style
+                });
+                text.anchor.set(0.5, 0);
+                text.x = ctrl.x;
+                text.y = posY - 60
+
+                midiApp.stage.addChild(text);
+            }
+
+            if (i == group.length - 1 && !ctrl.hit) {
+                const text = new PIXI.Text({
+                    text: ctrl.lyric,
+                    style: style
+                });
+                text.anchor.set(0.5, 0);
+                text.x = ctrl.x;
+                text.y = posY + n.r + 10
+
+                midiApp.stage.addChild(text);
+
+            }
             // 縮放動畫
             if (!ctrl.hit) ctrl.scale = Math.max(1, ctrl.scale - 0.2);
-        }
-
-        if (ctrl.lyric != undefined && !ctrl.hit && ctrl.x >= 185 && ctrl.x < midiApp.canvas.width) {
-            const style = new PIXI.TextStyle({
-                fontFamily: 'Arial',
-                fontSize: 40,
-                fontWeight: 'bold',
-                fill: ctrl.x == 185 ? 0xF7C242 : 0xBDC0BA,
-                align: 'left',
-            });
-            const text = new PIXI.Text({
-                text: ctrl.lyric,
-                style: style
-            });
-            text.anchor.set(0.5, 0);
-            text.x = ctrl.x;
-            text.y = textY - 40
-
-            midiApp.stage.addChild(text);
         }
 
         // hit 動畫處理
@@ -191,7 +216,7 @@ function drawEffects() {
 
 // 移除已播放音符，並播放音效、特效
 function removeSeq() {
-    if (!isRolling) return
+    if (!isRolling || noteSeq.length == 0) return
 
     for (let group of noteSeq) {
         const ctrl = group[0];
@@ -230,7 +255,6 @@ function removeSeq() {
             ctrl.x = 185;  // 鎖定位置避免重複觸發
         }
     }
-    console.log(pressed_V)
     pressed_V = 0;
 }
 
@@ -252,7 +276,7 @@ function drawString() {
                 const jitter = Math.sin(2 * Math.PI * waveFreq * t + time * 5) * envelope * maxJitter;
                 const y = poseY + jitter;
                 string.roundRect(x, y - 5, segmentWidth * 1.1, 10)
-                    .fill({ color: pitchToHexColor(guitarStandard[i], 'R'), alpha: stringSeq[i].alpha });
+                    .fill({ color: pitchToHexColor(guitarStandard[i], 'M', 240), alpha: stringSeq[i].alpha });
             }
             midiApp.stage.addChild(string);
             stringSeq[i].alpha -= 0.03;
@@ -261,7 +285,7 @@ function drawString() {
                 fontFamily: 'Arial',
                 fontSize: 50,
                 fontWeight: 'bold',
-                fill: pitchToHexColor(guitarStandard[i], 'R'),
+                fill: pitchToHexColor(guitarStandard[i], 'M', 240),
                 align: 'left',
                 alpha: stringSeq[i].alpha
             });
