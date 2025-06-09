@@ -142,7 +142,14 @@ function drawNote() {
                 .fill({ color: n.color, alpha: 0.2 });
 
             note.circle(ctrl.x, posY, n.r * ctrl.scale)
-                .fill({ color: n.color, alpha: 0.6 });
+                .fill({ color: n.color, alpha: 0.5 });
+
+            let decimalPlaces = ctrl.dltB.toString().split(".")[1]?.length || 0;
+            let result = ctrl.dltB *  Math.pow(10, decimalPlaces); 
+            if (result % 3 == 0 && decimalPlaces > 0) {
+                note.circle(ctrl.x + n.r + 10, posY + n.r, n.r / 2 * ctrl.scale)
+                    .fill({ color: n.color, alpha: 0.5 });
+            }
 
             if (!n.isReady && !ctrl.hit) {
                 const text = new PIXI.Text({
