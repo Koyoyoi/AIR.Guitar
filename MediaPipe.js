@@ -18,8 +18,8 @@ export async function setupMediaPipe() {
             delegate: "GPU"
         },
         runningMode: "VIDEO",
-        min_hand_detection_confidence: 0.4,
-        min_tracking_confidence: 0.4,
+        min_hand_detection_confidence: 0.5,
+        min_tracking_confidence: 0.5,
         numHands: 2
     });
 

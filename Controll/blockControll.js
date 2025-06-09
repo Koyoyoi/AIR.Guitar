@@ -106,11 +106,11 @@ export function ModeCtrl() {
     // 文字創建方式`
     const label = new PIXI.Text({
         text: `${modeName[modeNum]}`,
-        style: textStyle['normal']
+        style: textStyle['normal'],
+        x: Area.x + Area.w / 2,
+        y: Area.y + Area.h / 2
     });
     label.anchor.set(0.5);
-    label.x = Area.x + Area.w / 2;
-    label.y = Area.y + Area.h / 2;
     uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
 
     // 左箭頭三角形
@@ -169,11 +169,11 @@ export function midiPortCtrl() {
     // 顯示狀態文字
     const midiLabel = new PIXI.Text({
         text: `MIDI port : ${portOpen ? 'on' : 'off'}`,
-        style: textStyle['normal']
+        style: textStyle['normal'],
+        x: Area.x + Area.w / 2,
+        y: Area.y + Area.h / 2
     });
     midiLabel.anchor.set(0.5);
-    midiLabel.x = Area.x + Area.w / 2;
-    midiLabel.y = Area.y + Area.h / 2;
     uiApp.stage.addChild(midiLabel);
 
     // 點擊事件處理
@@ -206,11 +206,11 @@ export async function sampleCtrl() {
     // 顯示 sample 名稱
     const sampleLabel = new PIXI.Text({
         text: instruments[sampleNum],
-        style: textStyle['normal']
+        style: textStyle['normal'],
+        x: Area.x + Area.w / 2,
+        y: Area.y + Area.h / 2
     });
     sampleLabel.anchor.set(0.5);
-    sampleLabel.x = Area.x + Area.w / 2;
-    sampleLabel.y = Area.y + Area.h / 2;
     uiApp.stage.addChild(sampleLabel);
 
     // 建立左側按鈕（三角形）
@@ -290,11 +290,11 @@ export function handCtrl() {
     // left hand 
     const left = new PIXI.Text({
         text: '左',
-        style: isSwitch ? textStyle['soundCtrl'] : textStyle['gesture']
+        style: isSwitch ? textStyle['soundCtrl'] : textStyle['gesture'],
+        x: Area.x + 30,
+        y: Area.y + Area.h / 2
     });
     left.anchor.set(0.5);
-    left.x = Area.x + 30;
-    left.y = Area.y + Area.h / 2;
     uiApp.stage.addChild(left);
 
     const LHand = new PIXI.Sprite(IMGs['left_hand']);
@@ -315,11 +315,11 @@ export function handCtrl() {
     // right hand
     const right = new PIXI.Text({
         text: '右',
-        style: isSwitch ? textStyle['gesture'] : textStyle['soundCtrl']
+        style: isSwitch ? textStyle['gesture'] : textStyle['soundCtrl'],
+        x: Area.x + Area.w - 30,
+        y: Area.y + Area.h / 2
     });
     right.anchor.set(0.5);
-    right.x = Area.x + Area.w - 30;
-    right.y = Area.y + Area.h / 2;
     uiApp.stage.addChild(right);
 
     const RHand = new PIXI.Sprite(IMGs['right_hand']);
@@ -392,14 +392,14 @@ export function capoCtrl() {
     // 左邊控制（減號或「左」）
     const sub = new PIXI.Text({
         text: '-',
-        style: textStyle['normal']
+        style: textStyle['normal'],
+        x: Area.x + Area.w / 2 - 100,
+        y: Area.y + Area.h / 2,
+        hitArea: new PIXI.Rectangle(Area.x, Area.y, (Area.w - 160 / 2), Area.h),
+        interactive: true,
+        buttonMode: true
     });
     sub.anchor.set(0.5);
-    sub.x = Area.x + Area.w / 2 - 100;
-    sub.y = Area.y + Area.h / 2;
-    sub.hitArea = new PIXI.Rectangle(Area.x, Area.y, (Area.w - 160 / 2), Area.h);
-    sub.interactive = true;
-    sub.buttonMode = true;
     sub.on('pointerdown', () => {
         console.log("✅ - 被點擊");
         capo -= 1
@@ -409,14 +409,14 @@ export function capoCtrl() {
     // 右邊控制（加號或「+」）
     const add = new PIXI.Text({
         text: '+',
-        style: textStyle['normal']
+        style: textStyle['normal'],
+        x: Area.x + Area.w / 2 + 105,
+        y: Area.y + Area.h / 2,
+        hitArea: new PIXI.Rectangle( Area.x + Area.w / 2 + 95, Area.y, (Area.w - 160 / 2), Area.h),
+        interactive: true,
+        buttonMode: true
     });
     add.anchor.set(0.5);
-    add.x = Area.x + Area.w / 2 + 105;
-    add.y = Area.y + Area.h / 2;
-    add.hitArea = new PIXI.Rectangle(add.x - 10, Area.y, (Area.w - 160 / 2), Area.h);
-    add.interactive = true;
-    add.buttonMode = true;
     add.on('pointerdown', () => {
         console.log("✅ + 被點擊");
         capo += 1;
@@ -428,13 +428,14 @@ export function capoCtrl() {
     // capo 開關文字按鈕
     const text = new PIXI.Text({
         text: 'capo: ' + capo,
-        style: textStyle['normal']
+        style: textStyle['normal'],
+        x: Area.x + Area.w / 2 - 60,
+        y: Area.y + Area.h / 4,
+        hitArea: new PIXI.Rectangle(Area.x + Area.w / 2 - 60 - 20, Area.y, 160, Area.h),
+        interactive: true,
+        buttonMode: true
     });
-    text.x = Area.x + Area.w / 2 - 60;
-    text.y = Area.y + (Area.h - text.height) / 2;
-    text.hitArea = new PIXI.Rectangle(text.x - 20, Area.y, 160, Area.h);
-    text.interactive = true;
-    text.buttonMode = true;
+
     text.on('pointerdown', () => {
         console.log("✅ capo 被點擊");
         capo = 0
@@ -510,7 +511,7 @@ export function playCtrl() {
     LBtn.interactive = true;
     LBtn.buttonMode = true;
     LBtn.on("pointerdown", () => {
-        playNum  = (playName.length + playNum  - 1) % playName.length;
+        playNum = (playName.length + playNum - 1) % playName.length;
         console.log("✅ play Left 被點擊！");
     });
     uiApp.stage.addChild(LBtn);
@@ -527,7 +528,7 @@ export function playCtrl() {
     RBtn.interactive = true;
     RBtn.buttonMode = true;
     RBtn.on("pointerdown", () => {
-        playNum = (playNum  + 1) % playName.length;
+        playNum = (playNum + 1) % playName.length;
         console.log("✅ play Right 被點擊！");
     });
     uiApp.stage.addChild(RBtn);

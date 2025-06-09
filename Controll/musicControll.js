@@ -113,34 +113,37 @@ export async function strumCtrl() {
     }
 }
 
-export async function pinchCtrl(RHand, LHand) {
-    let shouldTrigger = false;
+let isRPinch = false;
+let isLPinch = false;
 
-    // 右手：拇指與食指靠近
+export async function pinchCtrl(RHand, LHand) {
+    // 檢查右手 pinch
     if (RHand?.[4] && RHand?.[8]) {
         const dx = RHand[4][0] - RHand[8][0];
         const dy = RHand[4][1] - RHand[8][1];
         const dist = Math.hypot(dx, dy);
-        if (dist < 50) shouldTrigger = true;
+        if (dist < 50 && !isRPinch) {
+            isRPinch = true;
+            rollSeq(); // 右手觸發
+        } else if (dist >= 50 && isRPinch) {
+            isRPinch = false;
+        }
     }
 
-    // 左手：拇指與食指靠近
+    // 檢查左手 pinch
     if (LHand?.[4] && LHand?.[8]) {
         const dx = LHand[4][0] - LHand[8][0];
         const dy = LHand[4][1] - LHand[8][1];
         const dist = Math.hypot(dx, dy);
-        if (dist < 50) shouldTrigger = true;
-    }
-
-
-    // 根據判斷結果觸發
-    if (shouldTrigger && !isPinch) {
-        isPinch = true;
-        rollSeq();
-    } else if (!shouldTrigger && isPinch) {
-        isPinch = false;
+        if (dist < 50 && !isLPinch) {
+            isLPinch = true;
+            rollSeq(); // 左手觸發
+        } else if (dist >= 50 && isLPinch) {
+            isLPinch = false;
+        }
     }
 }
+
 
 export async function wavingCtrl(RHand, LHand) {
     const LmidX = video.videoWidth / 4 * 3;

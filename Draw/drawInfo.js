@@ -2,6 +2,7 @@ import { video, baseApp, midiApp, uiApp } from "../main.js";
 import { rootTab, revRootTab, pluckNotes } from "../sound.js";
 import { modeNum, playNum, showAllCtrl, capo } from "../Controll/blockControll.js";
 import { songName } from "../midiEvent.js";
+import { fingerPlay } from "../handCompute.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
@@ -135,21 +136,24 @@ export function drawSongName() {
     baseApp.stage.addChild(text);
 }
 
-export function drawHand(handData) {
+export async function drawHand(handData) {
     const Rhand = handData['Right'];
     const Lhand = handData['Left'];
     const G = new PIXI.Graphics();
     const appWidth = baseApp.renderer.width;
+    let Rpluck, Lpluck, velocities;
 
     if (playNum == 0) {
-        if (Rhand[0] != undefined)
+        if (Rhand[0] != undefined) {
+            [Rpluck, velocities] = await fingerPlay(handData["Right"]);  // 偵測撥弦與速度
             G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
-                .fill({ color: 0xffffff, alpha: 0.6 });
-
-        if (Lhand[0] != undefined)
+                .fill({ color: Rpluck.includes(1) && Rpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+        }
+        if (Lhand[0] != undefined) {
+            [Lpluck, velocities] = await fingerPlay(handData["Left"]);  // 偵測撥弦與速度
             G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
-                .fill({ color: 0xffffff, alpha: 0.6 });
-
+                .fill({ color: Lpluck.includes(1) && Lpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+        }
         baseApp.stage.addChild(G);
     }
     else if (playNum == 1) {
@@ -186,7 +190,7 @@ export function drawHand(handData) {
                 .fill({ color: 0xffffff, alpha: 0.6 })
                 .circle(appWidth - 15, Rhand[9][1], 30)
                 .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .circle(appWidth / 2 - 15, Rhand[9][1], 30)
+                .circle(appWidth / 2 + 15, Rhand[9][1], 30)
                 .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 });
         }
         if (Lhand[9] != undefined) {
@@ -195,7 +199,7 @@ export function drawHand(handData) {
                 .fill({ color: 0xffffff, alpha: 0.6 })
                 .circle(0 + 15, Lhand[9][1], 30)
                 .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .circle(appWidth / 2 + 15, Lhand[9][1], 30)
+                .circle(appWidth / 2 - 15, Lhand[9][1], 30)
                 .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 });
         }
         baseApp.stage.addChild(G);

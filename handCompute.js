@@ -25,7 +25,7 @@ export function vectorAngle(v1, v2) {
 // 計算手指角度
 function fingerAngle(hand) {
     return [
-        vectorAngle(vectorCompute(hand[1], hand[2]), vectorCompute(hand[2], hand[4])),
+        vectorAngle(vectorCompute(hand[0], hand[2]), vectorCompute(hand[2], hand[4])),
         vectorAngle(vectorCompute(hand[5], hand[6]), vectorCompute(hand[6], hand[8])),
         vectorAngle(vectorCompute(hand[9], hand[10]), vectorCompute(hand[10], hand[12])),
         vectorAngle(vectorCompute(hand[13], hand[14]), vectorCompute(hand[14], hand[16])),
