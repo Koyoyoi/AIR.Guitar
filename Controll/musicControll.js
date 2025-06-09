@@ -142,7 +142,7 @@ export async function pinchCtrl(RHand, LHand) {
     }
 }
 
-export async function wavingHandCtrl(RHand, LHand) {
+export async function wavingCtrl(RHand, LHand) {
     const LmidX = video.videoWidth / 4 * 3;
     const RmidX = video.videoWidth / 4
     // 右手判斷
