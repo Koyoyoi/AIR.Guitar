@@ -1,5 +1,5 @@
 import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl, playCtrl, playNum } from "./Controll/blockControll.js";
-import { chordCtrl, touchPointCtrl, pluckCtrl, strumCtrl, wavingHandCtrl } from "./Controll/musicControll.js";
+import { chordCtrl, pinchCtrl, pluckCtrl, strumCtrl, wavingHandCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
 import { drawHand, drawSongName, reCanva } from "./Draw/drawInfo.js";
@@ -120,7 +120,7 @@ async function detectLoop() {
     await pluckCtrl(modeNum);
     if (modeNum == 1) {
         if (playNum == 1) {
-            await touchPointCtrl(handData['Right'], handData['Left'])
+            await pinchCtrl(handData['Right'], handData['Left'])
         } else if (playNum == 2) {
             await wavingHandCtrl(handData['Right'], handData['Left'])
         }

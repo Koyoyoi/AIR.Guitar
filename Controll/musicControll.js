@@ -10,7 +10,9 @@ import { rollSeq } from "../Draw/drawMIDI.js";
 let gesture = '', prevGesture = '';               // 手勢相關
 let armAngles = [];                               // 手臂角度
 let action = '', prevAction = '';                 // 動作狀態
-let isTouch = false                               // 指尖觸碰
+let isPinch = false                               // 指尖觸碰
+let prevRX = null, prevLX = null;
+
 let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];
 
 // 和弦控制
@@ -70,7 +72,6 @@ export async function pluckCtrl(mode) {
     drawFinger(handData['Right']);
 }
 
-
 // 掃弦控制
 export async function strumCtrl() {
     if (showAllCtrl) return
@@ -112,17 +113,8 @@ export async function strumCtrl() {
     }
 }
 
-export async function touchPointCtrl(RHand, LHand) {
+export async function pinchCtrl(RHand, LHand) {
     let shouldTrigger = false;
-
-
-    // 雙手：食指彼此靠近
-    if (RHand?.[8] && LHand?.[8]) {
-        const dx = RHand[8][0] - LHand[8][0];
-        const dy = RHand[8][1] - LHand[8][1];
-        const dist = Math.hypot(dx, dy);
-        if (dist < 50) shouldTrigger = true;
-    }
 
     // 右手：拇指與食指靠近
     if (RHand?.[4] && RHand?.[8]) {
@@ -142,16 +134,13 @@ export async function touchPointCtrl(RHand, LHand) {
 
 
     // 根據判斷結果觸發
-    if (shouldTrigger && !isTouch) {
-        isTouch = true;
+    if (shouldTrigger && !isPinch) {
+        isPinch = true;
         rollSeq();
-    } else if (!shouldTrigger && isTouch) {
-        isTouch = false;
+    } else if (!shouldTrigger && isPinch) {
+        isPinch = false;
     }
 }
-
-let prevRX = null;
-let prevLX = null;
 
 export async function wavingHandCtrl(RHand, LHand) {
     const LmidX = video.videoWidth / 4 * 3;
@@ -166,7 +155,6 @@ export async function wavingHandCtrl(RHand, LHand) {
         }
         prevRX = currentRX;
     }
-    // 不再 else 清空 prevRX，保留最後已知位置
 
     // 左手判斷
     if (LHand?.[0]) {
@@ -178,7 +166,4 @@ export async function wavingHandCtrl(RHand, LHand) {
         }
         prevLX = currentLX;
     }
-    // 不再 else 清空 prevLX，保留最後已知位置
 }
-
-
