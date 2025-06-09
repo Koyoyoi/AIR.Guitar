@@ -113,6 +113,28 @@ export function drawGesture(gesture, capo) {
     baseApp.stage.addChild(text);
 }
 
+export function drawSongName() {
+    const style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 50,
+        fontWeight: 'bold',
+        fill: 0xBDC0BA,
+        align: 'left',
+        alpha: 0.6
+    });
+
+    const text = new PIXI.Text({
+        text: songName,
+        style
+    });
+
+    text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
+    text.x = baseApp.renderer.width / 2; // 畫面水平中心
+    text.y = 15;
+
+    baseApp.stage.addChild(text);
+}
+
 export function drawHand(handData) {
     const Rhand = handData['Right'];
     const Lhand = handData['Left'];
@@ -179,26 +201,4 @@ export function drawHand(handData) {
         baseApp.stage.addChild(G);
     }
 
-}
-
-export function drawSongName() {
-    const style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 50,
-        fontWeight: 'bold',
-        fill: 0xBDC0BA,
-        align: 'left',
-        alpha: 0.6
-    });
-
-    const text = new PIXI.Text({
-        text: songName,
-        style
-    });
-
-    text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
-    text.x = baseApp.renderer.width / 2; // 畫面水平中心
-    text.y = 15;
-
-    baseApp.stage.addChild(text);
 }
