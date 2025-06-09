@@ -35,27 +35,41 @@ export async function chordCtrl() {
 export async function pluckCtrl(mode) {
     if (showAllCtrl) return;
 
-    let toPluck = [];
-    toPluck = mode == 1 ? ['Right', 'Left'] : ['Right'];
+    let toPluck = mode == 1 ? ['Right', 'Left'] : ['Right'];
 
     for (let hand of toPluck) {
-        if (handData[hand].length == 0) continue
+        if (handData[hand].length === 0) continue;
 
-        [pluck, velocities] = await fingerPlay(handData[hand]);  // 計算撥弦與速度
+        [pluck, velocities] = await fingerPlay(handData[hand]);  // 偵測撥弦與速度
 
-        // 檢查是否有新的撥弦，並執行撥弦動作
-        if (!pluck.includes(4)) {
-            let diffPluck = [...pluck, ...prevPluck[hand]].filter(x => !prevPluck[hand].includes(x));
+        if (mode === 1) {
+            // ✅ 只判斷拇指與食指是否彎曲
+            const bentThumbIndex = pluck.includes(0) && pluck.includes(1);
+            const wasBentThumbIndex = prevPluck[hand].includes(0) && prevPluck[hand].includes(1);
 
-            if (diffPluck.length > 0) {
-                plucking(diffPluck, capo, velocities);  // 撥弦
+            if (bentThumbIndex && !wasBentThumbIndex) {
+                // 固定撥 0,1 為撥弦指
+                rollSeq()
             }
-            prevPluck[hand] = pluck.slice();                  // 更新撥弦狀態
+
+            // 更新狀態
+            prevPluck[hand] = pluck.slice();
+        } else {
+            // 原本邏輯（可支援撥 2~4 指）
+            const isOnlyThumb = pluck.length === 1 && pluck[0] === 4;
+            if (!isOnlyThumb) {
+                const diffPluck = pluck.filter(x => !prevPluck[hand].includes(x));
+                if (diffPluck.length > 0) {
+                    plucking(diffPluck, capo, velocities);
+                }
+                prevPluck[hand] = pluck.slice();
+            }
         }
     }
 
-    drawFinger(handData['Right'])
+    drawFinger(handData['Right']);
 }
+
 
 // 掃弦控制
 export async function strumCtrl() {
