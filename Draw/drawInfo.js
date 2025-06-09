@@ -145,12 +145,12 @@ export async function drawHand(handData) {
 
     if (playNum == 0) {
         if (Rhand[0] != undefined) {
-            [Rpluck, velocities] = await fingerPlay(handData["Right"]);  // 偵測撥弦與速度
+            [Rpluck, velocities] = await fingerPlay(Rhand);  // 偵測撥弦與速度
             G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: Rpluck.includes(1) && Rpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
         }
         if (Lhand[0] != undefined) {
-            [Lpluck, velocities] = await fingerPlay(handData["Left"]);  // 偵測撥弦與速度
+            [Lpluck, velocities] = await fingerPlay(Lhand);  // 偵測撥弦與速度
             G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
                 .fill({ color: Lpluck.includes(1) && Lpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
         }
