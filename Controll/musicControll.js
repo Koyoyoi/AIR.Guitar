@@ -158,7 +158,7 @@ export async function wavingHandCtrl(RHand, LHand) {
     const RmidX = video.videoWidth / 4
     // 右手判斷
     if (RHand?.[0]) {
-        const currentRX = RHand[8][0];
+        const currentRX = RHand[12][0];
         if (prevRX !== null) {
             if ((prevRX < RmidX && currentRX >= RmidX) || (prevRX >= RmidX && currentRX < RmidX)) {
                 rollSeq();
@@ -170,7 +170,7 @@ export async function wavingHandCtrl(RHand, LHand) {
 
     // 左手判斷
     if (LHand?.[0]) {
-        const currentLX = LHand[8][0];
+        const currentLX = LHand[12][0];
         if (prevLX !== null) {
             if ((prevLX < LmidX && currentLX >= LmidX) || (prevLX >= LmidX && currentLX < LmidX)) {
                 rollSeq();
