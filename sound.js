@@ -1,6 +1,5 @@
-import { rollSeq } from "./Draw/drawMIDI.js";
 import { animateSeq } from "./midiEvent.js";
-import { modeNum, portOpen, sampleNum, playNum } from "./Controll/blockControll.js"
+import { modeNum, portOpen, sampleNum } from "./Controll/blockControll.js"
 
 export const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // 創建音頻處理播放
 export let soundSample;                                                           // 儲存音色樣本
@@ -33,7 +32,7 @@ const chordTab = {
     "dim": [0, 3, 6] // Dim 減和弦
 };
 export const guitarStandard = [40, 45, 50, 55, 59, 64]; // 標準吉他音高（從低音弦到高音弦）
-let outport = null, cnt = 0;                              // 儲存 MIDI 輸出端口
+let outport = null;                                     // 儲存 MIDI 輸出端口
 
 // 初始化 MIDI 端口，獲取並設置第一個可用的 MIDI 輸出端口
 export async function initMIDIPort() {
@@ -123,9 +122,8 @@ export async function plucking(pluck, capo, velocities) {
             notes.push([pluckNotes[p], velocities[i]]); // 播放的音符與對應的力度
         });
     }
-    if (modeNum == 1 && playNum == 0) {
-        rollSeq();
-    } else if (!portOpen) {
+
+    if (!portOpen) {
         // 沒有 MIDI 設備時，使用 Web Audio 播放音符
         notes.forEach(([note, velocity]) => {
             soundSample.play(note + capo, audioCtx.currentTime, { gain: velocity / 127 * 3, duration: 1.5 });
