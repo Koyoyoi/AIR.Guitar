@@ -158,22 +158,24 @@ export function drawHand(handData) {
         baseApp.stage.addChild(G);
     }
     else if (playNum == 2) {
-        if (Rhand[0] != undefined)
+        if (Rhand[9] != undefined) {
+            let closeMid = appWidth / 2 - Rhand[9][0] < Rhand[9][0] ? true : false;
             G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 })
                 .circle(appWidth - 15, Rhand[9][1], 30)
-                .fill({ color: 0xffffff, alpha: 0.6 })
+                .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
                 .circle(appWidth / 2 - 15, Rhand[9][1], 30)
-                .fill({ color: 0xffffff, alpha: 0.6 });
-
-        if (Lhand[0] != undefined)
+                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+        }
+        if (Lhand[9] != undefined) {
+            let closeMid = Lhand[9][0] - appWidth / 2 < appWidth - Lhand[9][0] ? true : false;
             G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 })
-                .circle(0 + 15, Rhand[9][1], 30)
-                .fill({ color: 0xffffff, alpha: 0.6 })
-                .circle(appWidth / 2 - 15, Rhand[9][1], 30)
-                .fill({ color: 0xffffff, alpha: 0.6 });
-
+                .circle(0 + 15, Lhand[9][1], 30)
+                .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                .circle(appWidth / 2 + 15, Lhand[9][1], 30)
+                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+        }
         baseApp.stage.addChild(G);
     }
 
