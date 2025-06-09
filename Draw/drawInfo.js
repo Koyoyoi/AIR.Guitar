@@ -131,18 +131,30 @@ export function drawHand(handData) {
         baseApp.stage.addChild(G);
     }
     else if (playNum == 1) {
-        if (Rhand[0] != undefined)
+        function dist2D(p1, p2) {
+            const dx = p1[0] - p2[0];
+            const dy = p1[1] - p2[1];
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        let Both
+        if (Rhand[0] != undefined && Lhand[0] != undefined)
+            Both = dist2D(Rhand[4], Lhand[4]);
+
+        if (Rhand[0] != undefined) {
+            let right = dist2D(Rhand[4], Rhand[8]) < 50;
             G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
-                .fill({ color: 0xffffff, alpha: 0.6 })
+                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
                 .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
-                .fill({ color: 0xffffff, alpha: 0.6 })
-
-        if (Lhand[0] != undefined)
+                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
+        }
+        if (Lhand[0] != undefined) {
+            let left = dist2D(Lhand[4], Lhand[8]) < 50;
             G.circle(appWidth - Lhand[4][0], Lhand[4][1], 25)
-                .fill({ color: 0xffffff, alpha: 0.6 })
+                .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 })
                 .circle(appWidth - Lhand[8][0], Lhand[8][1], 25)
-                .fill({ color: 0xffffff, alpha: 0.6 });
-
+                .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 });
+        }
         baseApp.stage.addChild(G);
     }
 
