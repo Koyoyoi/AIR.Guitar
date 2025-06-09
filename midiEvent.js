@@ -104,7 +104,7 @@ async function renderNotes() {
             r: 25,
             startTime: offset,
             isReady: i === PREBEATS - 1 ? '唱' : i + 1,
-            color: 0x828282,
+            color: 0xBDC0BA,
             noteType: 0.25
         }]);
         offset += 60 / tempo;
