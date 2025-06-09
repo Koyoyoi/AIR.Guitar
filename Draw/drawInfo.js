@@ -119,7 +119,7 @@ export function drawHand(handData) {
     const G = new PIXI.Graphics();
     const appWidth = baseApp.renderer.width;
 
-    if (playNum == 0 || playNum == 2) {
+    if (playNum == 0) {
         if (Rhand[0] != undefined)
             G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 });
@@ -155,6 +155,25 @@ export function drawHand(handData) {
                 .circle(appWidth - Lhand[8][0], Lhand[8][1], 25)
                 .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 });
         }
+        baseApp.stage.addChild(G);
+    }
+    else if (playNum == 2) {
+        if (Rhand[0] != undefined)
+            G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
+                .fill({ color: 0xffffff, alpha: 0.6 })
+                .circle(appWidth - 15, Rhand[9][1], 30)
+                .fill({ color: 0xffffff, alpha: 0.6 })
+                .circle(appWidth / 2 - 15, Rhand[9][1], 30)
+                .fill({ color: 0xffffff, alpha: 0.6 });
+
+        if (Lhand[0] != undefined)
+            G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
+                .fill({ color: 0xffffff, alpha: 0.6 })
+                .circle(0 + 15, Rhand[9][1], 30)
+                .fill({ color: 0xffffff, alpha: 0.6 })
+                .circle(appWidth / 2 - 15, Rhand[9][1], 30)
+                .fill({ color: 0xffffff, alpha: 0.6 });
+
         baseApp.stage.addChild(G);
     }
 
