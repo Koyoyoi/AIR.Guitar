@@ -162,26 +162,35 @@ export async function drawHand(handData) {
             const dy = p1[1] - p2[1];
             return Math.sqrt(dx * dx + dy * dy);
         }
+        let right = false;
+        let left = false;
+        let bothTouch = false;
+        // 判斷兩手食指是否接觸
+        if (Rhand?.[8] && Lhand?.[8]) {
+            bothTouch = dist2D(Rhand[8], Lhand[8]) < 50;
+        }
 
-        let Both
-        if (Rhand[0] != undefined && Lhand[0] != undefined)
-            Both = dist2D(Rhand[4], Lhand[4]);
-
-        if (Rhand[0] != undefined) {
-            let right = dist2D(Rhand[4], Rhand[8]) < 50;
+        // 判斷右手食指與拇指距離
+        if (Rhand?.[4] && Rhand?.[8]) {
+            right = dist2D(Rhand[4], Rhand[8]) < 50;
+            // 繪製右手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
             G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
                 .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
                 .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
-                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
+                .fill({ color: bothTouch ? 0x00AA90 : (right ? 0x00AA90 : 0xffffff), alpha: 0.5 });
         }
-        if (Lhand[0] != undefined) {
-            let left = dist2D(Lhand[4], Lhand[8]) < 50;
+        // 判斷左手食指與拇指距離
+        if (Lhand?.[4] && Lhand?.[8]) {
+            left = dist2D(Lhand[4], Lhand[8]) < 50;
+            // 繪製左手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
             G.circle(appWidth - Lhand[4][0], Lhand[4][1], 25)
                 .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 })
                 .circle(appWidth - Lhand[8][0], Lhand[8][1], 25)
-                .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 });
+                .fill({ color: bothTouch ? 0x00AA90 : (left ? 0x00AA90 : 0xffffff), alpha: 0.5 });
+
         }
         baseApp.stage.addChild(G);
+
     }
     else if (playNum == 2) {
         if (Rhand[9] != undefined) {

@@ -8,6 +8,8 @@ const PREBEATS = 4;
 const DEFAULT_NOTE = 84;
 const DEFAULT_VELOCITY = 100;
 
+const initLyric = ['預', '備', '起', '唱']
+
 export async function midiProcess(file) {
     resetSeq();
 
@@ -103,9 +105,10 @@ async function renderNotes() {
             d: 60 / tempo,
             r: 25,
             startTime: offset,
-            isReady: i === PREBEATS - 1 ? '唱' : i + 1,
+            isReady: initLyric[i],
             color: 0xBDC0BA,
-            noteType: 0.25
+            noteType: 0.25,
+            readyNote: i + 1
         }]);
         offset += 60 / tempo;
     }
@@ -158,8 +161,9 @@ async function renderNotes() {
             for (let j = 1; j < group.length; j++) {
                 group[j].color = pitchToColor(group[j].note,
                     deltaBeats <= 0.5 ? 'M' :
-                        deltaBeats <= 1 ? 'G' :
-                            deltaBeats <= 2 ? 'B' : 'C'
+                        deltaBeats <= 1 ? 'Y' :
+                            deltaBeats <= 1.5 ? 'G' :
+                                deltaBeats <= 2 ? 'B' : 'C'
                 );
             }
         }

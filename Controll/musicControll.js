@@ -1,16 +1,15 @@
 import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
-import { video } from "../main.js";
-import { predict } from "../SVM.js";
-import { drawGesture, drawFinger } from "../Draw/drawInfo.js";
-import { showAllCtrl, capo } from "./blockControll.js";
-import { handData, poseData } from "../main.js";
+import { showAllCtrl, capo, modeNum } from "./blockControll.js";
+import { drawGesture } from "../Draw/drawInfo.js";
+import { video, handData, poseData } from "../main.js";
 import { rollSeq } from "../Draw/drawMIDI.js";
+import { predict } from "../SVM.js";
 
-let gesture = '', prevGesture = '';               // 手勢相關
-let armAngles = [];                               // 手臂角度
-let action = '', prevAction = '';                 // 動作狀態
-let isPinch = false                               // 指尖觸碰
+let gesture = '', prevGesture = '';                        // 手勢相關
+let armAngles = [];                                        // 手臂角度
+let action = '', prevAction = '';                          // 動作狀態
+let isRPinch = false, isLPinch = false, PinchLR = false    // 指尖觸碰
 let prevRX = null, prevLX = null;
 
 let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];
@@ -34,17 +33,17 @@ export async function chordCtrl() {
 }
 
 // 撥弦控制
-export async function pluckCtrl(mode) {
+export async function pluckCtrl() {
     if (showAllCtrl) return;
 
-    let toPluck = mode == 1 ? ['Right', 'Left'] : ['Right'];
+    let toPluck = modeNum == 1 ? ['Right', 'Left'] : ['Right'];
 
     for (let hand of toPluck) {
         if (handData[hand].length === 0) continue;
 
         [pluck, velocities] = await fingerPlay(handData[hand]);  // 偵測撥弦與速度
 
-        if (mode === 1) {
+        if (modeNum === 1) {
             // ✅ 只判斷拇指與食指是否彎曲
             const bentThumbIndex = pluck.includes(0) && pluck.includes(1);
             const wasBentThumbIndex = prevPluck[hand].includes(0) && prevPluck[hand].includes(1);
@@ -68,8 +67,6 @@ export async function pluckCtrl(mode) {
             }
         }
     }
-
-    drawFinger(handData['Right']);
 }
 
 // 掃弦控制
@@ -113,35 +110,56 @@ export async function strumCtrl() {
     }
 }
 
-let isRPinch = false;
-let isLPinch = false;
-
 export async function pinchCtrl(RHand, LHand) {
-    // 檢查右手 pinch
-    if (RHand?.[4] && RHand?.[8]) {
-        const dx = RHand[4][0] - RHand[8][0];
-        const dy = RHand[4][1] - RHand[8][1];
+
+    // 檢查兩邊食指接觸 (PinchLR)
+    // 假設 RHand[8] 是右手食指尖端，LHand[8] 是左手食指尖端
+    if (RHand?.[8] && LHand?.[8]) {
+        const dx = RHand[8][0] - LHand[8][0];
+        const dy = RHand[8][1] - LHand[8][1];
         const dist = Math.hypot(dx, dy);
-        if (dist < 50 && !isRPinch) {
-            isRPinch = true;
-            rollSeq(); // 右手觸發
-        } else if (dist >= 50 && isRPinch) {
-            isRPinch = false;
+
+        // 您需要為兩手之間食指接觸設定一個不同的距離閾值
+        const indexFingerTouchThreshold = 50; // 根據實際情況調整此值
+
+        if (dist < indexFingerTouchThreshold && !PinchLR) {
+            PinchLR = true;
+            rollSeq();
+        } else if (dist >= indexFingerTouchThreshold && PinchLR) {
+            PinchLR = false;
+
         }
     }
 
-    // 檢查左手 pinch
-    if (LHand?.[4] && LHand?.[8]) {
-        const dx = LHand[4][0] - LHand[8][0];
-        const dy = LHand[4][1] - LHand[8][1];
-        const dist = Math.hypot(dx, dy);
-        if (dist < 50 && !isLPinch) {
-            isLPinch = true;
-            rollSeq(); // 左手觸發
-        } else if (dist >= 50 && isLPinch) {
-            isLPinch = false;
+    if (!PinchLR) {
+
+        // 檢查右手 pinch
+        if (RHand?.[4] && RHand?.[8]) {
+            const dx = RHand[4][0] - RHand[8][0];
+            const dy = RHand[4][1] - RHand[8][1];
+            const dist = Math.hypot(dx, dy);
+            if (dist < 40 && !isRPinch) {
+                isRPinch = true;
+                rollSeq(); // 右手觸發
+            } else if (dist >= 50 && isRPinch) {
+                isRPinch = false;
+            }
+        }
+
+        // 檢查左手 pinch
+        if (LHand?.[4] && LHand?.[8]) {
+            const dx = LHand[4][0] - LHand[8][0];
+            const dy = LHand[4][1] - LHand[8][1];
+            const dist = Math.hypot(dx, dy);
+            if (dist < 40 && !isLPinch) {
+                isLPinch = true;
+                rollSeq(); // 左手觸發
+            } else if (dist >= 50 && isLPinch) {
+                isLPinch = false;
+            }
         }
     }
+
 }
 
 
