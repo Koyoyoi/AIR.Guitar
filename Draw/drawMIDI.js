@@ -1,7 +1,7 @@
 import { midiApp } from "../main.js";
 import { soundSample, guitarStandard, revRootTab, mapRange } from "../sound.js";
 import { modeNum, capo } from "../Controll/blockControll.js";
-import { pitchToColor } from "../midiEvent.js";
+import { pitchToColor, vx } from "../midiEvent.js";
 
 // 序列資料
 export let noteSeq = [];
@@ -17,8 +17,8 @@ let isRolling = false;
 
 // 音高對應數字
 const note7Map = {
-    0: '1', 1: '1', 2: '2', 3: '2', 4: '3', 5: '4',
-    6: '4', 7: '5', 8: '5', 9: '6', 10: '6', 11: '7'
+    0: '1', 1: '1#', 2: '2', 3: '2#', 4: '3', 5: '4',
+    6: '4#', 7: '5', 8: '5#', 9: '6', 10: '6#', 11: '7'
 };
 
 // PIXI 圖
@@ -116,7 +116,7 @@ function drawNote() {
 
         const style = new PIXI.TextStyle({
             fontFamily: 'Arial',
-            fontSize: 40,
+            fontSize: 60,
             fontWeight: 'bold',
             fill: ctrl.x === 185 ? 0xF7C242 : 0xBDC0BA,
             align: 'left',
@@ -124,8 +124,8 @@ function drawNote() {
 
         // 滾動動畫
         if (isRolling && !ctrl.hit) {
-            ctrl.x = (ctrl.x - ctrl.targetX > 25)
-                ? ctrl.x - 25
+            ctrl.x = (ctrl.x - ctrl.targetX > vx)
+                ? ctrl.x - vx
                 : ctrl.targetX;
         }
 
@@ -142,34 +142,34 @@ function drawNote() {
                 .fill({ color: n.color, alpha: 0.2 });
 
             note.circle(ctrl.x, posY, n.r * ctrl.scale)
-                .fill({ color: n.color, alpha: 0.5 });
+                .fill({ color: n.color, alpha: 0.4 });
 
             let decimalPlaces = ctrl.dltB.toString().split(".")[1]?.length || 0;
             let result = ctrl.dltB * Math.pow(10, decimalPlaces);
             if (result % 3 == 0 && decimalPlaces > 0) {
                 note.circle(ctrl.x + n.r + 10, posY + n.r, n.r / 2 * ctrl.scale)
-                    .fill({ color: n.color, alpha: 0.5 });
+                    .fill({ color: n.color, alpha: 0.4 });
             }
 
-            if (!ctrl.hit) {
+            if (i == 1 && !ctrl.hit) {
                 const text = new PIXI.Text({
                     text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
-                    style
+                    style: style,
+                    x: ctrl.x,
+                    y: posY - 100
                 });
                 text.anchor.set(0.5, 0);
-                text.x = ctrl.x;
-                text.y = posY - 60;
                 midiApp.stage.addChild(text);
             }
 
             if (i === group.length - 1 && !ctrl.hit) {
                 const text = new PIXI.Text({
                     text: ctrl.lyric,
-                    style
+                    style: style,
+                    x: ctrl.x,
+                    y: posY + n.r + 10
                 });
                 text.anchor.set(0.5, 0);
-                text.x = ctrl.x;
-                text.y = posY + n.r + 10;
                 midiApp.stage.addChild(text);
             }
 

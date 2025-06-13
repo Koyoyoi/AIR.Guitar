@@ -1,7 +1,7 @@
 import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { mapRange, guitarStandard } from "./sound.js";
 
-export let tempo = 0, songName = "";
+export let tempo = 0, songName = "", vx = 20;
 
 let noteData, arrayBuffer, ticksPerQuarter, groupMap, offset;
 const PREBEATS = 4;
@@ -29,7 +29,7 @@ export async function midiProcess(file) {
         noteData = await mm.blobToNoteSequence(blob);
         noteData.notes.sort((a, b) => a.startTime - b.startTime);
 
-        tempo = noteData.tempos?.[0]?.qpm || 120;
+        tempo = noteData.tempos?.[0]?.qpm || 60;
         ticksPerQuarter = noteData.ticksPerQuarter || 480;
 
         console.log("Tempo:", tempo);
@@ -103,7 +103,7 @@ async function renderNotes() {
             note: DEFAULT_NOTE,
             v: DEFAULT_VELOCITY,
             d: 60 / tempo,
-            r: 25,
+            r: 40,
             startTime: offset,
             isReady: initLyric[i],
             color: 0xBDC0BA,
@@ -113,16 +113,17 @@ async function renderNotes() {
         offset += 60 / tempo;
     }
 
+    let initTime = noteData.notes[0].startTime
     for (const note of noteData.notes) {
         if (note.isDrum || typeof note.startTime !== 'number') continue;
-        const start = note.startTime + offset;
+        const start = note.startTime - initTime + offset;
 
         if (!groupMap.has(start)) groupMap.set(start, []);
         groupMap.get(start).push({
             note: note.pitch,
             v: note.velocity,
             d: note.endTime - note.startTime,
-            r: mapRange(note.velocity, 60, 127, 10, 25),
+            r: mapRange(note.velocity, 60, 127, 20, 50),
             startTime: note.startTime,
             isReady: false,
             color: 0xffffff,
@@ -135,10 +136,10 @@ async function renderNotes() {
         .slice(1)
         .reduce((min, curr, i) => {
             const delta = curr - sortedTimes[i];
-            return delta > 0 && delta < min ? delta : min;
+            return delta > 0 && delta < min ? delta / 60 * tempo : min;
         }, Infinity);
 
-    const pixelPerSec = Math.min(1000, 50 / minDelta);
+    const pixelPerSec = Math.min(1000, 200 / minDelta);
 
     sortedTimes.forEach((time, i) => {
         const group = groupMap.get(time);
@@ -152,10 +153,14 @@ async function renderNotes() {
             scale: 1,
             hit: false,
             x: 185 + time * pixelPerSec,
-            vx: 0,
             targetX: 185 + time * pixelPerSec,
             lyric: group[0].isReady ? `${group[0].isReady}` : ""
         });
+
+
+        if (i == 0) {
+            vx = (nextTime * pixelPerSec - time * pixelPerSec) / (30 * 60 / tempo)
+        }
 
         if (time >= offset) {
             for (let j = 1; j < group.length; j++) {
