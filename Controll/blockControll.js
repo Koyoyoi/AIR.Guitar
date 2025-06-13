@@ -535,7 +535,15 @@ export function onTimeCtrl() {
     // 背景區域
     const labelBase = new PIXI.Graphics()
         .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
-        .fill(0x434343)
+        .fill(isOnTime ? 0x00AA90 : 0x434343)
+
+    labelBase.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h); // 限定互動範圍（可調整）
+    labelBase.interactive = true;
+    labelBase.buttonMode = true;
+    labelBase.on('pointerdown', () => {
+        console.log("✅ onTime控制區被點擊！");
+        isOnTime = !isOnTime
+    });
     uiApp.stage.addChild(labelBase);
 
     // 文字創建方式`
@@ -546,6 +554,6 @@ export function onTimeCtrl() {
     label.anchor.set(0.5);
     label.x = Area.x + Area.w / 2;
     label.y = Area.y + Area.h / 2;
-    uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
 
+    uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
 }

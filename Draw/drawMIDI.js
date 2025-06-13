@@ -1,6 +1,6 @@
 import { midiApp } from "../main.js";
 import { soundSample, guitarStandard, revRootTab, mapRange } from "../sound.js";
-import { modeNum, capo } from "../Controll/blockControll.js";
+import { modeNum, capo, isOnTime } from "../Controll/blockControll.js";
 import { pitchToColor, vx } from "../midiEvent.js";
 
 // 序列資料
@@ -34,10 +34,11 @@ export function resetSeq() {
 
 // 啟動滾動動畫
 export function rollSeq(velocities = 0) {
-    if (!isRolling && modeNum === 1 && noteSeq.length > 0) {
+    if ((!isRolling || isOnTime) && modeNum === 1 && noteSeq.length > 0) {
 
         isRolling = true;
-        let offset = noteSeq.length <= 1 ? 10 : noteSeq[1][0].x - noteSeq[0][0].x;
+        let offset = noteSeq.length <= 1 ? 10 :
+            isOnTime ? noteSeq[1][0].x - 185 : noteSeq[1][0].x - noteSeq[0][0].x;
 
         // set target x
         for (let col = 0; col < noteSeq.length; col++) {
@@ -49,6 +50,7 @@ export function rollSeq(velocities = 0) {
 
         for (let i = 1; i < noteSeq[0].length; i++) {
             const n = noteSeq[0][i];
+            if (noteSeq[0][0].hit) break;
             if (n.v > 0) {
                 soundSample.play(n.note, 0, {
                     gain: velocities === 0 ? n.v / 127 * 3 : pressed_V / 127 * 3,
@@ -72,7 +74,6 @@ export function rollSeq(velocities = 0) {
         }
 
         Object.assign(noteSeq[0][0], { hit: true, scale: 2.5 });
-        noteSeq[0][0].x == 185;
 
     }
 }
@@ -114,7 +115,7 @@ function drawNote() {
             fontFamily: 'Arial',
             fontSize: 60,
             fontWeight: 'bold',
-            fill: ctrl.x === 185 ? 0xF7C242 : 0xBDC0BA,
+            fill: col === 0 ? 0xF7C242 : 0xBDC0BA,
             align: 'left',
         });
 
@@ -165,11 +166,9 @@ function drawNote() {
                 midiApp.stage.addChild(text);
             }
 
-            if (!ctrl.hit) ctrl.scale = Math.max(1, ctrl.scale - 0.2);
         }
 
         if (ctrl.hit) {
-            ctrl.x = 185;
             ctrl.scale -= 0.3;
         }
     }
