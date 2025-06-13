@@ -1,4 +1,4 @@
-import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl, playCtrl, playNum } from "./Controll/blockControll.js";
+import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl, playCtrl, playNum, onTimeCtrl } from "./Controll/blockControll.js";
 import { chordCtrl, pinchCtrl, pluckCtrl, strumCtrl, wavingCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
@@ -105,10 +105,8 @@ async function detectLoop() {
             break;
         case 1:
             drawHand(handData);
-            reloadCtrl();
             drawSongName();
-            touchCtrl();
-            playCtrl();
+          
             break;
         case 2:
             await chordCtrl();

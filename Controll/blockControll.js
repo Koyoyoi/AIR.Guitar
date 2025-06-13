@@ -4,7 +4,7 @@ import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
 export let modeNum = 0, sampleNum = 0, capo = 0, playNum = 0;
-export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
+export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false, isOnTime = false;
 
 let IMGs = {}
 let textStyle = {
@@ -81,6 +81,13 @@ export function settingCtrl() {
         handCtrl();
     } else {
         capoCtrl();
+    }
+
+    if (!showAllCtrl && modeNum == 1) {
+        reloadCtrl();
+        touchCtrl();
+        playCtrl();
+        onTimeCtrl();
     }
 }
 
@@ -511,5 +518,34 @@ export function playCtrl() {
         playNum = (playNum + 1) % playName.length
     });
     uiApp.stage.addChild(chBtn);
+
+}
+
+export function onTimeCtrl() {
+
+    if (showAllCtrl) return
+
+    const Area = {
+        x: uiApp.screen.width - uiApp.screen.width * 0.4,
+        y: uiApp.screen.height - uiApp.screen.height * 0.1,
+        w: uiApp.screen.width * 0.14,
+        h: uiApp.screen.height * 0.08
+    };
+
+    // 背景區域
+    const labelBase = new PIXI.Graphics()
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
+        .fill(0x434343)
+    uiApp.stage.addChild(labelBase);
+
+    // 文字創建方式`
+    const label = new PIXI.Text({
+        text: '即時觸發',
+        style: textStyle['normal']
+    });
+    label.anchor.set(0.5);
+    label.x = Area.x + Area.w / 2;
+    label.y = Area.y + Area.h / 2;
+    uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
 
 }
