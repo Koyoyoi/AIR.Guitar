@@ -473,7 +473,7 @@ export function playCtrl() {
     if (showAllCtrl) return
 
     const Area = {
-        x: uiApp.screen.width - uiApp.screen.width * 0.3,
+        x: uiApp.screen.width - uiApp.screen.width * 0.25,
         y: uiApp.screen.height - uiApp.screen.height * 0.1,
         w: uiApp.screen.width * 0.18,
         h: uiApp.screen.height * 0.08
@@ -498,8 +498,8 @@ export function playCtrl() {
     uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
 
     const chBtn = new PIXI.Sprite(IMGs['change']);
-    chBtn.x = Area.x + Area.w * 2 / 3 + 10;
-    chBtn.y = Area.y + 5;
+    chBtn.x = Area.x + Area.w * 2 / 3 + 20;
+    chBtn.y = Area.y;
     chBtn.width = 50;
     chBtn.height = Area.h;
     // 點擊事件
