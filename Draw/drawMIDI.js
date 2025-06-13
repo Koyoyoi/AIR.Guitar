@@ -56,15 +56,11 @@ export function rollSeq(velocities = 0) {
                 });
             }
 
-            let posY = n.isReady
-                ? midiApp.canvas.height / 2
-                : mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150);
-
             for (let j = 0; j < 5; j++) {
                 effectSeq.push({
                     type: "particle",
                     x: noteSeq[0][0].x,
-                    y: posY,
+                    y: n.y,
                     vx: (Math.random() - 0.5) * 10,
                     vy: (Math.random() - 0.5) * 10,
                     alpha: 1.0,
@@ -134,20 +130,16 @@ function drawNote() {
             const n = group[i];
             if (ctrl.x < 185 || ctrl.x > midiApp.canvas.width) continue;
 
-            let posY = n.isReady
-                ? midiApp.canvas.height / 2
-                : mapRange(n.note, 36, 84, midiApp.canvas.height - 150, 150);
-
-            blur.circle(ctrl.x, posY, n.r * 1.3 * ctrl.scale)
+            blur.circle(ctrl.x, n.y, n.r * 1.3 * ctrl.scale)
                 .fill({ color: n.color, alpha: 0.2 });
 
-            note.circle(ctrl.x, posY, n.r * ctrl.scale)
+            note.circle(ctrl.x, n.y, n.r * ctrl.scale)
                 .fill({ color: n.color, alpha: 0.4 });
 
             let decimalPlaces = ctrl.dltB.toString().split(".")[1]?.length || 0;
             let result = ctrl.dltB * Math.pow(10, decimalPlaces);
             if (result % 3 == 0 && decimalPlaces > 0) {
-                note.circle(ctrl.x + n.r + 10, posY + n.r, n.r / 2 * ctrl.scale)
+                note.circle(ctrl.x + n.r + 10, n.y + n.r, n.r / 2 * ctrl.scale)
                     .fill({ color: n.color, alpha: 0.4 });
             }
 
@@ -156,7 +148,7 @@ function drawNote() {
                     text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
                     style: style,
                     x: ctrl.x,
-                    y: posY - 100
+                    y: n.y - 100
                 });
                 text.anchor.set(0.5, 0);
                 midiApp.stage.addChild(text);
@@ -167,7 +159,7 @@ function drawNote() {
                     text: ctrl.lyric,
                     style: style,
                     x: ctrl.x,
-                    y: posY + n.r + 10
+                    y: n.y + n.r + 10
                 });
                 text.anchor.set(0.5, 0);
                 midiApp.stage.addChild(text);

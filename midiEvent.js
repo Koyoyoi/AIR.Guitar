@@ -1,5 +1,6 @@
 import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { mapRange, guitarStandard } from "./sound.js";
+import { midiApp } from "./main.js";
 
 export let tempo = 0, songName = "", vx = 20;
 
@@ -103,6 +104,7 @@ async function renderNotes() {
             note: DEFAULT_NOTE,
             v: DEFAULT_VELOCITY,
             d: 60 / tempo,
+            y:  midiApp.canvas.height / 2,
             r: 40,
             startTime: offset,
             isReady: initLyric[i],
@@ -123,6 +125,7 @@ async function renderNotes() {
             note: note.pitch,
             v: note.velocity,
             d: note.endTime - note.startTime,
+            y: mapRange(note.pitch, 48, 84, midiApp.canvas.height - 150, 150),
             r: mapRange(note.velocity, 60, 127, 20, 50),
             startTime: note.startTime,
             isReady: false,
