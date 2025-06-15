@@ -1,4 +1,4 @@
-import { settingCtrl, loadImg, modeNum, reloadCtrl, touchCtrl, playCtrl, playNum, onTimeCtrl } from "./Controll/blockControll.js";
+import { settingCtrl, loadImg, modeNum, playNum, } from "./Controll/blockControll.js";
 import { chordCtrl, pinchCtrl, pluckCtrl, strumCtrl, wavingCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
@@ -70,7 +70,7 @@ async function setupCamera() {
 function setupFileUpload() {
     document.getElementById("file-upload").addEventListener("change", async (event) => {
         const file = event.target.files[0];
-        if (!file || modeNum === 0) return;
+        if (!file) return;
         await midiProcess(file);
     });
 }
@@ -85,31 +85,30 @@ async function detectLoop() {
     await detectHand();
     await detectPose();
 
-    await strumCtrl();
     await pluckCtrl(modeNum);
-
-    if (modeNum === 1) {
-        if (playNum === 1) {
-            await pinchCtrl(handData['Right'], handData['Left']);
-        } else if (playNum === 2) {
-            await wavingCtrl(handData['Right'], handData['Left']);
-        }
-    }
 
     settingCtrl();
 
     switch (modeNum) {
         case 0:
             await chordCtrl();
+            await strumCtrl();
             drawFinger(handData['Right']);
             break;
         case 1:
             drawHand(handData);
             drawSongName();
-          
+            if (playNum === 1) {
+                await pinchCtrl(handData['Right'], handData['Left']);
+            } else if (playNum === 2) {
+                await wavingCtrl(handData['Right'], handData['Left']);
+            }
             break;
         case 2:
+            drawSongName();
             await chordCtrl();
+            await pinchCtrl(handData['Right']);
+            await wavingCtrl(handData['Right'])
             break;
     }
 

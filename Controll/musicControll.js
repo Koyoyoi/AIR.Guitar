@@ -1,4 +1,4 @@
-import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
+import { buildGuitarChord, plucking, strumming, mapRange} from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
 import { showAllCtrl, capo, modeNum } from "./blockControll.js";
 import { drawGesture } from "../Draw/drawInfo.js";
@@ -6,11 +6,14 @@ import { video, handData, poseData } from "../main.js";
 import { rollSeq } from "../Draw/drawMIDI.js";
 import { predict } from "../SVM.js";
 
-let gesture = '', prevGesture = '';                        // 手勢相關
+export let gesture = '', prevGesture = '';                        // 手勢相關
+
 let armAngles = [];                                        // 手臂角度
 let action = '', prevAction = '';                          // 動作狀態
 let isRPinch = false, isLPinch = false, PinchLR = false    // 指尖觸碰
+let triggeredBy = null;                                    // "R" 或 "L"：記錄目前由哪隻手觸發中
 let prevRX = null, prevLX = null;
+let prevRY = null;
 
 let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];
 
@@ -30,6 +33,7 @@ export async function chordCtrl() {
 
     // 繪製手勢
     drawGesture(gesture, capo);
+
 }
 
 // 撥弦控制
@@ -162,29 +166,60 @@ export async function pinchCtrl(RHand, LHand) {
 
 }
 
-
 export async function wavingCtrl(RHand, LHand) {
-    const LmidX = video.videoWidth / 4 * 3;
-    const RmidX = video.videoWidth / 4
-    // 右手判斷
-    if (RHand?.[0]) {
-        const currentRX = RHand[9][0];
-        if (prevRX !== null) {
-            if ((prevRX < RmidX && currentRX >= RmidX) || (prevRX >= RmidX && currentRX < RmidX)) {
-                rollSeq();
+    if (modeNum === 1) {
+        const midX = video.videoWidth / 2;
+
+        // 右手判斷
+        if (RHand?.[0]) {
+            const currentRX = RHand[9][0];
+            if (prevRX !== null) {
+                if ((prevRX < midX && currentRX >= midX) || (prevRX >= midX && currentRX < midX)) {
+                    if (triggeredBy === null || triggeredBy === "R") {
+                        triggeredBy = "R";
+                        rollSeq();
+                    }
+                }
             }
+            prevRX = currentRX;
+        } else if (triggeredBy === "R") {
+            triggeredBy = null; // 右手離開畫面，解除限制
         }
-        prevRX = currentRX;
+
+        // 左手判斷
+        if (LHand?.[0]) {
+            const currentLX = LHand[9][0];
+            if (prevLX !== null) {
+                if ((prevLX < midX && currentLX >= midX) || (prevLX >= midX && currentLX < midX)) {
+                    if (triggeredBy === null || triggeredBy === "L") {
+                        triggeredBy = "L";
+                        rollSeq();
+                    }
+                }
+            }
+            prevLX = currentLX;
+        } else if (triggeredBy === "L") {
+            triggeredBy = null; // 左手離開畫面，解除限制
+        }
+    }
+    else if (modeNum === 2) {
+        const midY = video.videoHeight / 2;
+
+        if (RHand?.[0]) {
+            const currentRY = RHand[9][1];
+
+            if (prevRY !== null) {
+                const crossedY = (prevRY < midY && currentRY >= midY) || (prevRY >= midY && currentRY < midY);
+                if (crossedY && (triggeredBy === null || triggeredBy === "R")) {
+                    triggeredBy = "R";
+                    rollSeq('Down');
+                }
+            }
+
+            prevRY = currentRY;
+        } else if (triggeredBy === "R") {
+            triggeredBy = null;
+        }
     }
 
-    // 左手判斷
-    if (LHand?.[0]) {
-        const currentLX = LHand[9][0];
-        if (prevLX !== null) {
-            if ((prevLX < LmidX && currentLX >= LmidX) || (prevLX >= LmidX && currentLX < LmidX)) {
-                rollSeq();
-            }
-        }
-        prevLX = currentLX;
-    }
 }

@@ -131,7 +131,10 @@ export function drawSongName() {
 
     text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
     text.x = baseApp.renderer.width / 2; // 畫面水平中心
-    text.y = 15;
+    if (modeNum == 1)
+        text.y = 15;
+    else if(modeNum == 2)
+        text.y = baseApp.canvas.height - 80
 
     baseApp.stage.addChild(text);
 }
@@ -194,22 +197,26 @@ export async function drawHand(handData) {
     }
     else if (playNum == 2) {
         if (Rhand[9] != undefined) {
-            let closeMid = appWidth / 2 - Rhand[9][0] < Rhand[9][0] ? true : false;
+            let closeMid = appWidth / 2 - Rhand[9][0] < Rhand[9][0] - appWidth / 2 ? true : false;
             G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 })
-                .circle(appWidth - 15, Rhand[9][1], 30)
+                .circle(appWidth, Rhand[9][1], 30)
                 .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .circle(appWidth / 2 + 15, Rhand[9][1], 30)
-                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+                .circle(0, Rhand[9][1], 30)
+                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                .roundRect(appWidth / 2, Rhand[9][1] - 15, 4, 30)
+                .fill(0xffffff);
         }
         if (Lhand[9] != undefined) {
-            let closeMid = Lhand[9][0] - appWidth / 2 < appWidth - Lhand[9][0] ? true : false;
+            let closeMid = Lhand[9][0] - appWidth / 2 < appWidth / 2 - Lhand[9][0] ? true : false;
             G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 })
-                .circle(0 + 15, Lhand[9][1], 30)
+                .circle(0, Lhand[9][1], 30)
                 .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .circle(appWidth / 2 - 15, Lhand[9][1], 30)
-                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+                .circle(appWidth, Lhand[9][1], 30)
+                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                .roundRect(appWidth / 2, Lhand[9][1] - 15, 10, 60)
+                .fill(0xffffff);
         }
         baseApp.stage.addChild(G);
     }

@@ -1,7 +1,8 @@
 import { midiApp } from "../main.js";
-import { soundSample, guitarStandard, revRootTab, mapRange } from "../sound.js";
+import { soundSample, guitarStandard, revRootTab, mapRange, note7Map, rootTab, guitarChord } from "../sound.js";
 import { modeNum, capo, isOnTime } from "../Controll/blockControll.js";
 import { pitchToColor, vx } from "../midiEvent.js";
+import { gesture } from "../Controll/musicControll.js";
 
 // 序列資料
 export let noteSeq = [];
@@ -15,11 +16,6 @@ let lastFpsUpdate = lastTime;
 let fps = 0;
 let isRolling = false;
 
-// 音高對應數字
-const note7Map = {
-    0: '1', 1: '1#', 2: '2', 3: '2#', 4: '3', 5: '4',
-    6: '4#', 7: '5', 8: '5#', 9: '6', 10: '6#', 11: '7'
-};
 
 // PIXI 圖
 const note = new PIXI.Graphics();
@@ -33,8 +29,10 @@ export function resetSeq() {
 }
 
 // 啟動滾動動畫
-export function rollSeq(velocities = 0) {
-    if ((!isRolling || isOnTime) && modeNum === 1 && noteSeq.length > 0) {
+export async function rollSeq(velocities = 0) {
+    if (noteSeq.length <= 0) return
+
+    if ((!isRolling || isOnTime) && modeNum === 1) {
 
         isRolling = true;
         let offset = noteSeq.length <= 1 ? 10 :
@@ -76,6 +74,44 @@ export function rollSeq(velocities = 0) {
         Object.assign(noteSeq[0][0], { hit: true, scale: 2.5 });
 
     }
+    else if (modeNum === 2) {
+        let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[noteSeq[0][1].note % 12][0]
+        if (isEqual) {
+
+            let noteGroup = noteSeq[0]
+            noteSeq.shift(); // 移除第一個 object
+            if (velocities == 'Down') {
+                function sleep(ms) {
+                    return new Promise(resolve => setTimeout(resolve, ms));
+                }
+                let v = noteGroup[1].v
+                let d = noteGroup[1].d
+                for (let i = 0; i < guitarChord.length; i++) {
+                    soundSample.play(guitarChord[i], 0, {
+                        gain: v / 127 * 3,
+                        duration: modeNum === 2 ? 2 : d
+
+                    });
+                    await sleep(100); // 等待 10 毫秒
+                }
+                
+            }
+            else {
+                for (let i = 1; i < noteGroup.length; i++) {
+                    const n = noteGroup[i];
+
+                    if (n.v > 0) {
+                        soundSample.play(n.note, 0, {
+                            gain: n.v / 127 * 3,
+                            duration: modeNum === 2 ? 2 : n.d
+                        });
+                    }
+                }
+
+            }
+
+        }
+    }
 }
 
 // 主動畫迴圈
@@ -90,14 +126,53 @@ export function midiDrawLoop(now) {
 
     midiApp.stage.removeChildren();
 
-    if (modeNum === 1) {
+    if (modeNum === 0) {
+        drawString();
+    }
+    else if (modeNum === 1) {
         drawEffects();
         drawNote();
-    } else {
-        drawString();
+    }
+    else if (modeNum === 2) {
+        drawNext();
     }
 
     requestAnimationFrame(midiDrawLoop);
+}
+
+function drawNext() {
+    if (noteSeq.length <= 0) return;
+
+    while (noteSeq[0][1].readyNote) {
+        noteSeq.shift();
+    }
+
+    for (let i = 0; i < 5; i++) {
+
+        if (noteSeq[i] == undefined) break
+
+        let ctrl = noteSeq[i][0]
+        let n = noteSeq[i][1]
+
+        const style = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 100,
+            fontWeight: 'bold',
+            fill: i == 0 ? 0xF7C242 : 0xBDC0BA,
+            align: 'left',
+        });
+
+        if (!ctrl.hit) {
+            const text = new PIXI.Text({
+                text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
+                style: style,
+                x: midiApp.canvas.width / 2 + i * 200,
+                y: 25
+            });
+            text.anchor.set(0.5, 0);
+            midiApp.stage.addChild(text);
+        }
+    }
 }
 
 // 音符繪製

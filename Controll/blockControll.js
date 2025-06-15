@@ -83,12 +83,18 @@ export function settingCtrl() {
         capoCtrl();
     }
 
-    if (!showAllCtrl && modeNum == 1) {
-        reloadCtrl();
-        touchCtrl();
-        playCtrl();
-        onTimeCtrl();
+    if (!showAllCtrl) {
+        if (modeNum == 1) {
+            reloadCtrl();
+            touchCtrl();
+            playCtrl();
+            onTimeCtrl();
+        }
+        else if (modeNum == 2) {
+            reloadCtrl();
+        }
     }
+
 }
 
 // Mode 控制區域
@@ -191,6 +197,7 @@ export function midiPortCtrl() {
     });
 
 }
+
 // SoundFont 控制區域
 export async function sampleCtrl() {
     // 區域大小設定

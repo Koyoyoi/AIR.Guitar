@@ -16,6 +16,12 @@ export const instruments = [
     "distortion_guitar",
     "guitar_harmonics"
 ];
+
+// 音高對應數字
+export const note7Map = {
+    0: '1', 1: '1#', 2: '2', 3: '2#', 4: '3', 5: '4',
+    6: '4#', 7: '5', 8: '5#', 9: '6', 10: '6#', 11: '7'
+};
 // 根音對應表
 export const rootTab = {
     "C": 0, "C#": 1, "D": 2, "D#": 3, "E": 4, "F": 5,

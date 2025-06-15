@@ -2,9 +2,9 @@ import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { mapRange, guitarStandard } from "./sound.js";
 import { midiApp } from "./main.js";
 
-export let tempo = 0, songName = "", vx = 20;
+export let tempo = 0, songName = "", vx = 0, noteData
 
-let noteData, arrayBuffer, ticksPerQuarter, groupMap, offset;
+let  arrayBuffer, ticksPerQuarter, groupMap, offset;
 const PREBEATS = 4;
 const DEFAULT_NOTE = 84;
 const DEFAULT_VELOCITY = 100;
