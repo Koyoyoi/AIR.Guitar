@@ -1,4 +1,4 @@
-import { buildGuitarChord, plucking, strumming, mapRange} from "../sound.js";
+import { buildGuitarChord, plucking, strumming, mapRange } from "../sound.js";
 import { compute, vectorAngle, vectorCompute, fingerPlay } from "../handCompute.js";
 import { showAllCtrl, capo, modeNum } from "./blockControll.js";
 import { drawGesture } from "../Draw/drawInfo.js";
@@ -209,8 +209,8 @@ export async function wavingCtrl(RHand, LHand) {
             const currentRY = RHand[9][1];
 
             if (prevRY !== null) {
-                const crossedY = (prevRY < midY && currentRY >= midY) || (prevRY >= midY && currentRY < midY);
-                if (crossedY && (triggeredBy === null || triggeredBy === "R")) {
+                const crossedDown = prevRY < midY && currentRY >= midY;  // 只由上往下
+                if (crossedDown && (triggeredBy === null || triggeredBy === "R")) {
                     triggeredBy = "R";
                     rollSeq('Down');
                 }
@@ -219,6 +219,7 @@ export async function wavingCtrl(RHand, LHand) {
             prevRY = currentRY;
         } else if (triggeredBy === "R") {
             triggeredBy = null;
+            prevRY = null;
         }
     }
 

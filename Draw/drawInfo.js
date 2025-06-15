@@ -133,7 +133,7 @@ export function drawSongName() {
     text.x = baseApp.renderer.width / 2; // 畫面水平中心
     if (modeNum == 1)
         text.y = 15;
-    else if(modeNum == 2)
+    else if (modeNum == 2)
         text.y = baseApp.canvas.height - 80
 
     baseApp.stage.addChild(text);
@@ -144,78 +144,96 @@ export async function drawHand(handData) {
     const Lhand = handData['Left'];
     const G = new PIXI.Graphics();
     const appWidth = baseApp.renderer.width;
+    const appHeight = baseApp.renderer.height;
     let Rpluck, Lpluck, velocities;
 
-    if (playNum == 0) {
-        if (Rhand[0] != undefined) {
-            [Rpluck, velocities] = await fingerPlay(Rhand);  // 偵測撥弦與速度
-            G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
-                .fill({ color: Rpluck.includes(1) && Rpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+    if (modeNum == 1) {
+        if (playNum == 0) {
+            if (Rhand[0] != undefined) {
+                [Rpluck, velocities] = await fingerPlay(Rhand);  // 偵測撥弦與速度
+                G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
+                    .fill({ color: Rpluck.includes(1) && Rpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+            }
+            if (Lhand[0] != undefined) {
+                [Lpluck, velocities] = await fingerPlay(Lhand);  // 偵測撥弦與速度
+                G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
+                    .fill({ color: Lpluck.includes(1) && Lpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+            }
+            baseApp.stage.addChild(G);
         }
-        if (Lhand[0] != undefined) {
-            [Lpluck, velocities] = await fingerPlay(Lhand);  // 偵測撥弦與速度
-            G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
-                .fill({ color: Lpluck.includes(1) && Lpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+        else if (playNum == 1) {
+            function dist2D(p1, p2) {
+                const dx = p1[0] - p2[0];
+                const dy = p1[1] - p2[1];
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            let right = false;
+            let left = false;
+            let bothTouch = false;
+            // 判斷兩手食指是否接觸
+            if (Rhand?.[8] && Lhand?.[8]) {
+                bothTouch = dist2D(Rhand[8], Lhand[8]) < 50;
+            }
+
+            // 判斷右手食指與拇指距離
+            if (Rhand?.[4] && Rhand?.[8]) {
+                right = dist2D(Rhand[4], Rhand[8]) < 50;
+                // 繪製右手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
+                G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
+                    .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
+                    .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
+                    .fill({ color: bothTouch ? 0x00AA90 : (right ? 0x00AA90 : 0xffffff), alpha: 0.5 });
+            }
+            // 判斷左手食指與拇指距離
+            if (Lhand?.[4] && Lhand?.[8]) {
+                left = dist2D(Lhand[4], Lhand[8]) < 50;
+                // 繪製左手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
+                G.circle(appWidth - Lhand[4][0], Lhand[4][1], 25)
+                    .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 })
+                    .circle(appWidth - Lhand[8][0], Lhand[8][1], 25)
+                    .fill({ color: bothTouch ? 0x00AA90 : (left ? 0x00AA90 : 0xffffff), alpha: 0.5 });
+
+            }
+            baseApp.stage.addChild(G);
+
         }
-        baseApp.stage.addChild(G);
+        else if (playNum == 2) {
+            if (Rhand[9] != undefined) {
+                let closeMid = appWidth / 2 - Rhand[9][0] < Rhand[9][0] - appWidth / 2 ? true : false;
+                G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
+                    .fill({ color: 0xffffff, alpha: 0.6 })
+                    .circle(appWidth, Rhand[9][1], 30)
+                    .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                    .circle(0, Rhand[9][1], 30)
+                    .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                    .roundRect(appWidth / 2, Rhand[9][1] - 30, 10, 60)
+                    .fill(0xffffff);
+            }
+            if (Lhand[9] != undefined) {
+                let closeMid = Lhand[9][0] - appWidth / 2 < appWidth / 2 - Lhand[9][0] ? true : false;
+                G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
+                    .fill({ color: 0xffffff, alpha: 0.6 })
+                    .circle(0, Lhand[9][1], 30)
+                    .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                    .circle(appWidth, Lhand[9][1], 30)
+                    .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                    .roundRect(appWidth / 2, Lhand[9][1] - 30, 10, 60)
+                    .fill(0xffffff);
+            }
+            baseApp.stage.addChild(G);
+        }
     }
-    else if (playNum == 1) {
-        function dist2D(p1, p2) {
-            const dx = p1[0] - p2[0];
-            const dy = p1[1] - p2[1];
-            return Math.sqrt(dx * dx + dy * dy);
-        }
-        let right = false;
-        let left = false;
-        let bothTouch = false;
-        // 判斷兩手食指是否接觸
-        if (Rhand?.[8] && Lhand?.[8]) {
-            bothTouch = dist2D(Rhand[8], Lhand[8]) < 50;
-        }
+    else if (modeNum == 2) {
 
-        // 判斷右手食指與拇指距離
-        if (Rhand?.[4] && Rhand?.[8]) {
-            right = dist2D(Rhand[4], Rhand[8]) < 50;
-            // 繪製右手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
-            G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
-                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
-                .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
-                .fill({ color: bothTouch ? 0x00AA90 : (right ? 0x00AA90 : 0xffffff), alpha: 0.5 });
-        }
-        // 判斷左手食指與拇指距離
-        if (Lhand?.[4] && Lhand?.[8]) {
-            left = dist2D(Lhand[4], Lhand[8]) < 50;
-            // 繪製左手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
-            G.circle(appWidth - Lhand[4][0], Lhand[4][1], 25)
-                .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 })
-                .circle(appWidth - Lhand[8][0], Lhand[8][1], 25)
-                .fill({ color: bothTouch ? 0x00AA90 : (left ? 0x00AA90 : 0xffffff), alpha: 0.5 });
-
-        }
-        baseApp.stage.addChild(G);
-
-    }
-    else if (playNum == 2) {
         if (Rhand[9] != undefined) {
-            let closeMid = appWidth / 2 - Rhand[9][0] < Rhand[9][0] - appWidth / 2 ? true : false;
+            let closeTop = Rhand[9][1] < appHeight - Rhand[9][1] ? true : false;
             G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 })
-                .circle(appWidth, Rhand[9][1], 30)
-                .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .circle(0, Rhand[9][1], 30)
-                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .roundRect(appWidth / 2, Rhand[9][1] - 15, 4, 30)
-                .fill(0xffffff);
-        }
-        if (Lhand[9] != undefined) {
-            let closeMid = Lhand[9][0] - appWidth / 2 < appWidth / 2 - Lhand[9][0] ? true : false;
-            G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
-                .fill({ color: 0xffffff, alpha: 0.6 })
-                .circle(0, Lhand[9][1], 30)
-                .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .circle(appWidth, Lhand[9][1], 30)
-                .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .roundRect(appWidth / 2, Lhand[9][1] - 15, 10, 60)
+                .circle(appWidth - Rhand[9][0], 0, 30)
+                .fill({ color: closeTop ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                .circle(appWidth - Rhand[9][0], appHeight, 30)
+                .fill({ color: !closeTop ? 0x00AA90 : 0xffffff, alpha: 0.6 })
+                .roundRect(appWidth  - Rhand[9][0] - 30, appHeight / 2, 60, 10)
                 .fill(0xffffff);
         }
         baseApp.stage.addChild(G);

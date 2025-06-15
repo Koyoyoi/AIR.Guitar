@@ -106,6 +106,7 @@ async function detectLoop() {
             break;
         case 2:
             drawSongName();
+            drawHand(handData);
             await chordCtrl();
             await pinchCtrl(handData['Right']);
             await wavingCtrl(handData['Right'])
