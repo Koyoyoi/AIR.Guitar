@@ -1,8 +1,8 @@
-import { midiApp } from "../main.js";
 import { soundSample, guitarStandard, revRootTab, mapRange, note7Map, rootTab, guitarChord } from "../sound.js";
 import { modeNum, capo, isOnTime } from "../Controll/blockControll.js";
 import { pitchToColor, vx } from "../midiEvent.js";
 import { gesture } from "../Controll/musicControll.js";
+import { midiApp } from "../main.js";
 
 // 序列資料
 export let noteSeq = [];

@@ -85,20 +85,22 @@ async function detectLoop() {
     await detectHand();
     await detectPose();
 
-    await pluckCtrl(modeNum);
-
     settingCtrl();
 
     switch (modeNum) {
         case 0:
             await chordCtrl();
             await strumCtrl();
+            await pluckCtrl();
             drawFinger(handData['Right']);
             break;
         case 1:
             drawHand(handData);
             drawSongName();
-            if (playNum === 1) {
+            if (playNum == 0) {
+                await pluckCtrl();
+            }
+            else if (playNum === 1) {
                 await pinchCtrl(handData['Right'], handData['Left']);
             } else if (playNum === 2) {
                 await wavingCtrl(handData['Right'], handData['Left']);
@@ -123,11 +125,6 @@ async function detectLoop() {
 
 // --- 主程式初始化 ---
 async function main() {
-    if (typeof mm === "undefined") {
-        console.error("Magenta.js 未正確載入！");
-        return;
-    }
-
     await loadImg();
     await setupMediaPipe();
     await load_SVM_Model();

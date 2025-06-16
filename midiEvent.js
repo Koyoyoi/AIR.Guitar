@@ -2,9 +2,9 @@ import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { mapRange, guitarStandard } from "./sound.js";
 import { midiApp } from "./main.js";
 
-export let tempo = 0, songName = "", vx = 0, noteData
+export let tempo = 0, songName = "", vx = 0;
 
-let  arrayBuffer, ticksPerQuarter, groupMap, offset;
+let arrayBuffer, ticksPerQuarter, groupMap, offset;
 const PREBEATS = 4;
 const DEFAULT_NOTE = 84;
 const DEFAULT_VELOCITY = 100;
@@ -16,7 +16,6 @@ export async function midiProcess(file) {
 
     if (file == undefined) {
         alert("尚未載入 MIDI 檔案！");
-
     }
 
     else {
@@ -104,7 +103,7 @@ async function renderNotes() {
             note: DEFAULT_NOTE,
             v: DEFAULT_VELOCITY,
             d: 60 / tempo,
-            y:  midiApp.canvas.height / 2,
+            y: midiApp.canvas.height / 2,
             r: 40,
             startTime: offset,
             isReady: initLyric[i],
@@ -159,10 +158,7 @@ async function renderNotes() {
             lyric: group[0].isReady ? `${group[0].isReady}` : ""
         });
 
-
-        if (i == 0) {
-            vx = (nextTime * pixelPerSec - time * pixelPerSec) / (30 * 60 / tempo)
-        }
+        if (i == 0) { vx = (nextTime * pixelPerSec - time * pixelPerSec) / (30 * 60 / tempo) }
 
         if (time >= offset) {
             for (let j = 1; j < group.length; j++) {

@@ -30,7 +30,7 @@ let textStyle = {
         align: "center"
     })
 }
-const modeName = ["自由演奏", "歌曲演奏", "揮動演奏"];
+const modeName = ["自由演奏", "歌曲演奏", "數字演奏"];
 const playName = ["彎曲手指", "雙指互碰", "手部揮動"]
 
 // 載入圖片

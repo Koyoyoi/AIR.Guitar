@@ -6,7 +6,7 @@ import { video, handData, poseData } from "../main.js";
 import { rollSeq } from "../Draw/drawMIDI.js";
 import { predict } from "../SVM.js";
 
-export let gesture = '', prevGesture = '';                        // 手勢相關
+export let gesture = '', prevGesture = '';                 // 手勢相關
 
 let armAngles = [];                                        // 手臂角度
 let action = '', prevAction = '';                          // 動作狀態
@@ -33,7 +33,6 @@ export async function chordCtrl() {
 
     // 繪製手勢
     drawGesture(gesture, capo);
-
 }
 
 // 撥弦控制
@@ -117,21 +116,16 @@ export async function strumCtrl() {
 export async function pinchCtrl(RHand, LHand) {
 
     // 檢查兩邊食指接觸 (PinchLR)
-    // 假設 RHand[8] 是右手食指尖端，LHand[8] 是左手食指尖端
     if (RHand?.[8] && LHand?.[8]) {
         const dx = RHand[8][0] - LHand[8][0];
         const dy = RHand[8][1] - LHand[8][1];
         const dist = Math.hypot(dx, dy);
 
-        // 您需要為兩手之間食指接觸設定一個不同的距離閾值
-        const indexFingerTouchThreshold = 50; // 根據實際情況調整此值
-
-        if (dist < indexFingerTouchThreshold && !PinchLR) {
+        if (dist < 50 && !PinchLR) {
             PinchLR = true;
             rollSeq();
-        } else if (dist >= indexFingerTouchThreshold && PinchLR) {
+        } else if (dist >= 50 && PinchLR) {
             PinchLR = false;
-
         }
     }
 
