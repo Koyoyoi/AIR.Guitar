@@ -80,7 +80,7 @@ async function detectLoop() {
     baseApp.stage.removeChildren();
     uiApp.stage.removeChildren();
     baseApp.stage.addChild(videoSprite);
-    if (modeNum === 1) baseApp.stage.addChild(overlay);
+    if (modeNum === 1 || modeNum === 2) baseApp.stage.addChild(overlay);
 
     await detectHand();
     await detectPose();

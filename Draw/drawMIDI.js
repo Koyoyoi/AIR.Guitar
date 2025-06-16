@@ -10,7 +10,7 @@ export let lyricSeq = [];
 export let stringSeq = new Array(6).fill(null).map(() => ({ note: null, alpha: 0 }));
 
 // 特效序列與狀態控制
-let effectSeq = [];
+let effectSeq = { 'scale': [], 'spike': [] };
 let lastTime = performance.now();
 let lastFpsUpdate = lastTime;
 let fps = 0;
@@ -48,7 +48,7 @@ export async function rollSeq(velocities = 0) {
 
         for (let i = 1; i < noteSeq[0].length; i++) {
             const n = noteSeq[0][i];
-            if (noteSeq[0][0].hit) break;
+
             if (n.v > 0) {
                 soundSample.play(n.note, 0, {
                     gain: velocities === 0 ? n.v / 127 * 3 : pressed_V / 127 * 3,
@@ -56,8 +56,15 @@ export async function rollSeq(velocities = 0) {
                 });
             }
 
+            effectSeq['scale'].push({
+                x: noteSeq[0][0].x,
+                y: n.y,
+                r: n.r * 2.5,
+                color: n.color
+            });
+
             for (let j = 0; j < 5; j++) {
-                effectSeq.push({
+                effectSeq['spike'].push({
                     type: "particle",
                     x: noteSeq[0][0].x,
                     y: n.y,
@@ -70,9 +77,7 @@ export async function rollSeq(velocities = 0) {
                 });
             }
         }
-
-        Object.assign(noteSeq[0][0], { hit: true, scale: 2.5 });
-
+        noteSeq.shift();
     }
     else if (modeNum === 2) {
         let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[noteSeq[0][1].note % 12][0]
@@ -94,7 +99,7 @@ export async function rollSeq(velocities = 0) {
                     });
                     await sleep(100); // 等待 10 毫秒
                 }
-                
+
             }
             else {
                 for (let i = 1; i < noteGroup.length; i++) {
@@ -162,16 +167,14 @@ function drawNext() {
             align: 'left',
         });
 
-        if (!ctrl.hit) {
-            const text = new PIXI.Text({
-                text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
-                style: style,
-                x: midiApp.canvas.width / 2 + i * 200,
-                y: 25
-            });
-            text.anchor.set(0.5, 0);
-            midiApp.stage.addChild(text);
-        }
+        const text = new PIXI.Text({
+            text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
+            style: style,
+            x: midiApp.canvas.width / 2 + i * 200,
+            y: 25
+        });
+        text.anchor.set(0.5, 0);
+        midiApp.stage.addChild(text);
     }
 }
 
@@ -195,10 +198,8 @@ function drawNote() {
         });
 
         // 滾動動畫
-        if (isRolling && !ctrl.hit) {
-            ctrl.x = (ctrl.x - ctrl.targetX > vx)
-                ? ctrl.x - vx
-                : ctrl.targetX;
+        if (isRolling) {
+            ctrl.x = (ctrl.x - ctrl.targetX > vx) ? ctrl.x - vx : ctrl.targetX;
         }
 
         // 繪製群組音符與歌詞
@@ -219,7 +220,7 @@ function drawNote() {
                     .fill({ color: n.color, alpha: 0.4 });
             }
 
-            if (i == 1 && !ctrl.hit) {
+            if (i == 1) {
                 const text = new PIXI.Text({
                     text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
                     style: style,
@@ -230,7 +231,7 @@ function drawNote() {
                 midiApp.stage.addChild(text);
             }
 
-            if (i === group.length - 1 && !ctrl.hit) {
+            if (i === group.length - 1) {
                 const text = new PIXI.Text({
                     text: ctrl.lyric,
                     style: style,
@@ -242,22 +243,13 @@ function drawNote() {
             }
 
         }
-
-        if (ctrl.hit) {
-            ctrl.scale -= 0.3;
-        }
-    }
-
-    // 移除觸發後的音符
-    if (noteSeq.length > 0 && noteSeq[0][0].hit && noteSeq[0][0].scale < 0) {
-        noteSeq.splice(0, 1);
     }
 
     midiApp.stage.addChild(blur);
     midiApp.stage.addChild(note);
 
     // 停止滾動條件
-    if (isRolling && noteSeq.length > 0 && noteSeq[0][0].x === 185 && !noteSeq[0][0].hit) {
+    if (isRolling && noteSeq.length > 0 && noteSeq[0][0].x === 185) {
         isRolling = false;
     }
 }
@@ -266,8 +258,20 @@ function drawNote() {
 function drawEffects() {
     effect.clear();
 
-    for (let i = effectSeq.length - 1; i >= 0; i--) {
-        const e = effectSeq[i];
+    for (let i = 0; i < effectSeq['scale'].length; i++) {
+        const e = effectSeq['scale'][i];
+        e.r *= 0.9;
+
+        effect.circle(e.x, e.y, e.r)
+            .fill({ color: e.color, alpha: 0.5 });
+
+        if (e.r < 0) {
+            effectSeq['scale'].splice(i, 1);
+        }
+    }
+
+    for (let i = effectSeq['spike'].length - 1; i >= 0; i--) {
+        const e = effectSeq['spike'][i];
         if (e.type === "particle") {
             e.x += e.vx;
             e.y += e.vy;
@@ -275,11 +279,11 @@ function drawEffects() {
             e.radius *= 0.96;
             e.life--;
 
-            effect.circle(e.x, e.y, e.radius || 5)
-                .fill({ color: e.color || 0xffcc33, alpha: e.alpha });
+            effect.circle(e.x, e.y, e.radius)
+                .fill({ color: e.color, alpha: e.alpha });
 
             if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
-                effectSeq.splice(i, 1);
+                effectSeq['spike'].splice(i, 1);
             }
         }
     }

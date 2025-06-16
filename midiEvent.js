@@ -154,7 +154,6 @@ async function renderNotes() {
         group.unshift({
             dltB: deltaBeats,
             scale: 1,
-            hit: false,
             x: 185 + time * pixelPerSec,
             targetX: 185 + time * pixelPerSec,
             lyric: group[0].isReady ? `${group[0].isReady}` : ""
