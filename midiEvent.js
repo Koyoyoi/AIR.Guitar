@@ -4,7 +4,7 @@ import { midiApp } from "./main.js";
 
 export let tempo = 0, songName = "", vx = 0;
 
-let arrayBuffer, ticksPerQuarter, groupMap, offset;
+let arrayBuffer, ticksPerQuarter, groupMap, offset, noteData;
 const PREBEATS = 4;
 const DEFAULT_NOTE = 84;
 const DEFAULT_VELOCITY = 100;
