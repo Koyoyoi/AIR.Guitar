@@ -16,7 +16,6 @@ let lastFpsUpdate = lastTime;
 let fps = 0;
 let isRolling = false;
 
-
 // PIXI 圖
 const note = new PIXI.Graphics();
 const blur = new PIXI.Graphics();
@@ -30,7 +29,7 @@ export function resetSeq() {
 
 // 啟動滾動動畫
 export async function rollSeq(velocities = 0) {
-    if (noteSeq.length <= 0) return
+    if (noteSeq.length <= 0) return;
 
     if ((!isRolling || isOnTime) && modeNum === 1) {
 
@@ -65,7 +64,6 @@ export async function rollSeq(velocities = 0) {
 
             for (let j = 0; j < 5; j++) {
                 effectSeq['spike'].push({
-                    type: "particle",
                     x: noteSeq[0][0].x,
                     y: n.y,
                     vx: (Math.random() - 0.5) * 10,
@@ -272,19 +270,17 @@ function drawEffects() {
 
     for (let i = effectSeq['spike'].length - 1; i >= 0; i--) {
         const e = effectSeq['spike'][i];
-        if (e.type === "particle") {
-            e.x += e.vx;
-            e.y += e.vy;
-            e.alpha -= 0.03;
-            e.radius *= 0.96;
-            e.life--;
+        e.x += e.vx;
+        e.y += e.vy;
+        e.alpha -= 0.03;
+        e.radius *= 0.96;
+        e.life--;
 
-            effect.circle(e.x, e.y, e.radius)
-                .fill({ color: e.color, alpha: e.alpha });
+        effect.circle(e.x, e.y, e.radius)
+            .fill({ color: e.color, alpha: e.alpha });
 
-            if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
-                effectSeq['spike'].splice(i, 1);
-            }
+        if (e.life <= 0 || e.alpha <= 0 || e.radius < 0.5) {
+            effectSeq['spike'].splice(i, 1);
         }
     }
 

@@ -1,8 +1,10 @@
 import { video, baseApp, midiApp, uiApp } from "../main.js";
-import { rootTab, revRootTab, pluckNotes } from "../sound.js";
+import { rootTab, revRootTab, pluckNotes, note7Map } from "../sound.js";
 import { modeNum, playNum, showAllCtrl, capo } from "../Controll/blockControll.js";
 import { songName } from "../midiEvent.js";
 import { fingerPlay } from "../handCompute.js";
+import { noteSeq } from "./drawMIDI.js";
+import { gesture } from "../Controll/musicControll.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
@@ -224,19 +226,38 @@ export async function drawHand(handData) {
         }
     }
     else if (modeNum == 2) {
+        function dist2D(p1, p2) {
+            const dx = p1[0] - p2[0];
+            const dy = p1[1] - p2[1];
+            return Math.sqrt(dx * dx + dy * dy);
+        }
 
-        if (Rhand[9] != undefined) {
+        if (Rhand[0] != undefined) {
             let closeTop = Rhand[9][1] < appHeight - Rhand[9][1] ? true : false;
-            G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
+            let right = dist2D(Rhand[4], Rhand[8]) < 50;
+            // finger touch
+            G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
+                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
+                .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
+                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
+                // sturming
+                .circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.6 })
                 .circle(appWidth - Rhand[9][0], 0, 30)
                 .fill({ color: closeTop ? 0x00AA90 : 0xffffff, alpha: 0.6 })
                 .circle(appWidth - Rhand[9][0], appHeight, 30)
                 .fill({ color: !closeTop ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                .roundRect(appWidth  - Rhand[9][0] - 30, appHeight / 2, 60, 10)
+                .roundRect(appWidth - Rhand[9][0] - 30, appHeight / 2, 60, 10)
                 .fill(0xffffff);
         }
         baseApp.stage.addChild(G);
+
+        if (Lhand[0] != undefined) {
+            let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[noteSeq[0][1].note % 12][0]
+
+            G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
+                .fill({ color: isEqual ? 0x00AA90 : 0xffffff, alpha: 0.6 });
+        }
     }
 
 }
