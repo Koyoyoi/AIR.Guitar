@@ -159,7 +159,7 @@ function drawNext() {
 
         const style = new PIXI.TextStyle({
             fontFamily: 'Arial',
-            fontSize: 100,
+            fontSize: 80,
             fontWeight: 'bold',
             fill: i == 0 ? 0xF7C242 : 0xBDC0BA,
             align: 'left',
@@ -173,6 +173,15 @@ function drawNext() {
         });
         text.anchor.set(0.5, 0);
         midiApp.stage.addChild(text);
+
+        const lryic = new PIXI.Text({
+            text: ctrl.lyric,
+            style: style,
+            x: midiApp.canvas.width / 2 + i * 200 - 40,
+            y: 100
+        });
+        text.anchor.set(0.5, 0);
+        midiApp.stage.addChild(lryic);
     }
 }
 

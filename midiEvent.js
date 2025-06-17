@@ -1,6 +1,7 @@
 import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
 import { mapRange, guitarStandard } from "./sound.js";
 import { midiApp } from "./main.js";
+import { closeSet } from "./Controll/blockControll.js";
 
 export let tempo = 0, songName = "", vx = 0;
 
@@ -17,7 +18,6 @@ export async function midiProcess(file) {
     if (file == undefined) {
         alert("尚未載入 MIDI 檔案！");
     }
-
     else {
         if (file != 'reload') {
             songName = file.name.replace(/\.mid(i)?$/i, "");
@@ -33,7 +33,7 @@ export async function midiProcess(file) {
         ticksPerQuarter = noteData.ticksPerQuarter || 480;
 
         console.log("Tempo:", tempo);
-
+        closeSet()
         await renderNotes();
         await renderLyrics();
     }
@@ -141,7 +141,7 @@ async function renderNotes() {
             return delta > 0 && delta < min ? delta / 60 * tempo : min;
         }, Infinity);
 
-    const pixelPerSec = Math.min(1000, 200 / minDelta);
+    const pixelPerSec = Math.min(500, 100 / minDelta);
 
     sortedTimes.forEach((time, i) => {
         const group = groupMap.get(time);
@@ -158,7 +158,7 @@ async function renderNotes() {
             lyric: group[0].isReady ? `${group[0].isReady}` : ""
         });
 
-        if (i == 0) { vx = (nextTime * pixelPerSec - time * pixelPerSec) / (30 * 60 / tempo) }
+        if (i == 0) { vx = (nextTime * pixelPerSec - time * pixelPerSec) / (50 * 60 / tempo) }
 
         if (time >= offset) {
             for (let j = 1; j < group.length; j++) {

@@ -3,8 +3,9 @@ import { uiApp } from "../main.js";
 import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
-export let modeNum = 0, sampleNum = 0, capo = 0, playNum = 0;
-export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false, isOnTime = false;
+export let modeNum = 1, sampleNum = 0, capo = 0, playNum = 0;
+export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
+export let isOnTime = true;
 
 let IMGs = {}
 let textStyle = {
@@ -43,6 +44,10 @@ export async function loadImg() {
         const texture = await PIXI.Assets.load(`./IMG/${filename}.png`)
         IMGs[key] = texture;
     }
+}
+
+export function closeSet(){
+    showAllCtrl = false;
 }
 
 // Setting 控制區域

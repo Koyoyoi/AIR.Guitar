@@ -32,7 +32,7 @@ export async function chordCtrl() {
     }
 
     // 繪製手勢
-    drawGesture(gesture, capo);
+    drawGesture(gesture, capo, handData['Left']);
 }
 
 // 撥弦控制

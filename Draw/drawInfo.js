@@ -4,7 +4,6 @@ import { modeNum, playNum, showAllCtrl, capo } from "../Controll/blockControll.j
 import { songName } from "../midiEvent.js";
 import { fingerPlay } from "../handCompute.js";
 import { noteSeq } from "./drawMIDI.js";
-import { gesture } from "../Controll/musicControll.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
@@ -84,36 +83,67 @@ export function drawFinger(handData) {
 }
 
 // 繪製手勢與轉調資訊，顯示在畫布上
-export function drawGesture(gesture, capo) {
-    if (showAllCtrl) return;
+export function drawGesture(gesture, capo, LHand) {
+    if (showAllCtrl || LHand[0] == undefined) return;
 
-    let transName = "";
+    if (modeNum == 0) {
 
-    // 如果 capo 不為 0，則顯示轉調資訊
-    if (capo != 0) {
-        transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]}${gesture.slice(1)})`
+        let transName = "";
+
+        // 如果 capo 不為 0，則顯示轉調資訊
+        if (capo != 0) {
+            transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]}${gesture.slice(1)})`
+        }
+
+        const style = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 100,
+            fontWeight: 'bold',
+            fill: '#00AA90',
+            align: 'left',
+        });
+
+        // 顯示手勢與轉調名稱
+        const text = new PIXI.Text({
+            text: `${gesture} ${transName}`,
+            style
+        });
+
+        text.anchor.set(0.5, 0);
+        text.x = baseApp.canvas.width - LHand[9][0];            // 設定 x 座標
+        text.y = LHand[9][1];            // 設定 y 座標
+
+        baseApp.stage.addChild(text);
     }
+    if (modeNum == 2 && noteSeq.length > 0) {
 
-    const style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 70,
-        fontWeight: 'bold',
-        fill: '#00AA90',
-        align: 'left',
-    });
+        let t = note7Map[rootTab[gesture[0]]];
 
-    // 顯示手勢與轉調名稱
-    const text = new PIXI.Text({
-        text: `${gesture} ${transName}`,
-        style
-    });
+        // 如果 capo 不為 0，則顯示轉調資訊
+        if (capo != 0) {
+            transName = `(${revRootTab[Math.floor((12 + rootTab[gesture[0]] + capo) % 12)]}${gesture.slice(1)})`
+        }
 
-    // 設定位置（等同 textAlign: 'left', textBaseline: 'top'）
-    text.anchor.set(0, 0);  // (0, 0) 是左上角對齊
-    text.x = 50;            // 設定 x 座標
-    text.y = 25;            // 設定 y 座標
+        const style = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 200,
+            fontWeight: 'bold',
+            fill: t == note7Map[noteSeq[0][1].note % 12] ? 0x00AA90 : 0xffffff,
+            align: 'left',
+        });
 
-    baseApp.stage.addChild(text);
+        // 顯示手勢與轉調名稱
+        const text = new PIXI.Text({
+            text: t,
+            style
+        });
+
+        text.anchor.set(0.5, 0);
+        text.x = baseApp.canvas.width - LHand[9][0];            // 設定 x 座標
+        text.y = LHand[9][1];            // 設定 y 座標
+
+        baseApp.stage.addChild(text);
+    }
 }
 
 export function drawSongName() {
@@ -251,13 +281,6 @@ export async function drawHand(handData) {
                 .fill(0xffffff);
         }
         baseApp.stage.addChild(G);
-
-        if (Lhand[0] != undefined) {
-            let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[noteSeq[0][1].note % 12][0]
-
-            G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
-                .fill({ color: isEqual ? 0x00AA90 : 0xffffff, alpha: 0.6 });
-        }
     }
 
 }
