@@ -9,12 +9,7 @@ export let guitarChord = [], pluckNotes = [];                                   
 export const instruments = [
     "acoustic_guitar_nylon",
     "acoustic_guitar_steel",
-    "electric_guitar_jazz",
     "electric_guitar_clean",
-    "electric_guitar_muted",
-    "overdriven_guitar",
-    "distortion_guitar",
-    "guitar_harmonics"
 ];
 
 // 音高對應數字
