@@ -1,6 +1,6 @@
 import { soundSample, guitarStandard, revRootTab, mapRange, note7Map, rootTab, guitarChord } from "../sound.js";
 import { modeNum, capo, isOnTime } from "../Controll/blockControll.js";
-import { pitchToColor, vx } from "../midiEvent.js";
+import { pitchToColor } from "../midiEvent.js";
 import { gesture } from "../Controll/musicControll.js";
 import { midiApp } from "../main.js";
 
@@ -15,6 +15,7 @@ let lastTime = performance.now();
 let lastFpsUpdate = lastTime;
 let fps = 0;
 let isRolling = false;
+let dx = 30;
 
 // PIXI 圖
 const note = new PIXI.Graphics();
@@ -206,7 +207,7 @@ function drawNote() {
 
         // 滾動動畫
         if (isRolling) {
-            ctrl.x = (ctrl.x - ctrl.targetX > vx) ? ctrl.x - vx : ctrl.targetX;
+            ctrl.x = (ctrl.x - ctrl.targetX > ctrl.vx) ? ctrl.x - ctrl.vx : ctrl.targetX;
         }
 
         // 繪製群組音符與歌詞

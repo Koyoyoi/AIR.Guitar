@@ -3,7 +3,7 @@ import { mapRange, guitarStandard } from "./sound.js";
 import { midiApp } from "./main.js";
 import { closeSet } from "./Controll/blockControll.js";
 
-export let tempo = 0, songName = "", vx = 0;
+export let tempo = 0, songName = "";
 
 let arrayBuffer, ticksPerQuarter, groupMap, offset, noteData;
 const PREBEATS = 4;
@@ -155,10 +155,9 @@ async function renderNotes() {
             scale: 1,
             x: 185 + time * pixelPerSec,
             targetX: 185 + time * pixelPerSec,
-            lyric: group[0].isReady ? `${group[0].isReady}` : ""
+            lyric: group[0].isReady ? `${group[0].isReady}` : "",
+            vx: 12
         });
-
-        if (i == 0) { vx = (nextTime * pixelPerSec - time * pixelPerSec) / (20 * 60 / tempo) }
 
         if (time >= offset) {
             for (let j = 1; j < group.length; j++) {
