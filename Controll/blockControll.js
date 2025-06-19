@@ -46,7 +46,7 @@ export async function loadImg() {
     }
 }
 
-export function closeSet(){
+export function closeSet() {
     showAllCtrl = false;
 }
 
@@ -82,9 +82,9 @@ export function settingCtrl() {
     if (showAllCtrl) {
         midiPortCtrl();
         sampleCtrl();
-        ModeCtrl();
         handCtrl();
     } else {
+        ModeCtrl();
         capoCtrl();
     }
 
@@ -105,7 +105,7 @@ export function settingCtrl() {
 // Mode 控制區域
 export function ModeCtrl() {
     const Area = {
-        x: uiApp.screen.width / 2 - uiApp.screen.width * 0.1,
+        x: 50,
         y: 10,
         w: uiApp.screen.width * 0.2,
         h: uiApp.screen.height * 0.08
