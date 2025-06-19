@@ -105,65 +105,44 @@ export function settingCtrl() {
 // Mode 控制區域
 export function ModeCtrl() {
     const Area = {
-        x: 50,
+        x: 20,
         y: 10,
         w: uiApp.screen.width * 0.2,
         h: uiApp.screen.height * 0.08
     };
 
-    const buttonWidth = Area.h * 0.8;
-    const buttonHeight = Area.h;
-    const buttonY = Area.y + (Area.h - buttonHeight) / 2;
-
     // 背景區域
     const labelBase = new PIXI.Graphics()
         .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
-        .fill(0x434343);
+        .fill(0x434343)
+        .roundRect(Area.x + Area.w * 3 / 5 + 10, Area.y + 5, 4, Area.h - 10)
+        .fill(0x656765);
     uiApp.stage.addChild(labelBase);
 
     // 文字創建方式`
     const label = new PIXI.Text({
         text: `${modeName[modeNum]}`,
         style: textStyle['normal'],
-        x: Area.x + Area.w / 2,
+        x: Area.x + Area.w / 3,
         y: Area.y + Area.h / 2
     });
     label.anchor.set(0.5);
     uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
 
-    // 左箭頭三角形
-    const LBtn = new PIXI.Graphics()
-        .moveTo(0, buttonHeight / 2)
-        .lineTo(buttonWidth, 0)
-        .lineTo(buttonWidth, buttonHeight)
-        .fill(0x434343);
-    LBtn.x = Area.x - 60;
-    LBtn.y = buttonY;
-    LBtn.hitArea = new PIXI.Rectangle(LBtn.x, LBtn.y, buttonWidth, buttonHeight); // 設置 hitArea
-    LBtn.interactive = true;
-    LBtn.buttonMode = true;
-    LBtn.on("pointerdown", () => {
-        modeNum = (modeName.length + modeNum - 1) % modeName.length;
-        console.log("✅ mode Left 被點擊！");
+    const chBtn = new PIXI.Sprite(IMGs['change_Mode']);
+    chBtn.x = Area.x + Area.w * 2 / 3 + 20;
+    chBtn.y = Area.y;
+    chBtn.width = 50;
+    chBtn.height = Area.h;
+    // 點擊事件
+    chBtn.hitArea = new PIXI.Rectangle(Area.x + Area.w * 2 / 3, Area.y, Area.w / 3, Area.h); // 限定互動範圍（可調整）
+    chBtn.interactive = true;
+    chBtn.buttonMode = true;
+    chBtn.on('pointerdown', () => {
+        console.log("✅ reload 控制區被點擊！");
+        modeNum = (modeNum + 1) % modeName.length
     });
-    uiApp.stage.addChild(LBtn);
-
-    // 右箭頭三角形
-    const RBtn = new PIXI.Graphics()
-        .moveTo(0, 0)
-        .lineTo(buttonWidth, buttonHeight / 2)
-        .lineTo(0, buttonHeight)
-        .fill(0x434343);
-    RBtn.x = Area.x + Area.w + 15;
-    RBtn.y = buttonY;
-    RBtn.hitArea = new PIXI.Rectangle(RBtn.x, RBtn.y, buttonWidth, buttonHeight); // 設置 hitArea
-    RBtn.interactive = true;
-    RBtn.buttonMode = true;
-    RBtn.on("pointerdown", () => {
-        modeNum = (modeNum + 1) % modeName.length;
-        console.log("✅ mode Right 被點擊！");
-    });
-    uiApp.stage.addChild(RBtn);
+    uiApp.stage.addChild(chBtn);
 }
 
 // MIDI 控制區域
@@ -502,7 +481,7 @@ export function playCtrl() {
     const labelBase = new PIXI.Graphics()
         .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
         .fill(0x434343)
-        .roundRect(Area.x + Area.w * 2 / 3 + 10, Area.y + 5, 4, Area.h - 10)
+        .roundRect(Area.x + Area.w * 3 / 5 + 20, Area.y + 5, 4, Area.h - 10)
         .fill(0x656765);
     uiApp.stage.addChild(labelBase);
 
@@ -516,7 +495,7 @@ export function playCtrl() {
     label.y = Area.y + Area.h / 2;
     uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
 
-    const chBtn = new PIXI.Sprite(IMGs['change']);
+    const chBtn = new PIXI.Sprite(IMGs['change_Play']);
     chBtn.x = Area.x + Area.w * 2 / 3 + 20;
     chBtn.y = Area.y;
     chBtn.width = 50;
