@@ -158,7 +158,7 @@ async function renderNotes() {
             lyric: group[0].isReady ? `${group[0].isReady}` : ""
         });
 
-        if (i == 0) { vx = (nextTime * pixelPerSec - time * pixelPerSec) / (50 * 60 / tempo) }
+        if (i == 0) { vx = (nextTime * pixelPerSec - time * pixelPerSec) / (20 * 60 / tempo) }
 
         if (time >= offset) {
             for (let j = 1; j < group.length; j++) {

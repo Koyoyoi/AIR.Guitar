@@ -267,12 +267,12 @@ function drawEffects() {
 
     for (let i = 0; i < effectSeq['scale'].length; i++) {
         const e = effectSeq['scale'][i];
-        e.r *= 0.9;
+        e.r *= 0.85;
 
         effect.circle(e.x, e.y, e.r)
             .fill({ color: e.color, alpha: 0.5 });
 
-        if (e.r < 0) {
+        if (e.r < 10) {
             effectSeq['scale'].splice(i, 1);
         }
     }
