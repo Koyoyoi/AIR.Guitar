@@ -5,7 +5,7 @@ import { closeSet } from "./Controll/blockControll.js";
 
 export let tempo = 0, songName = "";
 
-let arrayBuffer, ticksPerQuarter, groupMap, offset, noteData;
+let arrayBuffer, ticksPerQuarter, groupMap, offset, noteData, initTime = 0;
 const PREBEATS = 4;
 const DEFAULT_NOTE = 84;
 const DEFAULT_VELOCITY = 100;
@@ -35,7 +35,7 @@ export async function midiProcess(file) {
         console.log("Tempo:", tempo);
         closeSet()
         await renderNotes();
-        await renderLyrics();
+        await renderMetaData();
     }
 }
 
@@ -114,10 +114,10 @@ async function renderNotes() {
         offset += 60 / tempo;
     }
 
-    let initTime = noteData.notes[0].startTime
+    initTime = noteData.notes[0].startTime
     for (const note of noteData.notes) {
         if (note.isDrum || typeof note.startTime !== 'number') continue;
-        const start = note.startTime - initTime + offset;
+        const start = note.startTime + offset;
 
         if (!groupMap.has(start)) groupMap.set(start, []);
         groupMap.get(start).push({
@@ -153,7 +153,7 @@ async function renderNotes() {
         group.unshift({
             dltB: deltaBeats,
             scale: 1,
-            x: 185 + time * pixelPerSec,
+            x: 185 + (time - (time > offset ? initTime : 0)) * pixelPerSec,
             targetX: 185 + time * pixelPerSec,
             lyric: group[0].isReady ? `${group[0].isReady}` : "",
             vx: 12
@@ -172,7 +172,7 @@ async function renderNotes() {
     });
 }
 
-async function renderLyrics() {
+async function renderMetaData() {
     const midi = MidiParser.parse(new Uint8Array(arrayBuffer));
 
     midi.track.forEach(track => {
@@ -180,7 +180,7 @@ async function renderLyrics() {
 
         track.event.forEach(event => {
             ticks += event.deltaTime;
-
+            // Lryic
             if (event.type === 0xFF && event.metaType === 0x05) {
                 let text = "";
 
@@ -198,6 +198,37 @@ async function renderLyrics() {
                 if (text !== '\r' && groupMap.has(time)) {
                     groupMap.get(time)[0].lyric = text;
                 }
+            }
+            // Key Signature
+            if (event.type === 0xFF && event.metaType === 0x59) {
+
+
+                const highByte = (event.data >> 8) & 0xFF;
+                const lowByte = event.data & 0xFF;
+
+                // 有號整數表示的五度圈偏移量 (-7 ~ 7)
+                const keyByte = new Int8Array([highByte])[0];
+
+                // 大小調判斷 0 = major, 1 = minor
+                const scaleByte = lowByte;
+
+                // 五度圈調名對應（升號）
+                const sharpKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
+                // 五度圈調名對應（降號）
+                const flatKeys = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
+
+                let keyName = 'Unknown';
+
+                if (keyByte >= 0 && keyByte <= 7) {
+                    keyName = sharpKeys[keyByte];
+                } else if (keyByte >= -7 && keyByte < 0) {
+                    keyName = flatKeys[-keyByte];
+                }
+
+                const modeName = scaleByte === 0 ? 'major' : 'minor';
+
+                console.log(`${keyName} ${modeName}`)
+
             }
         });
     });

@@ -75,7 +75,7 @@ function setupFileUpload() {
     });
 }
 
-// --- 偵測邏輯主迴圈 ---
+// --- 主迴圈 ---
 async function detectLoop() {
     baseApp.stage.removeChildren();
     uiApp.stage.removeChildren();
@@ -111,7 +111,7 @@ async function detectLoop() {
             drawHand(handData);
             await chordCtrl();
             await pinchCtrl(handData['Right']);
-            await wavingCtrl(handData['Right'])
+            await wavingCtrl(handData['Right'], handData['Left']);
             break;
     }
 

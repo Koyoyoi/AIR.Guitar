@@ -13,7 +13,7 @@ let action = '', prevAction = '';                          // 動作狀態
 let isRPinch = false, isLPinch = false, PinchLR = false    // 指尖觸碰
 let triggeredBy = null;                                    // "R" 或 "L"：記錄目前由哪隻手觸發中
 let prevRX = null, prevLX = null;
-let prevRY = null;
+let prevLY = null;
 
 let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];
 
@@ -199,21 +199,21 @@ export async function wavingCtrl(RHand, LHand) {
     else if (modeNum === 2) {
         const midY = video.videoHeight / 2;
 
-        if (RHand?.[0]) {
-            const currentRY = RHand[9][1];
+        if (LHand?.[0]) {
+            const currentRY = LHand[9][1];
 
-            if (prevRY !== null) {
-                const crossedDown = prevRY < midY && currentRY >= midY;  // 只由上往下
-                if (crossedDown && (triggeredBy === null || triggeredBy === "R")) {
-                    triggeredBy = "R";
+            if (prevLY !== null) {
+                const crossedDown = prevLY < midY && currentRY >= midY;  // 只由上往下
+                if (crossedDown && (triggeredBy === null || triggeredBy === "L")) {
+                    triggeredBy = "L";
                     rollSeq('Down');
                 }
             }
 
-            prevRY = currentRY;
-        } else if (triggeredBy === "R") {
+            prevLY = currentRY;
+        } else if (triggeredBy === "L") {
             triggeredBy = null;
-            prevRY = null;
+            prevLY = null;
         }
     }
 
