@@ -1,6 +1,6 @@
 import { soundSample, guitarStandard, revRootTab, mapRange, note7Map, rootTab, guitarChord } from "../sound.js";
 import { modeNum, capo, isOnTime } from "../Controll/blockControll.js";
-import { pitchToColor } from "../midiEvent.js";
+import { pitchToColor, key } from "../midiEvent.js";
 import { gesture } from "../Controll/musicControll.js";
 import { midiApp } from "../main.js";
 
@@ -30,90 +30,91 @@ export function resetSeq() {
 
 // 啟動滾動動畫
 export async function rollSeq(velocities = 0) {
-    if (noteSeq.length <= 0) return;
 
-    if ((!isRolling || isOnTime) && modeNum === 1) {
+    if (noteSeq.length > 0) {
+        if ((!isRolling || isOnTime) && modeNum === 1) {
 
-        isRolling = true;
-        let offset = noteSeq.length <= 1 ? 10 :
-            isOnTime ? noteSeq[1][0].x - 185 : noteSeq[1][0].x - noteSeq[0][0].x;
+            isRolling = true;
+            let offset = noteSeq.length <= 1 ? 10 :
+                isOnTime ? noteSeq[1][0].x - 185 : noteSeq[1][0].x - noteSeq[0][0].x;
 
-        // set target x
-        for (let col = 0; col < noteSeq.length; col++) {
-            noteSeq[col][0].targetX = noteSeq[col][0].x - offset;
-        }
-
-        // push effect and sound out
-        let pressed_V = mapRange(velocities, 100, midiApp.canvas.height - 100, 127, 60);
-
-        for (let i = 1; i < noteSeq[0].length; i++) {
-            const n = noteSeq[0][i];
-
-            if (n.v > 0) {
-                soundSample.play(n.note, 0, {
-                    gain: velocities === 0 ? n.v / 127 * 3 : pressed_V / 127 * 3,
-                    duration: modeNum === 2 ? 2 : n.d
-                });
+            // set target x
+            for (let col = 0; col < noteSeq.length; col++) {
+                noteSeq[col][0].targetX = noteSeq[col][0].x - offset;
             }
 
-            effectSeq['scale'].push({
-                x: noteSeq[0][0].x,
-                y: n.y,
-                r: n.r * 2.5,
-                color: n.color
-            });
+            // push effect and sound out
+            let pressed_V = mapRange(velocities, 100, midiApp.canvas.height - 100, 127, 60);
 
-            for (let j = 0; j < 5; j++) {
-                effectSeq['spike'].push({
+            for (let i = 1; i < noteSeq[0].length; i++) {
+                const n = noteSeq[0][i];
+                // sound 
+                if (n.v > 0) {
+                    soundSample.play(n.note, 0, {
+                        gain: velocities === 0 ? n.v / 127 * 3 : pressed_V / 127 * 3,
+                        duration: modeNum === 2 ? 2 : n.d
+                    });
+                }
+                // effect
+                effectSeq['scale'].push({
                     x: noteSeq[0][0].x,
                     y: n.y,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 0.5) * 10,
-                    alpha: 1.0,
-                    life: 20 + Math.random() * 10,
-                    radius: 10 + Math.random() * 5,
-                    color: Math.random() < 0.5 ? 0xffcc33 : 0xff6666
+                    r: n.r * 2.5,
+                    color: n.color
                 });
-            }
-        }
-        noteSeq.shift();
-    }
-    else if (modeNum === 2) {
-        let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[noteSeq[0][1].note % 12][0]
-        if (isEqual) {
 
-            let noteGroup = noteSeq[0]
-            noteSeq.shift(); // 移除第一個 object
-            if (velocities == 'Down') {
-                function sleep(ms) {
-                    return new Promise(resolve => setTimeout(resolve, ms));
-                }
-                let v = noteGroup[1].v
-                let d = noteGroup[1].d
-                for (let i = 0; i < guitarChord.length; i++) {
-                    soundSample.play(guitarChord[i], 0, {
-                        gain: v / 127 * 3,
-                        duration: modeNum === 2 ? 2 : d
-
+                for (let j = 0; j < 5; j++) {
+                    effectSeq['spike'].push({
+                        x: noteSeq[0][0].x,
+                        y: n.y,
+                        vx: (Math.random() - 0.5) * 10,
+                        vy: (Math.random() - 0.5) * 10,
+                        alpha: 1.0,
+                        life: 20 + Math.random() * 10,
+                        radius: 10 + Math.random() * 5,
+                        color: Math.random() < 0.5 ? 0xffcc33 : 0xff6666
                     });
-                    await sleep(100); // 等待 10 毫秒
                 }
-
             }
-            else {
-                for (let i = 1; i < noteGroup.length; i++) {
-                    const n = noteGroup[i];
+            noteSeq.shift();
+        }
+        else if (modeNum === 2) {
+            let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[noteSeq[0][1].note % 12][0]
+            if (isEqual) {
 
-                    if (n.v > 0) {
-                        soundSample.play(n.note, 0, {
-                            gain: n.v / 127 * 3,
-                            duration: modeNum === 2 ? 2 : n.d
-                        });
+                let noteGroup = noteSeq[0]
+                noteSeq.shift(); // 移除第一個 object
+                if (velocities == 'Down') {
+                    function sleep(ms) {
+                        return new Promise(resolve => setTimeout(resolve, ms));
                     }
+                    let v = noteGroup[1].v
+                    let d = noteGroup[1].d
+                    for (let i = 0; i < guitarChord.length; i++) {
+                        soundSample.play(guitarChord[i], 0, {
+                            gain: v / 127 * 3,
+                            duration: modeNum === 2 ? 2 : d
+
+                        });
+                        await sleep(100); // 等待 10 毫秒
+                    }
+
+                }
+                else {
+                    for (let i = 1; i < noteGroup.length; i++) {
+                        const n = noteGroup[i];
+
+                        if (n.v > 0) {
+                            soundSample.play(n.note, 0, {
+                                gain: n.v / 127 * 3,
+                                duration: modeNum === 2 ? 2 : n.d
+                            });
+                        }
+                    }
+
                 }
 
             }
-
         }
     }
 }
@@ -227,10 +228,10 @@ function drawNote() {
                 note.circle(ctrl.x + n.r + 10, n.y + n.r, n.r / 2 * ctrl.scale)
                     .fill({ color: n.color, alpha: 0.4 });
             }
-
+            // note name
             if (i == 1) {
                 const text = new PIXI.Text({
-                    text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
+                    text: n.readyNote > 0 ? n.readyNote : note7Map[(n.note - key) % 12],
                     style: style,
                     x: ctrl.x,
                     y: n.y - 100
@@ -238,7 +239,7 @@ function drawNote() {
                 text.anchor.set(0.5, 0);
                 midiApp.stage.addChild(text);
             }
-
+            // lyric
             if (i === group.length - 1) {
                 const text = new PIXI.Text({
                     text: ctrl.lyric,

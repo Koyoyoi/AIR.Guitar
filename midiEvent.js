@@ -3,7 +3,7 @@ import { mapRange, guitarStandard } from "./sound.js";
 import { midiApp } from "./main.js";
 import { closeSet } from "./Controll/blockControll.js";
 
-export let tempo = 0, songName = "";
+export let tempo = 0, songName = "", key = 0;
 
 let arrayBuffer, ticksPerQuarter, groupMap, offset, noteData, initTime = 0;
 const PREBEATS = 4;
@@ -201,34 +201,9 @@ async function renderMetaData() {
             }
             // Key Signature
             if (event.type === 0xFF && event.metaType === 0x59) {
-
-
                 const highByte = (event.data >> 8) & 0xFF;
-                const lowByte = event.data & 0xFF;
-
                 // 有號整數表示的五度圈偏移量 (-7 ~ 7)
-                const keyByte = new Int8Array([highByte])[0];
-
-                // 大小調判斷 0 = major, 1 = minor
-                const scaleByte = lowByte;
-
-                // 五度圈調名對應（升號）
-                const sharpKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
-                // 五度圈調名對應（降號）
-                const flatKeys = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
-
-                let keyName = 'Unknown';
-
-                if (keyByte >= 0 && keyByte <= 7) {
-                    keyName = sharpKeys[keyByte];
-                } else if (keyByte >= -7 && keyByte < 0) {
-                    keyName = flatKeys[-keyByte];
-                }
-
-                const modeName = scaleByte === 0 ? 'major' : 'minor';
-
-                console.log(`${keyName} ${modeName}`)
-
+                key = new Int8Array([highByte])[0];
             }
         });
     });
