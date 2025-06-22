@@ -114,6 +114,11 @@ async function renderNotes() {
         offset += 60 / tempo;
     }
 
+
+    const maxPitch = Math.max(...noteData.notes.map(n => n.pitch));
+    const minPitch = Math.min(...noteData.notes.map(n => n.pitch));
+    console.log(maxPitch, minPitch)
+
     initTime = noteData.notes[0].startTime
     for (const note of noteData.notes) {
         if (note.isDrum || typeof note.startTime !== 'number') continue;
@@ -124,7 +129,7 @@ async function renderNotes() {
             note: note.pitch,
             v: note.velocity,
             d: note.endTime - note.startTime,
-            y: mapRange(note.pitch, 48, 84, midiApp.canvas.height - 150, 150),
+            y: mapRange(note.pitch, minPitch, maxPitch, midiApp.canvas.height - 300, 200),
             r: mapRange(note.velocity, 60, 127, 20, 50),
             startTime: note.startTime,
             isReady: false,
