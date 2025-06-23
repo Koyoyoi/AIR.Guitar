@@ -82,14 +82,15 @@ export function settingCtrl() {
     if (showAllCtrl) {
         midiPortCtrl();
         sampleCtrl();
-        handCtrl();
+
     } else {
         ModeCtrl();
         capoCtrl();
-    }
 
-    if (!showAllCtrl) {
-        if (modeNum == 1) {
+        if (modeNum == 0) {
+            handCtrl();
+        }
+        else if (modeNum == 1) {
             reloadCtrl();
             touchCtrl();
             playCtrl();
@@ -97,13 +98,14 @@ export function settingCtrl() {
         }
         else if (modeNum == 2) {
             reloadCtrl();
+            handCtrl();
         }
     }
 
 }
 
 // Mode 控制區域
-export function ModeCtrl() {
+function ModeCtrl() {
     const Area = {
         x: 20,
         y: 10,
@@ -146,7 +148,7 @@ export function ModeCtrl() {
 }
 
 // MIDI 控制區域
-export function midiPortCtrl() {
+function midiPortCtrl() {
     const Area = {
         x: 25,
         y: 10,
@@ -183,7 +185,7 @@ export function midiPortCtrl() {
 }
 
 // SoundFont 控制區域
-export async function sampleCtrl() {
+async function sampleCtrl() {
     // 區域大小設定
     const Area = {
         x: uiApp.screen.width / 2 - uiApp.screen.width * 0.15,
@@ -249,28 +251,32 @@ export async function sampleCtrl() {
 }
 
 // hand 控制區域
-export function handCtrl() {
+export function handCtrl(ctrl) {
+
+    if (ctrl == 'switch') isSwitch = !isSwitch;
+
     const Area = {
         x: 25,
-        y: uiApp.screen.height - 20 - uiApp.screen.height * 0.08,
-        w: uiApp.screen.width * 0.25,
-        h: uiApp.screen.height * 0.08
+        y: uiApp.screen.height / 2 - uiApp.screen.width * 0.25 / 2,
+        w: uiApp.screen.height * 0.08,
+        h: uiApp.screen.width * 0.25
     };
 
     // 背景區域
     const bg = new PIXI.Graphics()
         .roundRect(Area.x, Area.y, Area.w, Area.h, 50)
         .fill(0x434343)
-        .roundRect(Area.x + Area.w / 2 - 40, Area.y + 5, 4, Area.h - 10)
+        .roundRect(Area.x + 5, Area.y + Area.h / 2 - 40, Area.w - 10, 4)
         .fill(0x656765)
-        .roundRect(Area.x + Area.w / 2 + 40, Area.y + 5, 4, Area.h - 10)
+        .roundRect(Area.x + 5, Area.y + Area.h / 2 + 40, Area.w - 10, 4)
         .fill(0x656765)
     uiApp.stage.addChild(bg);
 
     const swBtn = new PIXI.Sprite(IMGs['switch']);
     swBtn.hitArea = new PIXI.Rectangle(Area.x + Area.w / 2 - 40, Area.y, 80, Area.h); // 限定互動範圍（可調整）
-    swBtn.x = Area.x + Area.w / 2 - 25;
-    swBtn.y = Area.y + 5;
+    swBtn.rotation = Math.PI / -2;
+    swBtn.x = Area.x + 5;
+    swBtn.y = Area.y + Area.h / 2 + 25;
     swBtn.width = 50;
     swBtn.height = 50;
 
@@ -289,51 +295,36 @@ export function handCtrl() {
     const left = new PIXI.Text({
         text: '左',
         style: isSwitch ? textStyle['soundCtrl'] : textStyle['gesture'],
-        x: Area.x + 30,
-        y: Area.y + Area.h / 2
+        x: Area.x + Area.w / 2,
+        y: Area.y + 30
     });
     left.anchor.set(0.5);
     uiApp.stage.addChild(left);
 
     const LHand = new PIXI.Sprite(IMGs['left_hand']);
-    LHand.x = left.x + 20;
-    LHand.y = Area.y + 5;
+    LHand.x = Area.x + 5;
+    LHand.y = left.y + 20;
     LHand.width = 50;
     LHand.height = 50;
-
-    // 互動
-    LHand.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w / 2 - 40, Area.h); // 限定互動範圍（可調整）
-    LHand.interactive = true;
-    LHand.buttonMode = true;
-
-    // 點擊事件
-    LHand.on('pointerdown', () => { console.log("✅ left hand 控制區被點擊！"); });
     uiApp.stage.addChild(LHand);
 
     // right hand
     const right = new PIXI.Text({
         text: '右',
         style: isSwitch ? textStyle['gesture'] : textStyle['soundCtrl'],
-        x: Area.x + Area.w - 30,
-        y: Area.y + Area.h / 2
+        x: Area.x + Area.w / 2,
+        y: Area.y + Area.h - 30
     });
     right.anchor.set(0.5);
     uiApp.stage.addChild(right);
 
     const RHand = new PIXI.Sprite(IMGs['right_hand']);
-    RHand.x = right.x - 70;
-    RHand.y = Area.y + 5;
+    RHand.x = Area.x + 5;
+    RHand.y = right.y - 70;
     RHand.width = 50;
     RHand.height = 50;
-
-    // 互動
-    RHand.hitArea = new PIXI.Rectangle(Area.x + Area.w / 2 + 40, Area.y, Area.w / 2 - 40, Area.h); // 限定互動範圍（可調整）
-    RHand.interactive = true;
-    RHand.buttonMode = true;
-
-    // 點擊事件
-    RHand.on('pointerdown', () => { console.log("✅ right hand 控制區被點擊！"); });
     uiApp.stage.addChild(RHand);
+
 }
 
 // reload 控制區域

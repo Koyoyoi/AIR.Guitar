@@ -1,9 +1,10 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { handData, poseData,video } from './main.js';
-import { isSwitch } from "./Controll/blockControll.js";
+import { handData, poseData, video } from './main.js';
+import { handCtrl, isSwitch } from "./Controll/blockControll.js";
 
 // 全域變數：用來儲存模型實例
 let handLandmarker, poseLandmarker;
+let switchH = false
 
 // 初始化 MediaPipe 手部與姿勢偵測模型
 export async function setupMediaPipe() {
@@ -40,7 +41,7 @@ export async function setupMediaPipe() {
 export async function detectHand() {
     if (!handLandmarker) return;
 
-    let data = handLandmarker.detectForVideo(video, performance.now(),  { width: video.videoWidth, height: video.videoHeight });
+    let data = handLandmarker.detectForVideo(video, performance.now(), { width: video.videoWidth, height: video.videoHeight });
 
     const handPoints = data.landmarks;
     const handednesses = data.handednesses;
@@ -55,8 +56,15 @@ export async function detectHand() {
         }
         handData[left_or_right] = points;
     }
-
-    if (isSwitch) {[handData['Left'], handData['Right']] = [handData['Right'], handData['Left']]}
+    if (handData['Left'].length > 0) {
+        if (!switchH && video.videoWidth - handData['Left'][9][0] < 50) {
+            handCtrl('switch')
+            switchH = true
+        } else if (switchH && video.videoWidth - handData['Left'][9][0] > 50) {
+            switchH = false
+        }
+    }
+    if (isSwitch) { [handData['Left'], handData['Right']] = [handData['Right'], handData['Left']] }
 }
 
 // 偵測身體關鍵點並繪製圖像，同時更新 poseData
