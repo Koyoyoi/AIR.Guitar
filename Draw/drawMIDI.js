@@ -194,7 +194,7 @@ function drawNext() {
         const text = new PIXI.Text({
             text: n.readyNote > 0 ? n.readyNote : note7Map[(n.note - key) % 12],
             style: style,
-            x: midiApp.canvas.width / 2 + i * 200,
+            x: midiApp.canvas.width / 2 + i * 200 - 100,
             y: midiApp.canvas.height * 0.25 + 25
         });
         text.anchor.set(0.5, 0);
@@ -203,7 +203,7 @@ function drawNext() {
         const lryic = new PIXI.Text({
             text: ctrl.lyric,
             style: style,
-            x: midiApp.canvas.width / 2 + i * 200 - 40,
+            x: midiApp.canvas.width / 2 + i * 200 - 140,
             y: midiApp.canvas.height * 0.25 + 100
         });
         text.anchor.set(0.5, 0);
