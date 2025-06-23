@@ -148,7 +148,6 @@ async function renderNotes() {
 
     const pixelPerSec = Math.min(500, 100 / minDelta);
 
-
     let posX = 185
     sortedTimes.forEach((time, i) => {
         const group = groupMap.get(time);
@@ -163,7 +162,7 @@ async function renderNotes() {
             x: posX,//185 + (time - (time > offset ? initTime : 0)) * pixelPerSec,
             targetX: 185 + time * pixelPerSec,
             lyric: group[0].isReady ? `${group[0].isReady}` : "",
-            vx: 15
+            vx: 18
         });
 
         posX += deltaBeats > 2 ? 400 :
