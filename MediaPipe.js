@@ -63,6 +63,13 @@ export async function detectHand() {
         } else if (switchH && video.videoWidth - handData['Left'][9][0] > 50) {
             switchH = false
         }
+    } else if (handData['Right'].length > 0) {
+        if (!switchH && video.videoWidth - handData['Right'][9][0] > video.videoWidth - 50) {
+            handCtrl('switch')
+            switchH = true
+        } else if (switchH && video.videoWidth - handData['Right'][9][0] < video.videoWidth - 50) {
+            switchH = false
+        }
     }
     if (isSwitch) { [handData['Left'], handData['Right']] = [handData['Right'], handData['Left']] }
 }

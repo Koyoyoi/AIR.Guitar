@@ -126,7 +126,7 @@ export function drawGesture(gesture, capo, LHand) {
 
         const style = new PIXI.TextStyle({
             fontFamily: 'Arial',
-            fontSize: 200,
+            fontSize: 150,
             fontWeight: 'bold',
             fill: t == note7Map[noteSeq[0][1].note % 12] ? 0x00AA90 : 0xffffff,
             align: 'left',
@@ -138,7 +138,7 @@ export function drawGesture(gesture, capo, LHand) {
             style
         });
 
-        text.anchor.set(0.5, 0);
+        text.anchor.set(0.5, 0.5);
         text.x = baseApp.canvas.width - LHand[9][0];            // 設定 x 座標
         text.y = LHand[9][1];            // 設定 y 座標
 
