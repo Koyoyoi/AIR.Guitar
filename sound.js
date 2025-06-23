@@ -10,6 +10,11 @@ export const instruments = [
     "acoustic_guitar_nylon",
     "acoustic_guitar_steel",
     "electric_guitar_clean",
+    "violin",
+    "flute",
+    "trumpet",
+    "orchestral_harp",
+    "bright_aocustic_piano"
 ];
 
 // 音高對應數字

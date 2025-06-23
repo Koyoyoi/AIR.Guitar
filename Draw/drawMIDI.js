@@ -14,7 +14,7 @@ let effectSeq = { 'scale': [], 'spike': [] };
 let lastTime = performance.now();
 let lastFpsUpdate = lastTime;
 let fps = 0;
-let isRolling = false;
+let isRolling = false, isLoad = false;
 let dx = 30;
 
 // PIXI 圖
@@ -24,7 +24,7 @@ const effect = new PIXI.Graphics();
 const string = new PIXI.Graphics();
 
 // 重設音符序列
-export function resetSeq() {
+export async function resetSeq() {
     noteSeq = [];
 }
 
@@ -142,6 +142,29 @@ export function midiDrawLoop(now) {
         drawNext();
     }
 
+    if (noteSeq.length == 0) {
+
+        const style = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 100,
+            fontWeight: 'bold',
+            fill: 0xBDC0BA,
+            align: 'left',
+        });
+
+        const text = new PIXI.Text({
+            text: isLoad ? "End" : "",
+            style: style,
+            x: midiApp.canvas.width / 2,
+            y: midiApp.canvas.height / 2
+        });
+        text.anchor.set(0.5, .5);
+        midiApp.stage.addChild(text);
+
+    } else {
+        isLoad = true
+    }
+
     requestAnimationFrame(midiDrawLoop);
 }
 
@@ -168,7 +191,7 @@ function drawNext() {
         });
 
         const text = new PIXI.Text({
-            text: n.readyNote > 0 ? n.readyNote : note7Map[n.note % 12],
+            text: n.readyNote > 0 ? n.readyNote : note7Map[(n.note - key) % 12],
             style: style,
             x: midiApp.canvas.width / 2 + i * 200,
             y: 25
@@ -224,8 +247,8 @@ function drawNote() {
 
             let decimalPlaces = ctrl.dltB.toString().split(".")[1]?.length || 0;
             let result = ctrl.dltB * Math.pow(10, decimalPlaces);
-            if (result % 3 == 0 && decimalPlaces > 0) {
-                note.circle(ctrl.x + n.r + 10, n.y + n.r, n.r / 2 * ctrl.scale)
+            if (result % 3 == 0 && decimalPlaces > 0 && !n.isReady) {
+                note.circle(ctrl.x + n.r + 15, n.y + n.r / 3, n.r / 2 * ctrl.scale)
                     .fill({ color: n.color, alpha: 0.4 });
             }
             // note name

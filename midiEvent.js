@@ -5,7 +5,7 @@ import { closeSet } from "./Controll/blockControll.js";
 
 export let tempo = 0, songName = "", key = 0;
 
-let arrayBuffer, ticksPerQuarter, groupMap, offset, noteData, initTime = 0;
+let midiBfr, tickPQtr, groupMap, offset, noteData, initTime = 0;
 const PREBEATS = 4;
 const DEFAULT_NOTE = 84;
 const DEFAULT_VELOCITY = 100;
@@ -13,8 +13,6 @@ const DEFAULT_VELOCITY = 100;
 const initLyric = ['預', '備', '起', '唱']
 
 export async function midiProcess(file) {
-    resetSeq();
-
     if (file == undefined) {
         alert("尚未載入 MIDI 檔案！");
     }
@@ -22,27 +20,30 @@ export async function midiProcess(file) {
         if (file != 'reload') {
             songName = file.name.replace(/\.mid(i)?$/i, "");
             console.log("檔案名稱:", songName);
-            arrayBuffer = await file.arrayBuffer();
+            midiBfr = await file.arrayBuffer();
+            const blob = new Blob([midiBfr], { type: "audio/midi" });
+            noteData = await mm.blobToNoteSequence(blob);
+            noteData.notes.sort((a, b) => a.startTime - b.startTime);
+
+            tempo = noteData.tempos?.[0]?.qpm || 60;
+            tickPQtr = noteData.ticksPerQuarter || 480;
+
+            console.log("Tempo:", tempo);
+            closeSet()
+            await renderNotes();
+            await renderMetaData();
+        } else {
+            animateSeq(groupMap)
         }
-
-        const blob = new Blob([arrayBuffer], { type: "audio/midi" });
-        noteData = await mm.blobToNoteSequence(blob);
-        noteData.notes.sort((a, b) => a.startTime - b.startTime);
-
-        tempo = noteData.tempos?.[0]?.qpm || 60;
-        ticksPerQuarter = noteData.ticksPerQuarter || 480;
-
-        console.log("Tempo:", tempo);
-        closeSet()
-        await renderNotes();
-        await renderMetaData();
     }
 }
 
 export async function animateSeq(context) {
+    await resetSeq();
     if (context instanceof Map) {
         for (const values of context.values()) {
-            noteSeq.push([...values]);  // 推入 noteSeq 中保留整組
+            const copiedValues = values.map(v => ({ ...v }));
+            noteSeq.push(copiedValues);
         }
     } else if (typeof context === 'number') {
         const closest = guitarStandard
@@ -129,7 +130,7 @@ async function renderNotes() {
             v: note.velocity,
             d: note.endTime - note.startTime,
             y: mapRange(note.pitch, minPitch, maxPitch, midiApp.canvas.height - 300, 200),
-            r: mapRange(note.velocity, 60, 127, 20, 50),
+            r: mapRange(note.velocity, 60, 127, 15, 40),
             startTime: note.startTime,
             isReady: false,
             color: 0xffffff,
@@ -147,6 +148,8 @@ async function renderNotes() {
 
     const pixelPerSec = Math.min(500, 100 / minDelta);
 
+
+    let posX = 185
     sortedTimes.forEach((time, i) => {
         const group = groupMap.get(time);
         const nextTime = sortedTimes[i + 1];
@@ -157,12 +160,14 @@ async function renderNotes() {
         group.unshift({
             dltB: deltaBeats,
             scale: 1,
-            x: 185 + (time - (time > offset ? initTime : 0)) * pixelPerSec,
+            x: posX,//185 + (time - (time > offset ? initTime : 0)) * pixelPerSec,
             targetX: 185 + time * pixelPerSec,
             lyric: group[0].isReady ? `${group[0].isReady}` : "",
-            vx: 12
+            vx: 15
         });
 
+        posX += deltaBeats > 2 ? 400 :
+            deltaBeats >= 0.5 ? deltaBeats * 200 : 100
         if (time >= offset) {
             for (let j = 1; j < group.length; j++) {
                 group[j].color = pitchToColor(group[j].note,
@@ -177,7 +182,7 @@ async function renderNotes() {
 }
 
 async function renderMetaData() {
-    const midi = MidiParser.parse(new Uint8Array(arrayBuffer));
+    const midi = MidiParser.parse(new Uint8Array(midiBfr));
 
     midi.track.forEach(track => {
         let ticks = 0;
@@ -197,7 +202,7 @@ async function renderMetaData() {
                     return;
                 }
 
-                const time = (ticks / ticksPerQuarter) * (60 / tempo) + offset;
+                const time = (ticks / tickPQtr) * (60 / tempo) + offset;
 
                 if (text !== '\r' && groupMap.has(time)) {
                     groupMap.get(time)[0].lyric = text;
