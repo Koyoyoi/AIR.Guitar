@@ -117,7 +117,6 @@ async function renderNotes() {
 
     const maxPitch = Math.max(...noteData.notes.map(n => n.pitch));
     const minPitch = Math.min(...noteData.notes.map(n => n.pitch));
-    console.log(maxPitch, minPitch)
 
     initTime = noteData.notes[0].startTime
     for (const note of noteData.notes) {
@@ -207,8 +206,11 @@ async function renderMetaData() {
             // Key Signature
             if (event.type === 0xFF && event.metaType === 0x59) {
                 const highByte = (event.data >> 8) & 0xFF;
+                const lowByte = event.data & 0xFF;
+                console.log(new Int8Array([highByte])[0], lowByte)
                 // 有號整數表示的五度圈偏移量 (-7 ~ 7)
-                key = new Int8Array([highByte])[0];
+                key = lowByte == 0 ? new Int8Array([highByte])[0] : new Int8Array([highByte])[0] - 6;
+                console.log(key)
             }
         });
     });
