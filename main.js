@@ -1,4 +1,4 @@
-import { settingCtrl, loadImg, modeNum, playNum, handCtrl, } from "./Controll/blockControll.js";
+import { settingCtrl, loadImg, modeNum, playNum } from "./Controll/blockControll.js";
 import { chordCtrl, pinchCtrl, pluckCtrl, strumCtrl, wavingCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";

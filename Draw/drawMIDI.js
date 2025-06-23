@@ -133,6 +133,7 @@ export function midiDrawLoop(now) {
 
     if (modeNum === 0) {
         drawString();
+        isLoad = false
     }
     else if (modeNum === 1) {
         drawEffects();
@@ -194,7 +195,7 @@ function drawNext() {
             text: n.readyNote > 0 ? n.readyNote : note7Map[(n.note - key) % 12],
             style: style,
             x: midiApp.canvas.width / 2 + i * 200,
-            y: 25
+            y: midiApp.canvas.height * 0.25 + 25
         });
         text.anchor.set(0.5, 0);
         midiApp.stage.addChild(text);
@@ -203,7 +204,7 @@ function drawNext() {
             text: ctrl.lyric,
             style: style,
             x: midiApp.canvas.width / 2 + i * 200 - 40,
-            y: 100
+            y: midiApp.canvas.height * 0.25 + 100
         });
         text.anchor.set(0.5, 0);
         midiApp.stage.addChild(lryic);

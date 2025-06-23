@@ -163,11 +163,7 @@ export function drawSongName() {
 
     text.anchor.set(0.5, 0); // anchor 設在水平方向中心、垂直方向頂部
     text.x = baseApp.renderer.width / 2; // 畫面水平中心
-    if (modeNum == 1)
-        text.y = 15;
-    else if (modeNum == 2)
-        text.y = baseApp.canvas.height - 80
-
+    text.y = 15;
     baseApp.stage.addChild(text);
 }
 
