@@ -1,5 +1,5 @@
 import { noteSeq, stringSeq, resetSeq } from "./Draw/drawMIDI.js";
-import { mapRange, guitarStandard } from "./sound.js";
+import { mapRange, guitarStandard, rootTab } from "./sound.js";
 import { midiApp } from "./main.js";
 import { closeSet } from "./Controll/blockControll.js";
 
@@ -209,11 +209,19 @@ async function renderMetaData() {
             }
             // Key Signature
             if (event.type === 0xFF && event.metaType === 0x59) {
-                const highByte = (event.data >> 8) & 0xFF;
+                const majorKeys = [
+                    "C♭", "G♭", "D♭", "A♭", "E♭", "B♭", "F", "C",
+                    "G", "D", "A", "E", "B", "F♯", "C♯"
+                ];
+
+                const highByte = new Int8Array([(event.data >> 8) & 0xFF])[0];
                 const lowByte = event.data & 0xFF;
-                console.log(new Int8Array([highByte])[0], lowByte)
-                // 有號整數表示的五度圈偏移量 (-7 ~ 7)
-                key = lowByte == 0 ? new Int8Array([highByte])[0] : new Int8Array([highByte])[0] - 6;
+                const MajKey = majorKeys[highByte + 7]
+
+                console.log(MajKey, lowByte == 0 ? 'major' : 'minor')
+                key = MajKey[1] == undefined ? rootTab[MajKey[0]] :
+                    MajKey[1] == '♭' ? rootTab[MajKey[0]] - 1 : rootTab[MajKey[0]] + 1
+
                 console.log(key)
             }
         });
