@@ -17,10 +17,21 @@ export async function midiProcess(file) {
         alert("尚未載入 MIDI 檔案！");
     }
     else {
-        if (file != 'reload') {
-            songName = file.name.replace(/\.mid(i)?$/i, "");
+        if (file !== 'reload') {
+            if (file instanceof File) {
+                // 使用者上傳的檔案
+                songName = file.name.replace(/\.mid(i)?$/i, "");
+                midiBfr = await file.arrayBuffer();
+            } else if (file instanceof ArrayBuffer) {
+                // 直接給的是 ArrayBuffer
+                songName = "望春風";  // 或你可以用其他名稱
+                midiBfr = file;
+            } else {
+                console.error("未知的 MIDI 輸入型態", file);
+                return;
+            }
+
             console.log("檔案名稱:", songName);
-            midiBfr = await file.arrayBuffer();
             const blob = new Blob([midiBfr], { type: "audio/midi" });
             noteData = await mm.blobToNoteSequence(blob);
             noteData.notes.sort((a, b) => a.startTime - b.startTime);
@@ -29,14 +40,16 @@ export async function midiProcess(file) {
             tickPQtr = noteData.ticksPerQuarter || 480;
 
             console.log("Tempo:", tempo);
-            closeSet()
+            closeSet();
             await renderNotes();
             await renderMetaData();
         } else {
-            animateSeq(groupMap)
+            animateSeq(groupMap);
         }
     }
+
 }
+
 
 export async function animateSeq(context) {
     await resetSeq();

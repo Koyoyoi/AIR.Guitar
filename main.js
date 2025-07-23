@@ -131,12 +131,27 @@ async function main() {
     await setupCamera();
     await initMIDIPort();
 
-    fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://imuse.ncnu.edu.tw/virtualpianostudio/audio/midi-files.json'))
+    const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+    const jsonUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/midi-files.json';
+    const midiUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/望春風.mid';
+
+    fetch(corsProxy + jsonUrl)
         .then(res => res.json())
-        .then(data => {
-            const json = JSON.parse(data.contents);
-            console.log(json);
-        });
+        .then(json => {
+            console.log('MIDI 檔清單:', json);
+        })
+        .catch(err => console.error('Fetch JSON error:', err));
+
+    fetch(corsProxy + midiUrl)
+        .then(res => res.arrayBuffer())
+        .then(buffer => {
+            console.log('透過 proxy 抓到 MIDI:', buffer);
+            // 處理 buffer
+            midiProcess(buffer)
+        })
+        .catch(err => console.error('Proxy Fetch Error:', err));
+
+
 
     buildGuitarChord('C');
 
