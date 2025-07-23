@@ -79,7 +79,7 @@ export async function rollSeq(velocities = 0) {
             noteSeq.shift();
         }
         else if (modeNum === 2) {
-            let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[noteSeq[0][1].note % 12][0]
+            let isEqual = note7Map[rootTab[gesture[0]]] == note7Map[(noteSeq[0][1].note - key) % 12][0]
             if (isEqual) {
 
                 let noteGroup = noteSeq[0]

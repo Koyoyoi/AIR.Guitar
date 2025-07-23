@@ -199,21 +199,22 @@ export async function wavingCtrl(RHand, LHand) {
     else if (modeNum === 2) {
         const midY = video.videoHeight / 2;
 
-        // 右手判斷（垂直方向）
+        // 右手判斷（僅偵測往下）
         if (RHand?.[0]) {
-            const currentRY = RHand[9][1]; // 取右手掌心（9號關節）的 Y 值
+            const currentRY = RHand[9][1]; // 右手掌心的 Y 座標
             if (prevRY !== null) {
-                if ((prevRY < midY && currentRY >= midY) || (prevRY >= midY && currentRY < midY)) {
+                if (prevRY < midY && currentRY >= midY) { // 往下穿越中線才觸發
                     if (triggeredBy === null || triggeredBy === "R") {
                         triggeredBy = "R";
-                        rollSeq("Down"); // 觸發事件
+                        rollSeq("Down"); // 呼叫觸發函式
                     }
                 }
             }
             prevRY = currentRY;
         } else if (triggeredBy === "R") {
-            triggeredBy = null; // 右手離開畫面，解除限制
+            triggeredBy = null; // 右手離開畫面，解除觸發限制
         }
+
     }
 
 }

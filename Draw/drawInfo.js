@@ -4,6 +4,7 @@ import { modeNum, playNum, showAllCtrl, capo } from "../Controll/blockControll.j
 import { songName } from "../midiEvent.js";
 import { fingerPlay } from "../handCompute.js";
 import { noteSeq } from "./drawMIDI.js";
+import { key } from "../midiEvent.js";
 
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
@@ -128,7 +129,7 @@ export function drawGesture(gesture, capo, LHand) {
             fontFamily: 'Arial',
             fontSize: 150,
             fontWeight: 'bold',
-            fill: t == note7Map[noteSeq[0][1].note % 12] ? 0x00AA90 : 0xffffff,
+            fill: t == note7Map[(noteSeq[0][1].note - key) % 12] ? 0x00AA90 : 0xffffff,
             align: 'left',
         });
 
