@@ -256,32 +256,20 @@ export async function drawHand(handData) {
         }
     }
     else if (modeNum == 2) {
-        function dist2D(p1, p2) {
-            const dx = p1[0] - p2[0];
-            const dy = p1[1] - p2[1];
-            return Math.sqrt(dx * dx + dy * dy);
-        }
         if (Rhand[0] != undefined) {
-            let right = dist2D(Rhand[4], Rhand[8]) < 50;
-            G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
-                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
-                .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
-                .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
-        }
-        if (Lhand[0] != undefined) {
-            let closeTop = Lhand[9][1] < appHeight - Lhand[9][1] ? true : false;
-            let right = dist2D(Lhand[4], Lhand[8]) < 50;
+            let closeTop = Rhand[9][1] < appHeight - Rhand[9][1] ? true : false;
 
             // sturming
-            G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
+            G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
                 .fill({ color: 0xffffff, alpha: 0.4 })
-                .circle(appWidth - Lhand[9][0], 0, 30)
+                .circle(appWidth - Rhand[9][0], 0, 30)
                 .fill({ color: closeTop ? 0x00AA90 : 0xffffff, alpha: 0.4 })
-                .circle(appWidth - Lhand[9][0], appHeight, 30)
+                .circle(appWidth - Rhand[9][0], appHeight, 30)
                 .fill({ color: !closeTop ? 0x00AA90 : 0xffffff, alpha: 0.4 })
-                .roundRect(appWidth - Lhand[9][0] - 30, appHeight / 2, 60, 10)
+                .roundRect(appWidth - Rhand[9][0] - 30, appHeight / 2, 60, 10)
                 .fill(0xffffff);
         }
+
         baseApp.stage.addChild(G);
     }
 

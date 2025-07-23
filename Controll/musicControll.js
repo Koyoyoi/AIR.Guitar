@@ -13,7 +13,7 @@ let action = '', prevAction = '';                          // 動作狀態
 let isRPinch = false, isLPinch = false, PinchLR = false    // 指尖觸碰
 let triggeredBy = null;                                    // "R" 或 "L"：記錄目前由哪隻手觸發中
 let prevRX = null, prevLX = null;
-let prevLY = null;
+let prevLY = null, prevRY = null;
 
 let pluck = [], prevPluck = { 'Right': [], 'Left': [] }, velocities = [];
 
@@ -199,21 +199,20 @@ export async function wavingCtrl(RHand, LHand) {
     else if (modeNum === 2) {
         const midY = video.videoHeight / 2;
 
-        if (LHand?.[0]) {
-            const currentRY = LHand[9][1];
-
-            if (prevLY !== null) {
-                const crossedDown = prevLY < midY && currentRY >= midY;  // 只由上往下
-                if (crossedDown && (triggeredBy === null || triggeredBy === "L")) {
-                    triggeredBy = "L";
-                    rollSeq('Down');
+        // 右手判斷（垂直方向）
+        if (RHand?.[0]) {
+            const currentRY = RHand[9][1]; // 取右手掌心（9號關節）的 Y 值
+            if (prevRY !== null) {
+                if ((prevRY < midY && currentRY >= midY) || (prevRY >= midY && currentRY < midY)) {
+                    if (triggeredBy === null || triggeredBy === "R") {
+                        triggeredBy = "R";
+                        rollSeq("Down"); // 觸發事件
+                    }
                 }
             }
-
-            prevLY = currentRY;
-        } else if (triggeredBy === "L") {
-            triggeredBy = null;
-            prevLY = null;
+            prevRY = currentRY;
+        } else if (triggeredBy === "R") {
+            triggeredBy = null; // 右手離開畫面，解除限制
         }
     }
 

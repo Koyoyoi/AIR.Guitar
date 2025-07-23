@@ -110,7 +110,6 @@ async function detectLoop() {
             drawSongName();
             drawHand(handData);
             await chordCtrl();
-            await pinchCtrl(handData['Right']);
             await wavingCtrl(handData['Right'], handData['Left']);
             break;
     }
