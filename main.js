@@ -131,18 +131,12 @@ async function main() {
     await setupCamera();
     await initMIDIPort();
 
-    fetch('https://imuse.ncnu.edu.tw/virtualpianostudio/audio/midi-files.json')
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
+    fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://imuse.ncnu.edu.tw/virtualpianostudio/audio/midi-files.json'))
+        .then(res => res.json())
         .then(data => {
-            console.log('取得 JSON 資料:', data);
-        })
-        .catch(error => {
-            console.error('Fetch 發生錯誤:', error);
+            const json = JSON.parse(data.contents);
+            console.log(json);
         });
-
 
     buildGuitarChord('C');
 
