@@ -135,14 +135,14 @@ async function main() {
     const jsonUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/midi-files.json';
     const midiUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/望春風.mid';
 
-    fetch(corsProxy + jsonUrl)
+    fetch(jsonUrl)
         .then(res => res.json())
         .then(json => {
             console.log('MIDI 檔清單:', json);
         })
         .catch(err => console.error('Fetch JSON error:', err));
 
-    fetch(corsProxy + midiUrl)
+    fetch(midiUrl)
         .then(res => res.arrayBuffer())
         .then(buffer => {
             console.log('透過 proxy 抓到 MIDI:', buffer);
