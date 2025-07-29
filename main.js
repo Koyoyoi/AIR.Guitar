@@ -131,7 +131,6 @@ async function main() {
     await setupCamera();
     await initMIDIPort();
 
-    const corsProxy = 'https://cors-anywhere.herokuapp.com/';
     const jsonUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/midi-files.json';
     const midiUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/望春風.mid';
 
