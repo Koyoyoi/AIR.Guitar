@@ -1,5 +1,5 @@
 import { soundSample, guitarStandard, revRootTab, mapRange, note7Map, rootTab, guitarChord } from "../sound.js";
-import { modeNum, capo, isOnTime } from "../Controll/blockControll.js";
+import { modeNum, capo } from "../Controll/blockControll.js";
 import { pitchToColor, key } from "../midiEvent.js";
 import { gesture } from "../Controll/musicControll.js";
 import { midiApp } from "../main.js";
@@ -32,11 +32,10 @@ export async function resetSeq() {
 export async function rollSeq(velocities = 0) {
 
     if (noteSeq.length > 0) {
-        if ((!isRolling || isOnTime) && modeNum === 1) {
+        if (modeNum === 1) {
 
             isRolling = true;
-            let offset = noteSeq.length <= 1 ? 10 :
-                isOnTime ? noteSeq[1][0].x - 185 : noteSeq[1][0].x - noteSeq[0][0].x;
+            let offset = noteSeq.length <= 1 ? 10 : noteSeq[1][0].x - 185 
 
             // set target x
             for (let col = 0; col < noteSeq.length; col++) {

@@ -5,7 +5,6 @@ import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
 export let modeNum = 1, sampleNum = 0, capo = 0, playNum = 0;
 export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
-export let isOnTime = true;
 
 let IMGs = {}
 let textStyle = {
@@ -94,7 +93,6 @@ export function settingCtrl() {
             reloadCtrl();
             touchCtrl();
             playCtrl();
-            onTimeCtrl();
         }
         else if (modeNum == 2) {
             reloadCtrl();
@@ -503,39 +501,3 @@ export function playCtrl() {
 
 }
 
-export function onTimeCtrl() {
-
-    if (showAllCtrl) return
-
-    const Area = {
-        x: uiApp.screen.width - uiApp.screen.width * 0.4,
-        y: uiApp.screen.height - uiApp.screen.height * 0.1,
-        w: uiApp.screen.width * 0.14,
-        h: uiApp.screen.height * 0.08
-    };
-
-    // 背景區域
-    const labelBase = new PIXI.Graphics()
-        .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
-        .fill(isOnTime ? 0x00AA90 : 0x434343)
-
-    labelBase.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h); // 限定互動範圍（可調整）
-    labelBase.interactive = true;
-    labelBase.buttonMode = true;
-    labelBase.on('pointerdown', () => {
-        console.log("✅ onTime控制區被點擊！");
-        isOnTime = !isOnTime
-    });
-    uiApp.stage.addChild(labelBase);
-
-    // 文字創建方式`
-    const label = new PIXI.Text({
-        text: '即時觸發',
-        style: textStyle['normal']
-    });
-    label.anchor.set(0.5);
-    label.x = Area.x + Area.w / 2;
-    label.y = Area.y + Area.h / 2;
-
-    uiApp.stage.addChild(label); // 確保文字能夠顯示在背景區域之上
-}
