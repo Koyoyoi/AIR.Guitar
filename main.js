@@ -10,6 +10,7 @@ import { load_SVM_Model } from "./SVM.js";
 // --- 全域變數宣告 ---
 export let video, baseApp, midiApp, uiApp;
 export let handData = { "Left": [], "Right": [] }, poseData = [];
+export let webCam = false;
 
 let videoSprite, overlay;
 
@@ -34,37 +35,77 @@ async function initCanvas() {
     wrapper.appendChild(uiApp.canvas);
 }
 
-// --- 初始化攝影機 ---
-async function setupCamera() {
+export async function setupCamera(ctrl = 'open') {
+    if (ctrl === 'close') {
+        // 關閉攝影機並停止所有串流 track
+        if (video?.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        }
+        webCam = false;
+
+        // 切換成佔位圖
+        const placeholderTexture = PIXI.Texture.from("images/no-camera.png");
+        setupVideoSprite(placeholderTexture, 1280, 720);
+
+        return null;
+    }
+
+    // ctrl === 'open' 或其他值 → 嘗試開啟攝影機
     video = document.createElement("video");
     video.style.display = "none";
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } }
-    });
+    let stream;
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        webCam = true;
+        video.srcObject = stream;
+    } catch (err) {
+        console.warn("使用者未允許或沒有鏡頭", err);
+        webCam = false;
 
-    video.srcObject = stream;
+        // 顯示佔位圖
+        const placeholderTexture = PIXI.Texture.from("images/no-camera.png");
+        setupVideoSprite(placeholderTexture, 1280, 720);
+
+        return null;
+    }
 
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
-            document.getElementById("title").textContent = "AIR Guitar";
-            document.getElementById("loading").classList.add("hidden");
-            document.querySelector(".upload-section")?.classList.add("show");
-
-            const texture = PIXI.Texture.from(video);
-            videoSprite = new PIXI.Sprite(texture);
-            videoSprite.width = video.videoWidth;
-            videoSprite.height = video.videoHeight;
-            videoSprite.scale.x = -1;
-            videoSprite.x = video.videoWidth;
-
-            reCanva();
-            window.addEventListener("resize", reCanva);
-
+            if (webCam) {
+                const texture = PIXI.Texture.from(video);
+                setupVideoSprite(texture, video.videoWidth, video.videoHeight);
+            } else {
+                const placeholderTexture = PIXI.Texture.from("images/no-camera.png");
+                setupVideoSprite(placeholderTexture, 1280, 720);
+            }
             resolve(video);
         };
+        video.play().catch(e => console.warn("無法自動播放攝影機影像", e));
     });
 }
+
+function setupVideoSprite(texture, width, height) {
+    // 更新 UI 狀態
+    document.getElementById("title").textContent = "AIR Guitar";
+    document.getElementById("loading").classList.add("hidden");
+    document.querySelector(".upload-section")?.classList.add("show");
+
+    videoSprite = new PIXI.Sprite(texture);
+    videoSprite.width = width;
+    videoSprite.height = height;
+    videoSprite.scale.x = -1;
+    videoSprite.x = width;
+
+    reCanva();
+    window.addEventListener("resize", reCanva);
+}
+
+
+
 
 // --- MIDI 檔上傳事件 ---
 function setupFileUpload() {
@@ -79,38 +120,47 @@ function setupFileUpload() {
 async function detectLoop() {
     baseApp.stage.removeChildren();
     uiApp.stage.removeChildren();
-    baseApp.stage.addChild(videoSprite);
+
+    if (webCam) baseApp.stage.addChild(videoSprite);
     if (modeNum === 1 || modeNum === 2) baseApp.stage.addChild(overlay);
 
-    await detectHand();
-    await detectPose();
+    if (webCam && !(video.videoWidth === 0 || video.videoHeight === 0)) {
+        await detectHand();
+        await detectPose();
+    }
 
     settingCtrl();
 
     switch (modeNum) {
         case 0:
-            await chordCtrl();
-            await strumCtrl();
-            await pluckCtrl();
-            drawFinger(handData['Right']);
+            if (webCam) {
+                await chordCtrl();
+                await strumCtrl();
+                await pluckCtrl();
+                drawFinger(handData['Right']);
+            }
             break;
         case 1:
             drawHand(handData);
             drawSongName();
-            if (playNum == 0) {
-                await pluckCtrl();
-            }
-            else if (playNum === 1) {
-                await pinchCtrl(handData['Right'], handData['Left']);
-            } else if (playNum === 2) {
-                await wavingCtrl(handData['Right'], handData['Left']);
+            if (webCam) {
+                if (playNum == 0) {
+                    await pluckCtrl();
+                }
+                else if (playNum === 1) {
+                    await pinchCtrl(handData['Right'], handData['Left']);
+                } else if (playNum === 2) {
+                    await wavingCtrl(handData['Right'], handData['Left']);
+                }
             }
             break;
         case 2:
-            drawSongName();
-            drawHand(handData);
-            await chordCtrl();
-            await wavingCtrl(handData['Right'], handData['Left']);
+            if (webCam) {
+                drawSongName();
+                drawHand(handData);
+                await chordCtrl();
+                await wavingCtrl(handData['Right'], handData['Left']);
+            }
             break;
     }
 

@@ -1,5 +1,5 @@
 import { rollSeq } from "../Draw/drawMIDI.js";
-import { uiApp } from "../main.js";
+import { uiApp, webCam, setupCamera } from "../main.js";
 import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
@@ -85,7 +85,7 @@ export function settingCtrl() {
     } else {
         ModeCtrl();
         capoCtrl();
-
+        camCtrl();
         if (modeNum == 0) {
             handCtrl();
         }
@@ -139,8 +139,8 @@ function ModeCtrl() {
     chBtn.interactive = true;
     chBtn.buttonMode = true;
     chBtn.on('pointerdown', () => {
-        console.log("✅ reload 控制區被點擊！");
-        modeNum = (modeNum + 1) % modeName.length
+        console.log("✅ mode 控制區被點擊！");
+        if (webCam) modeNum = (modeNum + 1) % modeName.length
     });
     uiApp.stage.addChild(chBtn);
 }
@@ -501,3 +501,51 @@ export function playCtrl() {
 
 }
 
+
+// --- CAM 控制按鈕 ---
+export function camCtrl() {
+    if (showAllCtrl) return;
+
+    const Area = {
+        x: uiApp.screen.width - uiApp.screen.width * 0.25,
+        y: 10,
+        w: uiApp.screen.width * 0.18,
+        h: uiApp.screen.height * 0.08
+    };
+
+    // 背景區域
+    const labelBase = new PIXI.Graphics()
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
+        .fill(0x434343)
+        .roundRect(Area.x + Area.w * 3 / 5 + 20, Area.y + 5, 4, Area.h - 10)
+        .fill(0x656765);
+    uiApp.stage.addChild(labelBase);
+
+    // 文字
+    const label = new PIXI.Text({
+        text: webCam ? "Cam On" : "Cam Off",
+        style: textStyle['normal']
+    });
+    label.anchor.set(0.5);
+    label.x = Area.x + Area.w / 3;
+    label.y = Area.y + Area.h / 2;
+    uiApp.stage.addChild(label);
+
+    // 按鈕
+    const camBtn = new PIXI.Sprite(IMGs['cam']);
+    camBtn.x = Area.x + Area.w * 2 / 3 + 20;
+    camBtn.y = Area.y;
+    camBtn.width = 50;
+    camBtn.height = Area.h;
+    camBtn.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h)
+    camBtn.interactive = true;
+    camBtn.buttonMode = true;
+
+    camBtn.on('pointerdown', async () => {
+        console.log("📷 CAM 控制按鈕被點擊！");
+        await setupCamera(webCam ? 'close' : 'open');
+        label.text = webCam ? "Cam On" : "Cam Off"; // 更新狀態文字
+    });
+
+    uiApp.stage.addChild(camBtn);
+}

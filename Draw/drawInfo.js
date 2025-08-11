@@ -6,9 +6,10 @@ import { fingerPlay } from "../handCompute.js";
 import { noteSeq } from "./drawMIDI.js";
 import { key } from "../midiEvent.js";
 
+const w = 1280, h = 720
 // 重新調整畫布與影片的大小，根據視窗大小
 export function reCanva() {
-    const aspectRatio = video.videoWidth / video.videoHeight;
+    const aspectRatio = 1280 / 720;
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
