@@ -362,7 +362,7 @@ function drawString() {
                 style
             });
             text.anchor.set(0.5, 0);
-            text.x = 80;
+            text.x = 180;
             text.y = poseY - 55;
 
             midiApp.stage.addChild(text);
