@@ -111,6 +111,7 @@ async function renderNotes() {
     offset = 0;
 
     // 插入預備拍
+    /*
     for (let i = 0; i < PREBEATS; i++) {
         const time = offset;
         groupMap.set(time, [{
@@ -126,7 +127,7 @@ async function renderNotes() {
             readyNote: i + 1
         }]);
         offset += 60 / tempo;
-    }
+    }*/
 
 
     const maxPitch = Math.max(...noteData.notes.map(n => n.pitch));
