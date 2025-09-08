@@ -85,7 +85,7 @@ export function settingCtrl() {
     } else {
         ModeCtrl();
         capoCtrl();
-        camCtrl();
+        //camCtrl();
         if (modeNum == 0) {
             handCtrl();
         }
