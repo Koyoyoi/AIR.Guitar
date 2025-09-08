@@ -85,7 +85,6 @@ export function settingCtrl() {
     } else {
         ModeCtrl();
         capoCtrl();
-        //camCtrl();
         if (modeNum == 0) {
             handCtrl();
         }
@@ -93,6 +92,7 @@ export function settingCtrl() {
             reloadCtrl();
             touchCtrl();
             playCtrl();
+            camCtrl();
         }
         else if (modeNum == 2) {
             reloadCtrl();
