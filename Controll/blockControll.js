@@ -34,12 +34,12 @@ let modeName = {}, playName = {};
 
 // 載入圖片
 export async function loadImg() {
-    const res = await fetch('../IMG/list.json');
+    const res = await fetch('../Controll/IMGs.json');
     const fileList = await res.json();
 
     for (let filename of fileList) {
         const key = filename;
-        const texture = await PIXI.Assets.load(`../IMG/${filename}.png`)
+        const texture = await PIXI.Assets.load(`../Controll/IMG/${filename}.png`)
         IMGs[key] = texture;
     }
 }
@@ -507,8 +507,6 @@ export function playCtrl() {
 
 }
 
-
-// --- CAM 控制按鈕 ---
 export function camCtrl() {
     if (showAllCtrl) return;
 
@@ -537,9 +535,13 @@ export function camCtrl() {
     camBtn.buttonMode = true;
 
     camBtn.on('pointerdown', async () => {
-        console.log("📷 CAM 控制按鈕被點擊！");
+        console.log("CAM 控制按鈕被點擊！");
         await setupCamera(webCam ? 'close' : 'open');
     });
 
     uiApp.stage.addChild(camBtn);
+}
+
+export function swLanguage(){
+
 }
