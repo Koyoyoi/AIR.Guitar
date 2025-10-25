@@ -9,6 +9,7 @@
     "reload",
     "change_Mode",
     "change_Play",
-    "cam"
+    "cam_on",
+    "cam_off"
   ]
   

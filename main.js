@@ -1,4 +1,4 @@
-import { settingCtrl, loadImg, modeNum, playNum } from "./Controll/blockControll.js";
+import { settingCtrl, loadImg, modeNum, playNum, loadLanguage } from "./Controll/blockControll.js";
 import { chordCtrl, pinchCtrl, pluckCtrl, strumCtrl, wavingCtrl } from "./Controll/musicControll.js";
 import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
@@ -174,6 +174,7 @@ async function detectLoop() {
 
 // --- 主程式初始化 ---
 async function main() {
+    await loadLanguage();
     await loadImg();
     await setupMediaPipe();
     await load_SVM_Model();

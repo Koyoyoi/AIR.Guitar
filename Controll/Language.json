@@ -1,0 +1,10 @@
+{
+  "zh-TW": {
+    "modeName": ["自由演奏", "歌曲演奏", "數字演奏"],
+    "playName": ["彎曲手指", "雙指互碰", "手部揮動"]
+  },
+  "EN": {
+    "modeName": ["Free Play", "Song Mode", "Number Mode"],
+    "playName": ["Finger Bend", "Finger Tap", "Hand Swing"]
+  }
+}

@@ -30,19 +30,25 @@ let textStyle = {
         align: "center"
     })
 }
-const modeName = ["自由演奏", "歌曲演奏", "數字演奏"];
-const playName = ["彎曲手指", "雙指互碰", "手部揮動"]
+let modeName = {}, playName = {};
 
 // 載入圖片
 export async function loadImg() {
-    const res = await fetch('./IMG/list.json');
+    const res = await fetch('../IMG/list.json');
     const fileList = await res.json();
 
     for (let filename of fileList) {
         const key = filename;
-        const texture = await PIXI.Assets.load(`./IMG/${filename}.png`)
+        const texture = await PIXI.Assets.load(`../IMG/${filename}.png`)
         IMGs[key] = texture;
     }
+}
+// 載入文字
+export async function loadLanguage(lang = 'zh-TW') {
+    const res = await fetch('../Controll/Language.json');
+    const json = await res.json();
+    const data = json[lang];
+    ({ modeName, playName } = data);
 }
 
 export function closeSet() {
@@ -507,9 +513,9 @@ export function camCtrl() {
     if (showAllCtrl) return;
 
     const Area = {
-        x: uiApp.screen.width - uiApp.screen.width * 0.25,
+        x: uiApp.screen.width - uiApp.screen.width * 0.1,
         y: 10,
-        w: uiApp.screen.width * 0.18,
+        w: uiApp.screen.width * 0.05,
         h: uiApp.screen.height * 0.08
     };
 
@@ -517,25 +523,14 @@ export function camCtrl() {
     const labelBase = new PIXI.Graphics()
         .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
         .fill(0x434343)
-        .roundRect(Area.x + Area.w * 3 / 5 + 20, Area.y + 5, 4, Area.h - 10)
-        .fill(0x656765);
+
     uiApp.stage.addChild(labelBase);
 
-    // 文字
-    const label = new PIXI.Text({
-        text: webCam ? "Cam On" : "Cam Off",
-        style: textStyle['normal']
-    });
-    label.anchor.set(0.5);
-    label.x = Area.x + Area.w / 3;
-    label.y = Area.y + Area.h / 2;
-    uiApp.stage.addChild(label);
-
     // 按鈕
-    const camBtn = new PIXI.Sprite(IMGs['cam']);
-    camBtn.x = Area.x + Area.w * 2 / 3 + 20;
+    const camBtn = new PIXI.Sprite(IMGs[webCam ? 'cam_on' : 'cam_off']);
+    camBtn.x = Area.x;
     camBtn.y = Area.y;
-    camBtn.width = 50;
+    camBtn.width = 60;
     camBtn.height = Area.h;
     camBtn.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h)
     camBtn.interactive = true;
@@ -544,7 +539,6 @@ export function camCtrl() {
     camBtn.on('pointerdown', async () => {
         console.log("📷 CAM 控制按鈕被點擊！");
         await setupCamera(webCam ? 'close' : 'open');
-        label.text = webCam ? "Cam On" : "Cam Off"; // 更新狀態文字
     });
 
     uiApp.stage.addChild(camBtn);
