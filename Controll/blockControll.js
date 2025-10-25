@@ -6,7 +6,7 @@ import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 export let modeNum = 1, sampleNum = 0, capo = 0, playNum = 0;
 export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
 
-let IMGs = {}
+let IMGs = {}, modeName = {}, playName = {};
 let textStyle = {
     'normal': new PIXI.TextStyle({
         fontFamily: "Arial",
@@ -30,7 +30,6 @@ let textStyle = {
         align: "center"
     })
 }
-let modeName = {}, playName = {};
 
 // 載入圖片
 export async function loadImg() {
@@ -99,6 +98,7 @@ export function settingCtrl() {
             touchCtrl();
             playCtrl();
             camCtrl();
+            swLanguage();
         }
         else if (modeNum == 2) {
             reloadCtrl();
@@ -513,20 +513,20 @@ export function camCtrl() {
     const Area = {
         x: uiApp.screen.width - uiApp.screen.width * 0.1,
         y: 10,
-        w: uiApp.screen.width * 0.05,
+        w: uiApp.screen.width * 0.06,
         h: uiApp.screen.height * 0.08
     };
 
     // 背景區域
     const labelBase = new PIXI.Graphics()
-        .roundRect(Area.x, Area.y, Area.w, Area.h, 10)
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 25)
         .fill(0x434343)
 
     uiApp.stage.addChild(labelBase);
 
     // 按鈕
     const camBtn = new PIXI.Sprite(IMGs[webCam ? 'cam_on' : 'cam_off']);
-    camBtn.x = Area.x;
+    camBtn.x = Area.x + Area.w / 7;
     camBtn.y = Area.y;
     camBtn.width = 60;
     camBtn.height = Area.h;
@@ -535,13 +535,43 @@ export function camCtrl() {
     camBtn.buttonMode = true;
 
     camBtn.on('pointerdown', async () => {
-        console.log("CAM 控制按鈕被點擊！");
+        console.log("CAM 被點擊！");
         await setupCamera(webCam ? 'close' : 'open');
     });
 
     uiApp.stage.addChild(camBtn);
 }
 
-export function swLanguage(){
+export function swLanguage() {
+    if (showAllCtrl) return;
 
+    const Area = {
+        x: uiApp.screen.width - uiApp.screen.width * 0.2,
+        y: 10,
+        w: uiApp.screen.width * 0.06,
+        h: uiApp.screen.height * 0.08
+    };
+
+    // 背景區域
+    const labelBase = new PIXI.Graphics()
+        .roundRect(Area.x, Area.y, Area.w, Area.h, 25)
+        .fill(0x434343)
+
+    uiApp.stage.addChild(labelBase);
+
+    // 按鈕
+    const camBtn = new PIXI.Sprite(IMGs['language']);
+    camBtn.x = Area.x + Area.w / 7;
+    camBtn.y = Area.y;
+    camBtn.width = 60;
+    camBtn.height = Area.h;
+    camBtn.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h)
+    camBtn.interactive = true;
+    camBtn.buttonMode = true;
+
+    camBtn.on('pointerdown', async () => {
+        console.log("Language 被點擊！");
+    });
+
+    uiApp.stage.addChild(camBtn);
 }
