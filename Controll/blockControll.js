@@ -3,20 +3,17 @@ import { uiApp, webCam, setupCamera } from "../main.js";
 import { midiProcess } from "../midiEvent.js";
 import { initMIDIPort, instruments, loadSamples } from "../sound.js";
 
-export let modeNum = 1, sampleNum = 0, capo = 0, playNum = 0;
+export let modeNum = 1, sampleNum = 0, capo = 0, playNum = 0, langNum = 0;
 export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
 
+const langs = ['zh-TW', 'EN'];
 let IMGs = {}, modeName = {}, playName = {};
 let textStyle = {
     'normal': new PIXI.TextStyle({
-        fontFamily: "Arial",
         fontSize: 30,
-        fontWeight: "bold",
         fill: 0xBDC0BA,
-        align: "center"
     }),
     'gesture': new PIXI.TextStyle({
-        fontFamily: "Arial",
         fontSize: 30,
         fontWeight: "bold",
         fill: 0xe87a90,
@@ -44,6 +41,8 @@ export async function loadImg() {
 }
 // 載入文字
 export async function loadLanguage(lang = 'zh-TW') {
+    modeName = [];
+    playName = [];
     const res = await fetch('../Controll/Language.json');
     const json = await res.json();
     const data = json[lang];
@@ -88,7 +87,8 @@ export function settingCtrl() {
         sampleCtrl();
 
     } else {
-        ModeCtrl();
+        modeCtrl();
+        LanguageCtrl();
         capoCtrl();
         if (modeNum == 0) {
             handCtrl();
@@ -98,7 +98,7 @@ export function settingCtrl() {
             touchCtrl();
             playCtrl();
             camCtrl();
-            swLanguage();
+
         }
         else if (modeNum == 2) {
             reloadCtrl();
@@ -109,11 +109,11 @@ export function settingCtrl() {
 }
 
 // Mode 控制區域
-function ModeCtrl() {
+function modeCtrl() {
     const Area = {
         x: 20,
         y: 10,
-        w: uiApp.screen.width * 0.2,
+        w: uiApp.screen.width * 0.22,
         h: uiApp.screen.height * 0.08
     };
 
@@ -466,9 +466,9 @@ export function playCtrl() {
     if (showAllCtrl) return
 
     const Area = {
-        x: uiApp.screen.width - uiApp.screen.width * 0.25,
+        x: uiApp.screen.width - uiApp.screen.width * 0.28,
         y: uiApp.screen.height - uiApp.screen.height * 0.1,
-        w: uiApp.screen.width * 0.18,
+        w: uiApp.screen.width * 0.22,
         h: uiApp.screen.height * 0.08
     };
 
@@ -511,7 +511,7 @@ export function camCtrl() {
     if (showAllCtrl) return;
 
     const Area = {
-        x: uiApp.screen.width - uiApp.screen.width * 0.1,
+        x: uiApp.screen.width - uiApp.screen.width * 0.08,
         y: 10,
         w: uiApp.screen.width * 0.06,
         h: uiApp.screen.height * 0.08
@@ -542,11 +542,11 @@ export function camCtrl() {
     uiApp.stage.addChild(camBtn);
 }
 
-export function swLanguage() {
+export function LanguageCtrl() {
     if (showAllCtrl) return;
 
     const Area = {
-        x: uiApp.screen.width - uiApp.screen.width * 0.2,
+        x: uiApp.screen.width - uiApp.screen.width * 0.15,
         y: 10,
         w: uiApp.screen.width * 0.06,
         h: uiApp.screen.height * 0.08
@@ -560,18 +560,21 @@ export function swLanguage() {
     uiApp.stage.addChild(labelBase);
 
     // 按鈕
-    const camBtn = new PIXI.Sprite(IMGs['language']);
-    camBtn.x = Area.x + Area.w / 7;
-    camBtn.y = Area.y;
-    camBtn.width = 60;
-    camBtn.height = Area.h;
-    camBtn.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h)
-    camBtn.interactive = true;
-    camBtn.buttonMode = true;
+    const langBtn = new PIXI.Sprite(IMGs['language']);
+    langBtn.x = Area.x + Area.w / 7;
+    langBtn.y = Area.y;
+    langBtn.width = Area.h;
+    langBtn.height = Area.h;
+    langBtn.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h)
+    langBtn.interactive = true;
+    langBtn.buttonMode = true;
 
-    camBtn.on('pointerdown', async () => {
+    langBtn.on('pointerdown', async () => {
         console.log("Language 被點擊！");
+        langNum += 1;
+        langNum = langNum % langs.length;
+        await loadLanguage(langs[langNum]);
     });
 
-    uiApp.stage.addChild(camBtn);
+    uiApp.stage.addChild(langBtn);
 }
