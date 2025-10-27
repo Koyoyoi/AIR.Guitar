@@ -182,8 +182,8 @@ async function main() {
     await setupCamera();
     await initMIDIPort();
 
-    const jsonUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/midi-files.json';
-    const midiUrl = 'https://imuse.ncnu.edu.tw/virtualpianostudio/audio/望春風.mid';
+    const jsonUrl = 'https://imuse.ncnu.edu.tw/Midi-library/audio/midi-files.json';
+    const midiUrl = 'https://imuse.ncnu.edu.tw/Midi-library/望春風.mid';
 
     fetch(jsonUrl)
         .then(res => res.json())
