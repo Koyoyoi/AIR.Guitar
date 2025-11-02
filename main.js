@@ -41,7 +41,6 @@ async function initCanvas() {
         overlay.clear()
             .rect(0, 0, baseApp.renderer.width, baseApp.renderer.height)
             .fill({ color: 0x1c1c1c, alpha: 0.5 });
-        setupCamera();
     });
     // 更新 UI 狀態
     //document.getElementById("title").textContent = "AIR Guitar";
@@ -58,11 +57,6 @@ export async function setupCamera(ctrl = 'open') {
             video.srcObject = null;
         }
         webCam = false;
-
-        // 切換成佔位圖
-        const placeholderTexture = PIXI.Texture.from("images/no-camera.png");
-        setupVideoSprite(placeholderTexture, baseApp.renderer.width, baseApp.renderer.height);
-
         return null;
     }
 
@@ -80,40 +74,40 @@ export async function setupCamera(ctrl = 'open') {
     } catch (err) {
         console.warn("使用者未允許或沒有鏡頭", err);
         webCam = false;
-
-        // 顯示佔位圖
-        const placeholderTexture = PIXI.Texture.from("images/no-camera.png");
-        setupVideoSprite(placeholderTexture, 1280, 720);
-
         return null;
     }
 
     return new Promise((resolve) => {
         video.onloadedmetadata = () => {
             if (webCam) {
-                const texture = PIXI.Texture.from(video);
-                setupVideoSprite(texture, baseApp.renderer.width, baseApp.renderer.height);
+
+                setupVideoSprite();
             }
             resolve(video);
         };
         video.play().catch(e => console.warn("無法自動播放攝影機影像", e));
     });
 }
-
-function setupVideoSprite(texture, width, height) {
-
-
+export let scale
+function setupVideoSprite() {
+    const texture = PIXI.Texture.from(video);
     videoSprite = new PIXI.Sprite(texture);
-    videoSprite.width = width;
-    videoSprite.height = height;
-    videoSprite.scale.x = -1;
-    videoSprite.x = width;
+
+    videoSprite.x = baseApp.renderer.width;
+    videoSprite.y = 0;
+    videoSprite.width = baseApp.renderer.width;
+    videoSprite.height = baseApp.renderer.height;
+    // 水平鏡像
+    videoSprite.scale.x = -videoSprite.scale.x;
+    scale = -videoSprite.scale.x
+
 }
 
 // --- 主迴圈 ---
 async function detectLoop() {
     baseApp.stage.removeChildren();
     uiApp.stage.removeChildren();
+    setupVideoSprite();
 
     if (webCam) baseApp.stage.addChild(videoSprite);
     if (modeNum === 1 || modeNum === 2) baseApp.stage.addChild(overlay);

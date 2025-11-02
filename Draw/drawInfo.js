@@ -1,11 +1,10 @@
-import { video, baseApp } from "../main.js";
+import { baseApp, scale, video } from "../main.js";
 import { rootTab, revRootTab, pluckNotes, note7Map } from "../sound.js";
 import { modeNum, playNum, showAllCtrl, capo } from "../Controll/blockControll.js";
 import { songName } from "../midiEvent.js";
 import { fingerPlay } from "../handCompute.js";
 import { noteSeq } from "./drawMIDI.js";
 import { key } from "../midiEvent.js";
-
 // 繪製手勢與轉調資訊，顯示在畫布上
 export function drawFinger(handData) {
     if (handData.length == 0 || modeNum != 0) return
@@ -29,8 +28,7 @@ export function drawFinger(handData) {
             style: style
         });
 
-        text.anchor.set(0.5);
-        text.x = baseApp.renderer.width - fingerTips[i][0];
+        text.x = baseApp.renderer.width - fingerTips[i][0] * scale;
         text.y = fingerTips[i][1] - 50;
         baseApp.stage.addChild(text);
     }
@@ -65,7 +63,7 @@ export function drawGesture(gesture, capo, LHand) {
         });
 
         text.anchor.set(0.5, 0);
-        text.x = baseApp.canvas.width - LHand[9][0];            // 設定 x 座標
+        text.x = baseApp.canvas.width - LHand[9][0] * scale;            // 設定 x 座標
         text.y = LHand[9][1];            // 設定 y 座標
 
         baseApp.stage.addChild(text);
@@ -94,7 +92,7 @@ export function drawGesture(gesture, capo, LHand) {
         });
 
         text.anchor.set(0.5, 0.5);
-        text.x = baseApp.canvas.width - LHand[9][0];            // 設定 x 座標
+        text.x = baseApp.canvas.width - LHand[9][0] * scale;            // 設定 x 座標
         text.y = LHand[9][1];            // 設定 y 座標
 
         baseApp.stage.addChild(text);
@@ -135,12 +133,12 @@ export async function drawHand(handData) {
         if (playNum == 0) {
             if (Rhand[0] != undefined) {
                 [Rpluck, velocities] = await fingerPlay(Rhand);  // 偵測撥弦與速度
-                G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
+                G.circle(appWidth - Rhand[9][0] * scale, Rhand[9][1] * scale, 50)
                     .fill({ color: Rpluck.includes(1) && Rpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
             }
             if (Lhand[0] != undefined) {
                 [Lpluck, velocities] = await fingerPlay(Lhand);  // 偵測撥弦與速度
-                G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
+                G.circle(appWidth - Lhand[9][0] * scale, Lhand[9][1] * scale, 50)
                     .fill({ color: Lpluck.includes(1) && Lpluck.includes(0) ? 0x00AA90 : 0xffffff, alpha: 0.6 });
             }
             baseApp.stage.addChild(G);
@@ -163,18 +161,18 @@ export async function drawHand(handData) {
             if (Rhand?.[4] && Rhand?.[8]) {
                 right = dist2D(Rhand[4], Rhand[8]) < 50;
                 // 繪製右手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
-                G.circle(appWidth - Rhand[4][0], Rhand[4][1], 25)
+                G.circle(appWidth - Rhand[4][0] * scale, Rhand[4][1] * scale, 25)
                     .fill({ color: right ? 0x00AA90 : 0xffffff, alpha: 0.5 })
-                    .circle(appWidth - Rhand[8][0], Rhand[8][1], 25)
+                    .circle(appWidth - Rhand[8][0] * scale, Rhand[8][1] * scale, 25)
                     .fill({ color: bothTouch ? 0x00AA90 : (right ? 0x00AA90 : 0xffffff), alpha: 0.5 });
             }
             // 判斷左手食指與拇指距離
             if (Lhand?.[4] && Lhand?.[8]) {
                 left = dist2D(Lhand[4], Lhand[8]) < 50;
                 // 繪製左手食指與拇指圓圈，兩手食指接觸時，食指顏色變綠
-                G.circle(appWidth - Lhand[4][0], Lhand[4][1], 25)
+                G.circle(appWidth - Lhand[4][0] * scale, Lhand[4][1] * scale, 25)
                     .fill({ color: left ? 0x00AA90 : 0xffffff, alpha: 0.5 })
-                    .circle(appWidth - Lhand[8][0], Lhand[8][1], 25)
+                    .circle(appWidth - Lhand[8][0] * scale, Lhand[8][1] * scale, 25)
                     .fill({ color: bothTouch ? 0x00AA90 : (left ? 0x00AA90 : 0xffffff), alpha: 0.5 });
 
             }
@@ -183,25 +181,25 @@ export async function drawHand(handData) {
         }
         else if (playNum == 2) {
             if (Rhand[9] != undefined) {
-                let closeMid = appWidth / 2 - Rhand[9][0] < Rhand[9][0] - appWidth / 2 ? true : false;
-                G.circle(appWidth - Rhand[9][0], Rhand[9][1], 50)
+                let closeMid = appWidth / 2 - Rhand[9][0] * scale < Rhand[9][0] * scale - appWidth / 2 ? true : false;
+                G.circle(appWidth - Rhand[9][0] * scale, Rhand[9][1] * scale, 50)
                     .fill({ color: 0xffffff, alpha: 0.6 })
-                    .circle(appWidth, Rhand[9][1], 30)
+                    .circle(appWidth, Rhand[9][1] * scale, 30)
                     .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                    .circle(0, Rhand[9][1], 30)
+                    .circle(0, Rhand[9][1] * scale, 30)
                     .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                    .roundRect(appWidth / 2, Rhand[9][1] - 30, 10, 60)
+                    .roundRect(appWidth / 2, Rhand[9][1] * scale - 30, 10, 60)
                     .fill(0xffffff);
             }
             if (Lhand[9] != undefined) {
-                let closeMid = Lhand[9][0] - appWidth / 2 < appWidth / 2 - Lhand[9][0] ? true : false;
-                G.circle(appWidth - Lhand[9][0], Lhand[9][1], 50)
+                let closeMid = Lhand[9][0] * scale - appWidth / 2 < appWidth / 2 - Lhand[9][0] * scale ? true : false;
+                G.circle(appWidth - Lhand[9][0] * scale, Lhand[9][1], 50)
                     .fill({ color: 0xffffff, alpha: 0.6 })
-                    .circle(0, Lhand[9][1], 30)
+                    .circle(0, Lhand[9][1] * scale, 30)
                     .fill({ color: !closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                    .circle(appWidth, Lhand[9][1], 30)
+                    .circle(appWidth, Lhand[9][1] * scale, 30)
                     .fill({ color: closeMid ? 0x00AA90 : 0xffffff, alpha: 0.6 })
-                    .roundRect(appWidth / 2, Lhand[9][1] - 30, 10, 60)
+                    .roundRect(appWidth / 2, Lhand[9][1] * scale - 30, 10, 60)
                     .fill(0xffffff);
             }
             baseApp.stage.addChild(G);
