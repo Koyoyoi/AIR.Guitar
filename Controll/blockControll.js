@@ -41,8 +41,7 @@ export async function loadImg() {
 }
 // 載入文字
 export async function loadLanguage(lang = 'zh-TW') {
-    modeName = [];
-    playName = [];
+
     const res = await fetch('../Controll/Language.json');
     const json = await res.json();
     const data = json[lang];

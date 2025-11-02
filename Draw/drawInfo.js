@@ -1,57 +1,10 @@
-import { video, baseApp, midiApp, uiApp } from "../main.js";
+import { video, baseApp } from "../main.js";
 import { rootTab, revRootTab, pluckNotes, note7Map } from "../sound.js";
 import { modeNum, playNum, showAllCtrl, capo } from "../Controll/blockControll.js";
 import { songName } from "../midiEvent.js";
 import { fingerPlay } from "../handCompute.js";
 import { noteSeq } from "./drawMIDI.js";
 import { key } from "../midiEvent.js";
-
-const w = 1280, h = 720
-// 重新調整畫布與影片的大小，根據視窗大小
-export function reCanva() {
-    const aspectRatio = 1280 / 720;
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-
-    // 計算新的寬度和高度，並限制最大高度為 900px
-    let newHeight = Math.min(windowHeight, 900);
-    let newWidth = newHeight * aspectRatio;
-
-    // 如果新寬度超出視窗寬度，則以視窗寬度為主重新計算
-    if (newWidth > windowWidth) {
-        newWidth = windowWidth;
-        newHeight = newWidth / aspectRatio;
-    }
-
-    // 設置影片和畫布的寬高
-    video.style.width = `${newWidth}px`;
-    video.style.height = `${newHeight}px`;
-
-    baseApp.canvas.style.width = video.style.width;
-    baseApp.canvas.style.height = video.style.height;
-    midiApp.canvas.style.width = video.style.width;
-    midiApp.canvas.style.height = video.style.height;
-    uiApp.canvas.style.width = video.style.width;
-    uiApp.canvas.style.height = video.style.height;
-
-    // 垂直置中
-    const verticalOffset = Math.max(0, (windowHeight - newHeight) / 2);
-    video.style.position = 'absolute';
-    video.style.top = `${verticalOffset}px`;
-
-    baseApp.canvas.style.position = 'absolute';
-    baseApp.canvas.style.top = `${verticalOffset}px`;
-    midiApp.canvas.style.position = 'absolute';
-    midiApp.canvas.style.top = `${verticalOffset}px`;
-    uiApp.canvas.style.position = 'absolute';
-    uiApp.canvas.style.top = `${verticalOffset}px`;
-
-    // 標題遮擋判斷
-    const title = document.getElementById("title");
-    if (title) {
-        title.style.display = verticalOffset < 100 ? 'none' : 'block';
-    }
-}
 
 // 繪製手勢與轉調資訊，顯示在畫布上
 export function drawFinger(handData) {

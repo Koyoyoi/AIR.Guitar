@@ -1,0 +1,95 @@
+/* 按鈕絕對定位在 canvas 底部中央 */
+
+.show-list-btn {
+    display: none;
+    position: absolute;
+    bottom: 5%;          /* 距底部百分比，會跟 canvas 高度縮放 */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: #1e88e5;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 1.2% 2.4%;  /* 百分比 padding，跟 canvas 縮放 */
+    font-size: 1.2vw;    /* 跟 canvas 寬度縮放字型 */
+    cursor: pointer;
+    box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.show-list-btn:hover {
+    background: #42a5f5;
+    transform: translateX(-50%) scale(1.05);
+}
+
+.show-list-btn.show {
+    display: block;
+    /* 顯示按鈕 */
+    opacity: 1;
+}
+
+/* =======================
+   MIDI 清單外框（預設隱藏）
+   ======================= */
+.midi-list-container {
+    display: none;
+    position: fixed;
+    /* 固定在視窗，不跟隨畫布滾動 */
+    top: 80px;
+    /* 距離頂部 80px，可依需要調整 */
+    left: 50%;
+    /* 水平置中 */
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 700px;
+    height: 60vh;
+    /* 高度 60% 視窗高度 */
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 12px;
+    overflow-y: auto;
+    /* 可滾動 */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    padding: 16px;
+    z-index: 100;
+    /* 保證在畫布上層 */
+}
+
+/* 清單標題 */
+.midi-list-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #66ccff;
+    text-align: left;
+}
+
+/* MIDI 個別項目 */
+.midi-item {
+    padding: 10px 8px;
+    border-bottom: 1px solid #333;
+    color: #eee;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.midi-item:hover {
+    background: #222;
+}
+
+/* 清單關閉按鈕 */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    color: #ccc;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #fff;
+}

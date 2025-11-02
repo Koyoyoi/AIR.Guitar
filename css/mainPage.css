@@ -11,13 +11,42 @@ body {
     /* 防止畫面捲動 */
 }
 
-canvas {
+.canvas-wrapper {
+    position: relative;
+    /* 相對於 body，可重疊其他元素 */
+    width: 100vw;
+    /* 寬度滿版 */
+    height: calc(100vw * 9 / 16);
+    /* 維持 16:9 比例 */
+
+    max-width: 100%;
+    max-height: 100%;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background: #1c1c1c;
+    z-index: 0;
+    /* canvas 層次，按鈕可放更高層 */
+}
+
+/* 所有 PIXI canvas 滿版 wrapper */
+.canvas-wrapper canvas {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, 0%);
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 1;
+    /* canvas 層 */
 }
 
+#baseCanva {
+    top: 0;
+}
 
 /* === 標題樣式 === */
 .title {
@@ -126,49 +155,4 @@ canvas {
     70% {
         transform: scale(1);
     }
-}
-
-/* === 檔案上傳區塊 === */
-.upload-section {
-    position: fixed;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    display: none;
-    /* 預設不顯示，等待條件觸發 .show 顯示 */
-}
-
-/* 顯示狀態下的 upload-section */
-.upload-section.show {
-    display: block;
-}
-
-/* 上傳按鈕外框 */
-.upload-box {
-    width: 50px;
-    height: 50px;
-    border: 2px dashed #aaa;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background-color: #2a2a2a88;
-}
-
-/* 滑鼠 hover 時的樣式變化 */
-.upload-box:hover {
-    border-color: #fff;
-    background-color: #2a2a2aaa;
-}
-
-/* + 號樣式 */
-.upload-box .plus {
-    font-size: 40px;
-    color: #aaa;
-    font-weight: bold;
-    user-select: none;
-    pointer-events: none;
 }

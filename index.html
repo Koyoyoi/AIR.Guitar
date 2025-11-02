@@ -11,9 +11,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/8.6.6/pixi.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/midi-parser-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/encoding-japanese@2.2.0/encoding.min.js"></script>
-
     <script type="module" src="./main.js" defer></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/mainPage.css">
+    <link rel="stylesheet" href="/css/midiFile.css">
 </head>
 
 <body>
@@ -21,14 +21,17 @@
     <div class="title" id="title"></div>
 
     <!-- 畫布區 -->
-    <div class="canvas-wrapper"></div>
+    <div class="canvas-wrapper">
+        <canvas id="myCanvas"></canvas>
+        <!-- 一鍵顯示清單按鈕 -->
+        <button class="show-list-btn" id="showListBtn">顯示 MIDI 清單</button>
+    </div>
 
-    <!-- 檔案上傳區，支援 .mid -->
-    <div class="upload-section">
-        <label for="file-upload" class="upload-box">
-            <span class="plus">+</span>
-            <input type="file" id="file-upload" style="display: none" accept=".mid,.midi,.MID,.kar" />
-        </label>
+    <!-- 可滾動 MIDI 清單區 -->
+    <div class="midi-list-container" id="midiListContainer">
+        <span class="close-btn" id="closeList">✕</span>
+        <div class="midi-list-title">🎵 MIDI 清單</div>
+        <div id="midiList">載入中...</div>
     </div>
 
     <!-- 載入動畫（初始載入時顯示） -->

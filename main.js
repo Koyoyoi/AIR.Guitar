@@ -1,11 +1,12 @@
 import { settingCtrl, loadImg, modeNum, playNum, loadLanguage } from "./Controll/blockControll.js";
 import { chordCtrl, pinchCtrl, pluckCtrl, strumCtrl, wavingCtrl } from "./Controll/musicControll.js";
-import { setupMediaPipe, detectHand, detectPose } from "./MediaPipe.js";
+import { setupMediaPipe, detectHand, detectPose } from "./models/MediaPipe.js";
 import { initMIDIPort, buildGuitarChord } from "./sound.js";
-import { drawHand, drawSongName, reCanva, drawFinger } from "./Draw/drawInfo.js";
+import { drawHand, drawSongName, drawFinger } from "./Draw/drawInfo.js";
 import { midiDrawLoop } from "./Draw/drawMIDI.js";
 import { midiProcess } from "./midiEvent.js"
-import { load_SVM_Model } from "./SVM.js";
+import { load_SVM_Model } from "./models/SVM.js";
+import { loadMidiFiles } from "./Controll/midList.js";
 
 // --- 全域變數宣告 ---
 export let video, baseApp, midiApp, uiApp;
@@ -16,23 +17,37 @@ let videoSprite, overlay;
 
 // --- 初始化畫布 ---
 async function initCanvas() {
+    const wrapper = document.querySelector('.canvas-wrapper');
     baseApp = new PIXI.Application();
-    await baseApp.init({ backgroundColor: 0x1c1c1c, width: 1280, height: 720 });
+    await baseApp.init({ resizeTo: wrapper, antialias: true });
 
     midiApp = new PIXI.Application();
-    await midiApp.init({ backgroundAlpha: 0, width: 1280, height: 720 });
+    await midiApp.init({ backgroundAlpha: 0, resizeTo: wrapper, antialias: true });
 
     uiApp = new PIXI.Application();
-    await uiApp.init({ backgroundAlpha: 0, width: 1280, height: 720 });
+    await uiApp.init({ backgroundAlpha: 0, resizeTo: wrapper, antialias: true });
 
     overlay = new PIXI.Graphics()
-        .rect(0, 0, baseApp.canvas.width, baseApp.canvas.height)
+        .rect(0, 0, baseApp.renderer.width, baseApp.renderer.height)
         .fill({ color: 0x1c1c1c, alpha: 0.5 });
 
-    const wrapper = document.querySelector('.canvas-wrapper');
+    // PIXI canvas append
     wrapper.appendChild(baseApp.canvas);
     wrapper.appendChild(midiApp.canvas);
     wrapper.appendChild(uiApp.canvas);
+
+    // overlay 隨 baseApp canvas resize
+    baseApp.renderer.on('resize', () => {
+        overlay.clear()
+            .rect(0, 0, baseApp.renderer.width, baseApp.renderer.height)
+            .fill({ color: 0x1c1c1c, alpha: 0.5 });
+        setupCamera();
+    });
+    // 更新 UI 狀態
+    //document.getElementById("title").textContent = "AIR Guitar";
+    document.getElementById("loading").classList.add("hidden");
+    document.querySelector(".show-list-btn")?.classList.add("show");
+
 }
 
 export async function setupCamera(ctrl = 'open') {
@@ -46,7 +61,7 @@ export async function setupCamera(ctrl = 'open') {
 
         // 切換成佔位圖
         const placeholderTexture = PIXI.Texture.from("images/no-camera.png");
-        setupVideoSprite(placeholderTexture, 1280, 720);
+        setupVideoSprite(placeholderTexture, baseApp.renderer.width, baseApp.renderer.height);
 
         return null;
     }
@@ -58,7 +73,7 @@ export async function setupCamera(ctrl = 'open') {
     let stream;
     try {
         stream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: 1280 }, height: { ideal: 720 } }
+            video: { width: { ideal: baseApp.renderer.width }, height: { ideal: baseApp.renderer.height } }
         });
         webCam = true;
         video.srcObject = stream;
@@ -77,10 +92,7 @@ export async function setupCamera(ctrl = 'open') {
         video.onloadedmetadata = () => {
             if (webCam) {
                 const texture = PIXI.Texture.from(video);
-                setupVideoSprite(texture, video.videoWidth, video.videoHeight);
-            } else {
-                const placeholderTexture = PIXI.Texture.from("images/no-camera.png");
-                setupVideoSprite(placeholderTexture, 1280, 720);
+                setupVideoSprite(texture, baseApp.renderer.width, baseApp.renderer.height);
             }
             resolve(video);
         };
@@ -89,31 +101,13 @@ export async function setupCamera(ctrl = 'open') {
 }
 
 function setupVideoSprite(texture, width, height) {
-    // 更新 UI 狀態
-    document.getElementById("title").textContent = "AIR Guitar";
-    document.getElementById("loading").classList.add("hidden");
-    document.querySelector(".upload-section")?.classList.add("show");
+
 
     videoSprite = new PIXI.Sprite(texture);
     videoSprite.width = width;
     videoSprite.height = height;
     videoSprite.scale.x = -1;
     videoSprite.x = width;
-
-    reCanva();
-    window.addEventListener("resize", reCanva);
-}
-
-
-
-
-// --- MIDI 檔上傳事件 ---
-function setupFileUpload() {
-    document.getElementById("file-upload").addEventListener("change", async (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        await midiProcess(file);
-    });
 }
 
 // --- 主迴圈 ---
@@ -176,36 +170,14 @@ async function detectLoop() {
 async function main() {
     await loadLanguage();
     await loadImg();
+    await loadMidiFiles();
     await setupMediaPipe();
     await load_SVM_Model();
     await initCanvas();
     await setupCamera();
     await initMIDIPort();
 
-    const jsonUrl = 'https://imuse.ncnu.edu.tw/Midi-library/audio/midi-files.json';
-    const midiUrl = 'https://imuse.ncnu.edu.tw/Midi-library/望春風.mid';
-
-    fetch(jsonUrl)
-        .then(res => res.json())
-        .then(json => {
-            console.log('MIDI 檔清單:', json);
-        })
-        .catch(err => console.error('Fetch JSON error:', err));
-
-    fetch(midiUrl)
-        .then(res => res.arrayBuffer())
-        .then(buffer => {
-            console.log('透過 proxy 抓到 MIDI:', buffer);
-            // 處理 buffer
-            midiProcess(buffer)
-        })
-        .catch(err => console.error('Proxy Fetch Error:', err));
-
-
-
     buildGuitarChord('C');
-
-    setupFileUpload();
     detectLoop();
     midiDrawLoop();
 }

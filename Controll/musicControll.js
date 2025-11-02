@@ -4,7 +4,7 @@ import { showAllCtrl, capo, modeNum } from "./blockControll.js";
 import { drawGesture } from "../Draw/drawInfo.js";
 import { video, handData, poseData } from "../main.js";
 import { rollSeq } from "../Draw/drawMIDI.js";
-import { predict } from "../SVM.js";
+import { predict } from "../models/SVM.js";
 
 export let gesture = '', prevGesture = '';                 // 手勢相關
 

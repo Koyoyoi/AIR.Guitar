@@ -1,6 +1,6 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
-import { handData, poseData, video } from './main.js';
-import { handCtrl, isSwitch } from "./Controll/blockControll.js";
+import { handData, poseData, video } from '../main.js';
+import { handCtrl, isSwitch } from "../Controll/blockControll.js";
 
 // 全域變數：用來儲存模型實例
 let handLandmarker, poseLandmarker;
