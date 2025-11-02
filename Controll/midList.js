@@ -1,3 +1,5 @@
+import { midiProcess } from "../midiEvent.js";
+
 const API_URL = "https://imuse.ncnu.edu.tw/Midi-library/api/midis?page=1&limit=20&sort=uploaded_at&order=desc";
 const showListBtn = document.getElementById("showListBtn");
 const midiListContainer = document.getElementById("midiListContainer");
@@ -44,8 +46,14 @@ function renderMidiList() {
 
                 const arrayBuffer = await res.arrayBuffer();
                 console.log("MIDI 檔案抓取完成:", arrayBuffer);
+                midiProcess(arrayBuffer, mid.title)
 
-                // 這裡可以做其他處理，例如轉成 SoundFont 播放或存檔
+                // 自動關閉 MIDI 清單
+                const midiListContainer = document.getElementById("midiListContainer");
+                if (midiListContainer) {
+                    midiListContainer.style.display = "none";
+                }
+                
             } catch (err) {
                 console.error("抓取 MIDI 檔案失敗:", err);
             }

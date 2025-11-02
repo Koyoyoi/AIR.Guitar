@@ -12,7 +12,7 @@ const DEFAULT_VELOCITY = 100;
 
 const initLyric = ['預', '備', '起', '唱']
 
-export async function midiProcess(file) {
+export async function midiProcess(file, title) {
     if (file == undefined) {
         alert("尚未載入 MIDI 檔案！");
     }
@@ -24,7 +24,7 @@ export async function midiProcess(file) {
                 midiBfr = await file.arrayBuffer();
             } else if (file instanceof ArrayBuffer) {
                 // 直接給的是 ArrayBuffer
-                songName = "望春風";  // 或你可以用其他名稱
+                songName = title;  // 或你可以用其他名稱
                 midiBfr = file;
             } else {
                 console.error("未知的 MIDI 輸入型態", file);

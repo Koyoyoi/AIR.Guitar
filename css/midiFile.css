@@ -3,7 +3,7 @@
 .show-list-btn {
     display: none;
     position: absolute;
-    bottom: 5%;          /* 距底部百分比，會跟 canvas 高度縮放 */
+    bottom: 2%;          /* 距底部百分比，會跟 canvas 高度縮放 */
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -29,9 +29,6 @@
     opacity: 1;
 }
 
-/* =======================
-   MIDI 清單外框（預設隱藏）
-   ======================= */
 .midi-list-container {
     display: none;
     position: fixed;
