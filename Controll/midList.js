@@ -1,6 +1,6 @@
 import { midiProcess } from "../midiEvent.js";
 
-const API_URL = "https://imuse.ncnu.edu.tw/Midi-library/api/midis?page=1&limit=20&sort=uploaded_at&order=desc";
+const API_URL = "https://imuse.ncnu.edu.tw/Midi-library/api/midis?page=1&limit=100&sort=uploaded_at&order=desc";
 const showListBtn = document.getElementById("showListBtn");
 const midiListContainer = document.getElementById("midiListContainer");
 const midiListDiv = document.getElementById("midiList");
@@ -15,6 +15,7 @@ export async function loadMidiFiles() {
         .then(res => res.json())
         .then(json => {
             list = Array.isArray(json.items) ? json.items : [];
+            console.log(list)
         })
         .catch(err => {
             console.error(err);
