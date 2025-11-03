@@ -30,12 +30,12 @@ let textStyle = {
 
 // 載入圖片
 export async function loadImg() {
-    const res = await fetch('../Controll/IMGs.json');
+    const res = await fetch('./Controll/IMGs.json');
     const fileList = await res.json();
 
     for (let filename of fileList) {
         const key = filename;
-        const texture = await PIXI.Assets.load(`../Controll/IMG/${filename}.png`)
+        const texture = await PIXI.Assets.load(`./Controll/IMG/${filename}.png`)
         IMGs[key] = texture;
     }
 }
