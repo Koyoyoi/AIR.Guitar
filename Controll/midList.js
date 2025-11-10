@@ -5,17 +5,15 @@ const showListBtn = document.getElementById("showListBtn");
 const midiListContainer = document.getElementById("midiListContainer");
 const midiListDiv = document.getElementById("midiList");
 const closeList = document.getElementById("closeList");
-let list
-/**
- * 載入 MIDI 清單並顯示
- */
+export let midiList
+// 載入 MIDI 清單並顯示
 export async function loadMidiFiles() {
 
     fetch(API_URL)
         .then(res => res.json())
         .then(json => {
-            list = Array.isArray(json.items) ? json.items : [];
-            console.log(list)
+            midiList = Array.isArray(json.items) ? json.items : [];
+            console.log(midiList.length)
         })
         .catch(err => {
             console.error(err);
@@ -33,7 +31,7 @@ function renderMidiList() {
     midiListContainer.style.display = "block";
     midiListDiv.innerHTML = "載入中...";
     midiListDiv.innerHTML = "";
-    list.forEach(mid => {
+    midiList.forEach(mid => {
         const div = document.createElement("div");
         div.className = "midi-item";
         div.textContent = `${mid.title}`;
