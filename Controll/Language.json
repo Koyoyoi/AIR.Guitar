@@ -1,10 +1,14 @@
 {
   "zh-TW": {
     "modeName": ["自由演奏", "歌曲演奏", "數字演奏"],
-    "playName": ["彎曲手指", "雙指互碰", "手部揮動"]
+    "playName": ["彎曲手指", "雙指互碰", "手部揮動"],
+    "hand"    : ["左", "右"],
+    "list"    : ["顯示 MIDI 清單", "🎵 MIDI 清單"]
   },
   "EN": {
     "modeName": ["Free Play", "Song Play", "Number"],
-    "playName": ["Finger Bend", "Pinch", "Hand Swing"]
+    "playName": ["Finger Bend", "Pinch", "Hand Swing"],
+    "hand"    : ["L", "R"],
+    "list"    : ["Show MIDI List", "🎵 MIDI List"]
   }
 }

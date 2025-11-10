@@ -7,7 +7,7 @@ export let modeNum = 1, sampleNum = 0, capo = 0, playNum = 0, langNum = 0;
 export let showAllCtrl = false, isPlay = false, isSwitch = false, portOpen = false;
 
 const langs = ['zh-TW', 'EN'];
-let IMGs = {}, modeName = {}, playName = {};
+let IMGs = {}, modeName = {}, playName = {}, hand = {}, list = {};
 let textStyle = {
     'normal': new PIXI.TextStyle({
         fontSize: 30,
@@ -45,7 +45,9 @@ export async function loadLanguage(lang = 'zh-TW') {
     const res = await fetch('./Controll/Language.json');
     const json = await res.json();
     const data = json[lang];
-    ({ modeName, playName } = data);
+    ({ modeName, playName, hand, list } = data);
+    document.getElementById("showListBtn").textContent = list[0];
+    document.getElementById("listTitle").textContent = list[1];
 }
 
 export function closeSet() {
@@ -137,7 +139,7 @@ function modeCtrl() {
     const chBtn = new PIXI.Sprite(IMGs['change_Mode']);
     chBtn.x = Area.x + Area.w * 2 / 3 + 20;
     chBtn.y = Area.y;
-    chBtn.width = 50;
+    chBtn.width = Area.h;
     chBtn.height = Area.h;
     // 點擊事件
     chBtn.hitArea = new PIXI.Rectangle(Area.x + Area.w * 2 / 3, Area.y, Area.w / 3, Area.h); // 限定互動範圍（可調整）
@@ -280,8 +282,8 @@ export function handCtrl(ctrl) {
     swBtn.rotation = Math.PI / -2;
     swBtn.x = Area.x + 5;
     swBtn.y = Area.y + Area.h / 2 + 25;
-    swBtn.width = 50;
-    swBtn.height = 50;
+    swBtn.width = Area.w;
+    swBtn.height = Area.w;
 
     // 互動
     swBtn.interactive = true;
@@ -296,7 +298,7 @@ export function handCtrl(ctrl) {
 
     // left hand 
     const left = new PIXI.Text({
-        text: '左',
+        text: hand[0],
         style: isSwitch ? textStyle['soundCtrl'] : textStyle['gesture'],
         x: Area.x + Area.w / 2,
         y: Area.y + 30
@@ -307,13 +309,13 @@ export function handCtrl(ctrl) {
     const LHand = new PIXI.Sprite(IMGs['left_hand']);
     LHand.x = Area.x + 5;
     LHand.y = left.y + 20;
-    LHand.width = 50;
-    LHand.height = 50;
+    LHand.width = Area.w;
+    LHand.height = Area.w;
     uiApp.stage.addChild(LHand);
 
     // right hand
     const right = new PIXI.Text({
-        text: '右',
+        text: hand[1],
         style: isSwitch ? textStyle['gesture'] : textStyle['soundCtrl'],
         x: Area.x + Area.w / 2,
         y: Area.y + Area.h - 30
@@ -324,8 +326,8 @@ export function handCtrl(ctrl) {
     const RHand = new PIXI.Sprite(IMGs['right_hand']);
     RHand.x = Area.x + 5;
     RHand.y = right.y - 70;
-    RHand.width = 50;
-    RHand.height = 50;
+    RHand.width = Area.w;
+    RHand.height = Area.w;
     uiApp.stage.addChild(RHand);
 
 }
@@ -344,7 +346,7 @@ export function reloadCtrl() {
     const reloadBtn = new PIXI.Sprite(IMGs['reload']);
     reloadBtn.x = Area.x;
     reloadBtn.y = Area.y;
-    reloadBtn.width = Area.w;
+    reloadBtn.width = Area.h;
     reloadBtn.height = Area.h;
 
     // 讓圖片可以互動
@@ -492,7 +494,7 @@ export function playCtrl() {
     const chBtn = new PIXI.Sprite(IMGs['change_Play']);
     chBtn.x = Area.x + Area.w * 2 / 3 + 20;
     chBtn.y = Area.y;
-    chBtn.width = 50;
+    chBtn.width = Area.h;
     chBtn.height = Area.h;
     // 點擊事件
     chBtn.hitArea = new PIXI.Rectangle(Area.x + Area.w * 2 / 3, Area.y, Area.w / 3, Area.h); // 限定互動範圍（可調整）
@@ -527,7 +529,7 @@ export function camCtrl() {
     const camBtn = new PIXI.Sprite(IMGs[webCam ? 'cam_on' : 'cam_off']);
     camBtn.x = Area.x + Area.w / 7;
     camBtn.y = Area.y;
-    camBtn.width = 60;
+    camBtn.width = Area.h;
     camBtn.height = Area.h;
     camBtn.hitArea = new PIXI.Rectangle(Area.x, Area.y, Area.w, Area.h)
     camBtn.interactive = true;
