@@ -1,24 +1,27 @@
 import { midiProcess } from "../midiEvent.js";
 
-const API_URL = "https://imuse.ncnu.edu.tw/Midi-library/api/midis?page=1&limit=100&sort=uploaded_at&order=desc";
 const showListBtn = document.getElementById("showListBtn");
 const midiListContainer = document.getElementById("midiListContainer");
 const midiListDiv = document.getElementById("midiList");
 const closeList = document.getElementById("closeList");
-export let midiList
+export let midiList = [];
+
 // 載入 MIDI 清單並顯示
 export async function loadMidiFiles() {
+    let page = 1;
+    while (true) {
+        let url = `https://imuse.ncnu.edu.tw/Midi-library/api/midis?page=${page}&limit=100&sort=uploaded_at&order=desc`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
 
-    fetch(API_URL)
-        .then(res => res.json())
-        .then(json => {
-            midiList = Array.isArray(json.items) ? json.items : [];
-            console.log(midiList.length)
-        })
-        .catch(err => {
-            console.error(err);
-            midiListDiv.innerHTML = "<p style='color:#f55'>載入失敗，請稍後再試。</p>";
-        });
+        const items = Array.isArray(json.items) ? json.items : [];
+        if (items.length === 0) break;
+        midiList = [...midiList, ...items];
+        page++;
+        await new Promise(r => setTimeout(r, 250));
+    }
+    console.log(`Total ${midiList.length} are loaded.`);
 }
 
 // 關閉清單
@@ -52,7 +55,7 @@ function renderMidiList() {
                 if (midiListContainer) {
                     midiListContainer.style.display = "none";
                 }
-                
+
             } catch (err) {
                 console.error("抓取 MIDI 檔案失敗:", err);
             }
