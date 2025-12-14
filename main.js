@@ -173,19 +173,7 @@ async function main() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const title = urlParams.get("midi");
-    if (title) {
-
-        const result = midiList.find(item => item.title === title);
-        console.log(result.id);
-
-        const midiUrl = `https://imuse.ncnu.edu.tw/Midi-library/api/midis/${result.id}/download`;
-        const res = await fetch(midiUrl);
-        if (res.ok) {
-            const arrayBuffer = await res.arrayBuffer();
-            console.log("MIDI 檔案抓取完成:", arrayBuffer);
-            midiProcess(arrayBuffer, title)
-        }
-    }
+    if (title) { midiProcess(title) }
 
     buildGuitarChord('C');
     detectLoop();

@@ -6,7 +6,6 @@ import { midiApp } from "../main.js";
 
 // 序列資料
 export let noteSeq = [];
-export let lyricSeq = [];
 export let stringSeq = new Array(6).fill(null).map(() => ({ note: null, alpha: 0 }));
 
 // 特效序列與狀態控制

@@ -39,16 +39,8 @@ function renderMidiList() {
         div.className = "midi-item";
         div.textContent = `${mid.title}`;
         div.addEventListener("click", async () => {
-            console.log(`MIDI ID: ${mid.id}`);
-            const midiUrl = `https://imuse.ncnu.edu.tw/Midi-library/api/midis/${mid.id}/download`;
-
             try {
-                const res = await fetch(midiUrl);
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-                const arrayBuffer = await res.arrayBuffer();
-                console.log("MIDI 檔案抓取完成:", arrayBuffer);
-                midiProcess(arrayBuffer, mid.title)
+                midiProcess(mid.title, mid.id)
 
                 // 自動關閉 MIDI 清單
                 const midiListContainer = document.getElementById("midiListContainer");
