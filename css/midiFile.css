@@ -90,3 +90,39 @@
 .close-btn:hover {
     color: #fff;
 }
+
+/* MIDI 搜尋框 */
+.midi-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #111;
+
+    color: #eee;
+    font-size: 14px;
+
+    outline: none;
+    transition: border 0.25s, box-shadow 0.25s;
+}
+
+.midi-search::placeholder {
+    color: #777;
+}
+
+/* focus 狀態 */
+.midi-search:focus {
+    border-color: #66ccff;
+    box-shadow: 0 0 0 1px rgba(102, 204, 255, 0.4);
+}
+
+/* 搜尋結果為空 */
+.empty {
+    padding: 12px;
+    text-align: center;
+    color: #777;
+    font-style: italic;
+}

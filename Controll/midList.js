@@ -4,6 +4,8 @@ const showListBtn = document.getElementById("showListBtn");
 const midiListContainer = document.getElementById("midiListContainer");
 const midiListDiv = document.getElementById("midiList");
 const closeList = document.getElementById("closeList");
+const midiSearchInput = document.getElementById("midiSearch");
+
 export let midiList = [];
 
 // 載入 MIDI 清單並顯示
@@ -29,33 +31,41 @@ closeList.addEventListener("click", () => {
     midiListContainer.style.display = "none";
 });
 
+// 搜尋列
+midiSearchInput.addEventListener("input", () => {
+    renderMidiList(midiSearchInput.value);
+});
+showListBtn.addEventListener("click", () => {
+    midiSearchInput.value = "";
+    renderMidiList("");
+});
+
+
 // 顯示 MIDI 清單項目
-function renderMidiList() {
+function renderMidiList(keyword = "") {
+    if (typeof keyword !== "string") keyword = "";
+
+    const lowerKeyword = keyword.toLowerCase();
+
     midiListContainer.style.display = "block";
-    midiListDiv.innerHTML = "載入中...";
     midiListDiv.innerHTML = "";
-    midiList.forEach(mid => {
-        const div = document.createElement("div");
-        div.className = "midi-item";
-        div.textContent = `${mid.title}`;
-        div.addEventListener("click", async () => {
-            try {
-                midiProcess(mid.title, mid.id)
 
-                // 自動關閉 MIDI 清單
-                const midiListContainer = document.getElementById("midiListContainer");
-                if (midiListContainer) {
-                    midiListContainer.style.display = "none";
-                }
+    midiList
+        .filter(mid => mid.title.toLowerCase().includes(lowerKeyword))
+        .forEach(mid => {
+            const div = document.createElement("div");
+            div.className = "midi-item";
+            div.textContent = mid.title;
 
-            } catch (err) {
-                console.error("抓取 MIDI 檔案失敗:", err);
-            }
+            div.onclick = () => {
+                midiProcess(mid.title, mid.id);
+                midiListContainer.style.display = "none";
+            };
+
+            midiListDiv.appendChild(div);
         });
-
-        midiListDiv.appendChild(div);
-    });
 }
+
 
 // 按鈕綁定
 showListBtn.addEventListener("click", renderMidiList);
