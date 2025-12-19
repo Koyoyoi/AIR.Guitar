@@ -120,7 +120,7 @@ async function renderNotes() {
 
         groupMap.get(n.time).push({
             note: n.midi,
-            v: n.velocity,
+            v: n.velocity * 100,
             d: n.duration,
             y: mapRange(n.midi, minPitch, maxPitch, midiApp.canvas.height - 300, 200),
             r: mapRange(n.velocity, 60, 127, 15, 40),
