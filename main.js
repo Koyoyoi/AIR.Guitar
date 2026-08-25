@@ -2,13 +2,7 @@ import { MediaPipe } from "./models/MediaPipe.js";
 
 export let MP;
 
-async function loop() {
-    await MP.detectHand();
-    await MP.detectPose();
-    requestAnimationFrame(loop);
-}
-
-async function initializeVideo() {
+async function initVideo() {
     const video = document.querySelector("#camera");
 
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -25,8 +19,14 @@ async function initializeVideo() {
     return video;
 }
 
+async function loop() {
+    await MP.detectHand();
+    await MP.detectPose();
+    requestAnimationFrame(loop);
+}
+
 async function main() {
-    const video = await initializeVideo();
+    const video = await initVideo();
     MP = new MediaPipe(video);
     await MP.init();
     loop();
