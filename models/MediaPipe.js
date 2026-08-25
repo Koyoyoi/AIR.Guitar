@@ -1,6 +1,6 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { load_SVM_Model, predict } from "./SVM.js";
-import { compute, fingerBends } from "./HandFeature.js";
+import { transData, fingerBends } from "./HandFeature.js";
 
 export class MediaPipe {
     constructor(video) {
@@ -75,7 +75,7 @@ export class MediaPipe {
         }
 
         if (this.handData.Left.length > 0) {
-            this.gesture = await predict(compute(this.handData.Left));
+            this.gesture = await predict(transData(this.handData.Left));
         }
 
 

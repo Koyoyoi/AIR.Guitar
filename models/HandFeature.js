@@ -34,7 +34,7 @@ function isHandLandmarks(landmarks) {
         && landmarks.every((point) => Array.isArray(point) && point.length >= 3);
 }
 
-export function compute(landmarks) {
+export function transData(landmarks) {
     if (!isHandLandmarks(landmarks)) return [];
 
     const refDistance = Math.hypot(
