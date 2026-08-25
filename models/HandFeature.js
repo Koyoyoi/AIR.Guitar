@@ -65,17 +65,19 @@ export function mapRange(value, inputMin, inputMax, outputMin, outputMax) {
 }
 
 export function fingerBends(hand) {
-    if (!isHandLandmarks(hand)) return [[], []];
+
+    if (!isHandLandmarks(hand)) {
+        return [];
+    }
 
     const angles = fingerAngle(hand);
-    const pick = [];
-    const velocities = [];
+    const fingerBends = [];
 
-    if (angles[0] > 15) { pick.push(0); velocities.push(mapRange(angles[0], 30, 60, 60, 127)); }
-    if (angles[1] > 20) { pick.push(1); velocities.push(mapRange(angles[1], 30, 180, 40, 127)); }
-    if (angles[2] > 20) { pick.push(2); velocities.push(mapRange(angles[2], 20, 160, 40, 127)); }
-    if (angles[3] > 30) { pick.push(3); velocities.push(mapRange(angles[3], 20, 150, 40, 127)); }
-    if (angles[4] > 150) { pick.push(4); velocities.push(0); }
+    if (angles[0] > 15) { fingerBends.push([0, mapRange(angles[0], 30, 60, 60, 127)]); }
+    if (angles[1] > 20) { fingerBends.push([1, mapRange(angles[1], 30, 180, 40, 127)]); }
+    if (angles[2] > 20) { fingerBends.push([2, mapRange(angles[2], 20, 160, 40, 127)]); }
+    if (angles[3] > 30) { fingerBends.push([3, mapRange(angles[3], 20, 150, 40, 127)]); }
+    if (angles[4] > 150) { fingerBends.push([4, 0]); }
 
-    return [pick, velocities];
+    return fingerBends;
 }

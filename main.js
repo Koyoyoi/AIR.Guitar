@@ -1,6 +1,7 @@
 import { MediaPipe } from "./models/MediaPipe.js";
-
+import { GuitarSound } from "./controll/sound.js";
 export let MP;
+export let GS;
 
 async function initVideo() {
     const video = document.querySelector("#camera");
@@ -22,6 +23,9 @@ async function initVideo() {
 async function loop() {
     await MP.detectHand();
     await MP.detectPose();
+    GS.buildGuitarChord(MP.gesture);
+    GS.plucking(MP.fingerBend);
+ 
     requestAnimationFrame(loop);
 }
 
@@ -29,6 +33,9 @@ async function main() {
     const video = await initVideo();
     MP = new MediaPipe(video);
     await MP.init();
+    GS = new GuitarSound();
+    await GS.loadSamples();
+
     loop();
 }
 

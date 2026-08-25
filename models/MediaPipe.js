@@ -3,6 +3,7 @@ import { load_SVM_Model, predict } from "./SVM.js";
 import { transData, fingerBends } from "./HandFeature.js";
 
 export class MediaPipe {
+
     constructor(video) {
         this.video = video;
 
@@ -50,7 +51,6 @@ export class MediaPipe {
         if (!this.handLandmarker || !this.video) return;
 
         this.handData = { Left: [], Right: [] };
-        this.gesture = null;
         this.fingerBend = [];
 
         const data = this.handLandmarker.detectForVideo(
@@ -101,13 +101,5 @@ export class MediaPipe {
                 ])
             );
         }
-    }
-
-    clear() {
-        this.handData = { Left: [], Right: [] };
-        this.poseData = [];
-        this.gesture = { Left: "", Right: "" };
-        this.features = { Left: [], Right: [] };
-        this.fingerBend = { Left: [[], []], Right: [[], []] };
     }
 }
