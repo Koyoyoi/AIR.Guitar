@@ -52,7 +52,7 @@ export class MediaPipe {
         for (let i = 0; i < data.handednesses.length; i++) {
             const side = String(data.handednesses[i][0].categoryName);
             this.handData[side] = data.landmarks[i].map(({ x, y, z }) => [
-                x * this.video.videoWidth,
+                Math.abs(x * this.video.videoWidth - this.video.videoWidth),
                 y * this.video.videoHeight,
                 z * 10,
             ]);
