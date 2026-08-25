@@ -1,4 +1,6 @@
 import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
+import { load_SVM_Model, predict } from "./SVM.js";
+import { compute, fingerBends } from "./HandFeature.js";
 
 export class MediaPipe {
     constructor(video) {
@@ -9,9 +11,14 @@ export class MediaPipe {
 
         this.handData = { Left: [], Right: [] };
         this.poseData = [];
+
+        this.gesture = null;
+        this.fingerBend = [];
     }
 
     async init() {
+        await load_SVM_Model();
+
         const vision = await FilesetResolver.forVisionTasks(
             "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
         );
@@ -42,6 +49,10 @@ export class MediaPipe {
     async detectHand() {
         if (!this.handLandmarker || !this.video) return;
 
+        this.handData = { Left: [], Right: [] };
+        this.gesture = null;
+        this.fingerBend = [];
+
         const data = this.handLandmarker.detectForVideo(
             this.video, performance.now(), {
             width: this.video.videoWidth,
@@ -58,10 +69,22 @@ export class MediaPipe {
             ]);
         }
 
+
+        if (this.handData.Right.length > 0) {
+            this.fingerBend = fingerBends(this.handData.Right);
+        }
+
+        if (this.handData.Left.length > 0) {
+            this.gesture = await predict(compute(this.handData.Left));
+        }
+
+
     }
 
     async detectPose() {
         if (!this.poseLandmarker || !this.video) return;
+
+        this.poseData = [];
 
         const data = this.poseLandmarker.detectForVideo(this.video, performance.now(), {
             width: this.video.videoWidth,
@@ -82,5 +105,9 @@ export class MediaPipe {
 
     clear() {
         this.handData = { Left: [], Right: [] };
+        this.poseData = [];
+        this.gesture = { Left: "", Right: "" };
+        this.features = { Left: [], Right: [] };
+        this.fingerBend = { Left: [[], []], Right: [[], []] };
     }
 }

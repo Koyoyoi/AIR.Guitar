@@ -1,11 +1,10 @@
 import { MediaPipe } from "./models/MediaPipe.js";
 
-let MP;
+export let MP;
 
-function loop() {
-    MP.detectHand();
-    MP.detectPose();
-    MP.clear();
+async function loop() {
+    await MP.detectHand();
+    await MP.detectPose();
     requestAnimationFrame(loop);
 }
 
