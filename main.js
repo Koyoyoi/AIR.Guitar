@@ -10,11 +10,7 @@ function loop() {
 }
 
 async function initializeVideo() {
-    const video = document.createElement("video");
-    video.autoplay = true;
-    video.playsInline = true;
-    video.muted = true;
-    document.body.appendChild(video);
+    const video = document.querySelector("#camera");
 
     const stream = await navigator.mediaDevices.getUserMedia({
         video: {
