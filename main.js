@@ -49,7 +49,7 @@ async function loop() {
 async function main() {
     GS = new GuitarSound();
     await GS.loadSamples();
-    MP = new MediaPipe(await initVideo();
+    MP = new MediaPipe(await initVideo());
     await MP.init();
     DH = new DrawHand(await initCanvas());
 
