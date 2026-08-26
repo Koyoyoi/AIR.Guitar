@@ -29,12 +29,12 @@ export async function load_SVM_Model() {
 
     // 定義模型名稱
     const modelDir = 'SVM_model'; 
-    const modelName = 'svm_chordPos_model.pkl';
-    const modelPath = `./models/${modelDir}/${modelName}`;
+    const modelName = 'numberPos';
+    const modelPath = `./models/${modelDir}/svm_${modelName}_model.pkl`;
 
     // 加載模型和標準化器文件
     const modelData = await loadBinaryFile(modelPath);
-    const scalerData = await loadBinaryFile(modelPath.replace('svm_chordPos_model.pkl', 'scaler_chordPos.pkl'));
+    const scalerData = await loadBinaryFile(modelPath.replace('svm_numberPos_model.pkl', 'scaler_numberPos.pkl'));
 
     // 加載標籤數據，這裡假設它是文本文件，按行分割
     const response = await fetch(`./models/${modelDir}/labels.txt`);
