@@ -7,11 +7,20 @@ body {
     background: #000;
 }
 
-#camera {
+#camera,
+#canvas {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
     object-fit: cover;
+
+}
+
+#camera {
     transform: scaleX(-1);
+}
+
+#canvas {
+    pointer-events: none;
 }
