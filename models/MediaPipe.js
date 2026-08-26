@@ -6,13 +6,8 @@ export class MediaPipe {
 
     constructor(video) {
         this.video = video;
-
         this.handLandmarker = null;
-        this.poseLandmarker = null;
-
         this.handData = { Left: [], Right: [] };
-        this.poseData = [];
-
         this.gesture = null;
         this.fingerBend = [];
     }
@@ -26,24 +21,13 @@ export class MediaPipe {
 
         this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
             baseOptions: {
-                modelAssetPath: "./models/MediaPipe/hand_landmarker.task",
+                modelAssetPath: "./models/MP_model/hand_landmarker.task",
                 delegate: "GPU",
             },
             runningMode: "VIDEO",
             min_hand_detection_confidence: 0.5,
             min_tracking_confidence: 0.5,
             numHands: 2,
-        });
-
-        this.poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
-            baseOptions: {
-                modelAssetPath: "./models/MediaPipe/pose_landmarker_lite.task",
-                delegate: "GPU",
-            },
-            runningMode: "VIDEO",
-            min_pose_detection_confidence: 0.8,
-            min_tracking_confidence: 0.7,
-            numPoses: 1,
         });
     }
 
@@ -81,25 +65,4 @@ export class MediaPipe {
 
     }
 
-    async detectPose() {
-        if (!this.poseLandmarker || !this.video) return;
-
-        this.poseData = [];
-
-        const data = this.poseLandmarker.detectForVideo(this.video, performance.now(), {
-            width: this.video.videoWidth,
-            height: this.video.videoHeight,
-        });
-        const pose = data.landmarks[0];
-
-        if (pose) {
-            this.poseData.push(
-                ...pose.map(({ x, y, z }) => [
-                    x * this.video.videoWidth,
-                    y * this.video.videoHeight,
-                    z * 10,
-                ])
-            );
-        }
-    }
 }

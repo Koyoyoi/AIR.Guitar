@@ -22,9 +22,9 @@ async function initVideo() {
 
 async function loop() {
     await MP.detectHand();
-    await MP.detectPose();
     GS.buildGuitarChord(MP.gesture);
     GS.plucking(MP.fingerBend);
+    GS.strumming(MP.handData.Right);
  
     requestAnimationFrame(loop);
 }

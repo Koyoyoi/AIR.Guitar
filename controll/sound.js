@@ -1,3 +1,5 @@
+import { vectorAngle, vectorCompute } from "../models/HandFeature.js";
+
 const DEFAULT_INSTRUMENTS = [
     "acoustic_guitar_nylon",
     "acoustic_guitar_steel",
@@ -22,19 +24,22 @@ export class GuitarSound {
         soundfont = "FluidR3_GM",
         tuning = [40, 45, 50, 55, 59, 64],
     } = {}) {
+        // Sound
         this.instruments = instruments;
         this.instrumentID = instrumentID;
         this.soundfont = soundfont;
         this.tuning = tuning;
-
         this.audioContext = null;
         this.soundSample = null;
+        // Guitar
         this.guitarChord = [];
         this.pluckNotes = [];
         this.capo = 0;
-
+        // Gesture
         this.prevGesture = null;
-        this.prevPluck = []
+        this.prevPluck = [];
+        this.prevWristX = null;
+        this.prevAction = null;
     }
 
     async loadSamples(instrumentIndex = this.instrumentID) {
@@ -100,7 +105,7 @@ export class GuitarSound {
 
     async plucking(fingerBend) {
 
-        if (!this.soundSample) return;
+        if (!this.soundSample || !this.prevAction) return;
 
         const picks = fingerBend.map(
             ([pick]) => pick
@@ -149,18 +154,63 @@ export class GuitarSound {
         // 更新目前按下的手指
         this.prevPluck = picks;
     }
-    async strumming(direction, capo = 0, duration = 120) {
+
+    async strumming(hand) {
         if (!this.soundSample || this.guitarChord.length === 0) return;
 
-        const notes = direction === "Up" ? [...this.guitarChord].reverse() : this.guitarChord;
-        const interval = Math.max(0, Math.floor(duration) * 4 / notes.length);
+        if (!hand || hand.length === 0) {
+            this.prevWristX = null;
+            this.prevAction = null;
+            return;
+        }
+
+        const wristX = hand[0][0];
+
+        if (this.prevWristX === null) {
+            this.prevWristX = wristX;
+            return;
+        }
+
+        const movement = wristX - this.prevWristX;
+        this.prevWristX = wristX;
+
+        const threshold = 10;
+        let action = null;
+
+        if (movement > threshold) {
+            action = "Dn";
+        } else if (movement < -threshold) {
+            action = "Up";
+        }
+
+        if (action === null || action === this.prevAction) return;
+        console.log(action, movement);
+        this.prevAction = action;
+
+        const duration = this.mapRange(Math.abs(movement), threshold, 150, 125, 1);
+
+        const notes = action === "Up"
+            ? [...this.guitarChord].reverse()
+            : this.guitarChord;
+
+        const interval = Math.max(
+            1,
+            Math.floor(duration * 4 / notes.length)
+        );
 
         for (const note of notes) {
-            this.soundSample.play(note + capo, this.audioContext.currentTime, {
-                gain: 4,
-                duration: 1,
-            });
-            await new Promise((resolve) => setTimeout(resolve, interval));
+            this.soundSample.play(
+                note + this.capo,
+                this.audioContext.currentTime,
+                {
+                    gain: 4,
+                    duration: 1
+                }
+            );
+
+            await new Promise(resolve =>
+                setTimeout(resolve, interval)
+            );
         }
     }
 

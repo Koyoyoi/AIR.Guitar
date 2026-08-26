@@ -28,14 +28,16 @@ export async function load_SVM_Model() {
     await initPyodide();
 
     // 定義模型名稱
-    const modelName = 'numberPos';
+    const modelDir = 'SVM_model'; 
+    const modelName = 'svm_chordPos_model.pkl';
+    const modelPath = `./models/${modelDir}/${modelName}`;
 
     // 加載模型和標準化器文件
-    const modelData = await loadBinaryFile(`./models/${modelName}/svm_${modelName}_model.pkl`);
-    const scalerData = await loadBinaryFile(`./models/${modelName}/scaler_${modelName}.pkl`);
+    const modelData = await loadBinaryFile(modelPath);
+    const scalerData = await loadBinaryFile(modelPath.replace('svm_chordPos_model.pkl', 'scaler_chordPos.pkl'));
 
     // 加載標籤數據，這裡假設它是文本文件，按行分割
-    const response = await fetch(`./models/${modelName}/labels.txt`);
+    const response = await fetch(`./models/${modelDir}/labels.txt`);
     const labelText = await response.text();
     const labelData = labelText.split('\n').map(line => line.trim());
 
