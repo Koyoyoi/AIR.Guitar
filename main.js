@@ -23,12 +23,15 @@ async function initVideo() {
 }
 
 async function loop() {
+    DH.clear();
     await MP.detectHand();
-    DH.drawGesture(MP.gesture, MP.handData.Left[9]);
     GS.buildGuitarChord(MP.gesture);
     GS.plucking(MP.fingerBend);
     GS.strumming(MP.handData.Right);
- 
+
+    DH.drawGesture(MP.gesture, MP.handData.Left[9]);
+    DH.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
+
     requestAnimationFrame(loop);
 }
 
