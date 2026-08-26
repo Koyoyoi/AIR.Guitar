@@ -22,6 +22,17 @@ async function initVideo() {
     return video;
 }
 
+async function initCanvas() {
+    const canvas = document.querySelector("#canvas");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    return ctx;
+
+}
+
 async function loop() {
     DH.clear();
     await MP.detectHand();
@@ -36,22 +47,11 @@ async function loop() {
 }
 
 async function main() {
-    const video = await initVideo();
-
-    const canvas = document.querySelector("#canvas");
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext("2d");
-
-    DH = new DrawHand(ctx);
-
-    MP = new MediaPipe(video);
-    await MP.init();
-
     GS = new GuitarSound();
     await GS.loadSamples();
+    MP = new MediaPipe(await initVideo(),;
+    await MP.init();
+    DH = new DrawHand(await initCanvas());
 
     loop();
 }
