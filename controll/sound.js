@@ -184,7 +184,6 @@ export class GuitarSound {
         }
 
         if (action === null || action === this.prevAction) return;
-        console.log(action, movement);
         this.prevAction = action;
 
         const duration = this.mapRange(Math.abs(movement), threshold, 150, 125, 1);
