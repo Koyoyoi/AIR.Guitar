@@ -1,9 +1,9 @@
 import { MediaPipe } from "./models/MediaPipe.js";
 import { GuitarSound } from "./controll/sound.js";
-import { DrawHand } from "./visual/drawHand.js";
+import { GuitarVisualizer } from "./visual/GuitarVisualizer.js";
 export let MP;
 export let GS;
-export let DH;
+export let GV;
 
 async function initVideo() {
     const video = document.querySelector("#camera");
@@ -22,7 +22,7 @@ async function initVideo() {
     return video;
 }
 
-async function initCanvas() {
+async function initCanvas(video) {
     const canvas = document.querySelector("#canvas");
 
     canvas.width = video.videoWidth;
@@ -34,14 +34,14 @@ async function initCanvas() {
 }
 
 async function loop() {
-    DH.clear();
+    GV.clear();
     await MP.detectHand();
     GS.buildGuitarChord(MP.gesture);
     GS.plucking(MP.fingerBend);
     GS.strumming(MP.handData.Right);
 
-    DH.drawGesture(MP.gesture, MP.handData.Left[9]);
-    DH.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
+    GV.drawGesture(MP.gesture, MP.handData.Left[9]);
+    GV.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
 
     requestAnimationFrame(loop);
 }
@@ -51,7 +51,7 @@ async function main() {
     await GS.loadSamples();
     MP = new MediaPipe(await initVideo());
     await MP.init();
-    DH = new DrawHand(await initCanvas());
+    GV = new GuitarVisualizer(await initCanvas(MP.video));
 
     loop();
 }

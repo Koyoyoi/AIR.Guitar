@@ -1,4 +1,4 @@
-export class DrawHand {
+export class GuitarVisualizer {
 
     constructor(ctx) {
         this.ctx = ctx;
