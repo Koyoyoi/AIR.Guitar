@@ -4,6 +4,7 @@ export class GuitarVisualizer {
         this.ctx = ctx;
         this.lineWidth = 2;
         this.pointRadius = 5;
+        this.strings = [];
         this.NOTE_NAMES = [
             "C", "C#", "D", "D#", "E", "F",
             "F#", "G", "G#", "A", "A#", "B"
@@ -48,11 +49,88 @@ export class GuitarVisualizer {
             const name = this.NOTE_NAMES[midi % 12];
             const octave = Math.floor(midi / 12) - 1;
 
-            ctx.fillStyle = prePluck?.includes(i)
-                ? "#D0104C"
-                : "#00AA90";
+            if (prePluck?.includes(i)) {
+                ctx.fillStyle = "#D0104C";
+
+                if (!this.prevPluck.includes(i)) {
+                    this.strings.push({
+                        y,
+                        midi,
+                        startTime: performance.now(),
+                        duration: 500,
+                        amplitude: 8,
+                        frequency: 0.08
+                    });
+                }
+            } else {
+                ctx.fillStyle = "#00AA90";
+            }
 
             ctx.fillText(`${name}${octave}`, x, y);
         }
+
+        this.prevPluck = prePluck?.slice() ?? [];
     }
+
+    drawStrings() {
+        const ctx = this.ctx;
+        const width = ctx.canvas.width;
+        const now = performance.now();
+
+        this.strings = this.strings.filter(string => {
+            const elapsed = now - string.startTime;
+
+            if (elapsed >= string.duration) return false;
+
+            const progress = elapsed / string.duration;
+            const fade = 1 - progress;
+
+            ctx.beginPath();
+            ctx.strokeStyle = this.noteToColor(string.midi);
+            ctx.globalAlpha = fade;
+            ctx.lineWidth = 8;
+
+            const segments = 40;
+
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const x = width * t;
+
+                const wave = Math.sin(t * Math.PI * 8 + elapsed * string.frequency);
+
+                const y = string.y + wave * string.amplitude * fade;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            return true;
+        });
+    }
+
+    noteToColor(midi) {
+        const colors = [
+            "#FF4D4D", // C
+            "#FF8A4D", // C#
+            "#FFD24D", // D
+            "#B8D94E", // D#
+            "#4DCC66", // E
+            "#4DD9A8", // F
+            "#4DC4FF", // F#
+            "#4D79FF", // G
+            "#795CFF", // G#
+            "#B04DFF", // A
+            "#E04DFF", // A#
+            "#FF4DB8"  // B
+        ];
+
+        return colors[midi % 12];
+    }
+
 }

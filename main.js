@@ -42,6 +42,7 @@ async function loop() {
 
     GV.drawGesture(MP.gesture, MP.handData.Left[9]);
     GV.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
+    GV.drawStrings();
 
     requestAnimationFrame(loop);
 }
