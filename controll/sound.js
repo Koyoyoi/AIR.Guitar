@@ -135,6 +135,7 @@ export class GuitarSound extends EventTarget {
 
             this.dispatchEvent(new CustomEvent("noteOn", {
                 detail: {
+                    type: "pluck",
                     stringIndex,
                     midi,
                 }
@@ -188,23 +189,30 @@ export class GuitarSound extends EventTarget {
             action = "Up";
         }
 
-        if (action === null || action === this.prevAction) return;
+        if (action === null || action === this.prevAction)
+            return;
         this.prevAction = action;
 
         const duration = this.mapRange(Math.abs(movement), threshold, 150, 125, 1);
 
-        const notes = action === "Up"
-            ? [...this.guitarChord].reverse()
-            : this.guitarChord;
+        const notes = action === "Up" ? [...this.guitarChord].reverse() : this.guitarChord;
 
-        const interval = Math.max(
-            1,
-            Math.floor(duration * 4 / notes.length)
-        );
+        const interval = Math.max(1, Math.floor(duration * 4 / notes.length));
 
-        for (const note of notes) {
+        for (let i = 0; i < notes.length; i++) {
+            const midi = notes[i] + this.capo;
+
+            this.dispatchEvent(new CustomEvent("noteOn", {
+                detail: {
+                    type: "strum",
+                    stringIndex: i,
+                    midi,
+                    direction: action
+                }
+            }));
+
             this.soundSample.play(
-                note + this.capo,
+                midi,
                 this.audioContext.currentTime,
                 {
                     gain: 4,

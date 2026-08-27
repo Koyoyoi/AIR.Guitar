@@ -9,7 +9,7 @@ export class GuitarVisualizer {
             "F#", "G", "G#", "A", "A#", "B"
         ];
     }
-    
+
     setHand(hand) {
         this.hand = hand;
     }
@@ -66,13 +66,33 @@ export class GuitarVisualizer {
 
     connectSound(guitarSound) {
         guitarSound.addEventListener("noteOn", ({ detail }) => {
-            console.log("noteOn", detail);
-            const fingertips = [4, 8, 12, 16];
-            const point = this.hand.Right?.[fingertips[detail.stringIndex]];
+            const hand = this.hand.Right;
+            if (!hand) return;
 
-            if (!point) return;
+            if (detail.type === "pluck") {
+                const fingertips = [4, 8, 12, 16];
+                const point = hand[fingertips[detail.stringIndex]];
 
-            this.addString(point[1], detail.midi);
+                if (!point) return;
+
+                this.addString(point[1], detail.midi);
+                return;
+            }
+
+            if (detail.type === "strum") {
+                const base = hand[11];
+                if (!base) return;
+
+                let index = detail.stringIndex;
+
+                if (detail.direction === "Up") {
+                    index = 5 - index;
+                }
+
+                const y = base[1] + index * 35;
+
+                this.addString(y, detail.midi);
+            }
         });
     }
 
