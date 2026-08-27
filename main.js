@@ -1,6 +1,7 @@
 import { MediaPipe } from "./models/MediaPipe.js";
 import { GuitarSound } from "./controll/sound.js";
 import { GuitarVisualizer } from "./visual/GuitarVisualizer.js";
+import { Loading } from "./visual/Loading.js";
 let MP;
 let GS;
 let GV;
@@ -50,13 +51,35 @@ async function loop() {
 }
 
 async function main() {
+    const loading = new Loading();
+    loading.setProgress(10, "Starting");
+
     GS = new GuitarSound();
+
+    loading.setProgress(20, "Loading Guitar");
+
     await GS.loadSamples();
+
+    loading.setProgress(50, "Loading Camera");
+
     MP = new MediaPipe(await initVideo());
+
+    loading.setProgress(80, "Loading MediaPipe");
+
     await MP.init();
+
+
     GV = new GuitarVisualizer(await initCanvas(MP.video));
     GV.connectSound(GS);
-    loop();
+
+    loading.setProgress(100, "Ready");
+
+    setTimeout(() => {
+        loading.hide();
+        setTimeout(() => {
+            loop();
+        }, 300);
+    }, 500);
 }
 
 window.addEventListener("DOMContentLoaded", main);
