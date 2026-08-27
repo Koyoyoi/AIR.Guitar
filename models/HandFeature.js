@@ -73,7 +73,7 @@ export function fingerBends(hand) {
     const angles = fingerAngle(hand);
     const fingerBends = [];
 
-    if (angles[0] > 15) { fingerBends.push([0, mapRange(angles[0], 30, 60, 60, 127)]); }
+    if (angles[0] > 20) { fingerBends.push([0, mapRange(angles[0], 30, 60, 60, 127)]); }
     if (angles[1] > 20) { fingerBends.push([1, mapRange(angles[1], 30, 180, 40, 127)]); }
     if (angles[2] > 20) { fingerBends.push([2, mapRange(angles[2], 20, 160, 40, 127)]); }
     if (angles[3] > 30) { fingerBends.push([3, mapRange(angles[3], 20, 150, 40, 127)]); }
