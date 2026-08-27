@@ -2,8 +2,6 @@ export class GuitarVisualizer {
 
     constructor(ctx) {
         this.ctx = ctx;
-        this.lineWidth = 2;
-        this.pointRadius = 5;
         this.strings = [];
         this.NOTE_NAMES = [
             "C", "C#", "D", "D#", "E", "F",
@@ -88,7 +86,7 @@ export class GuitarVisualizer {
             ctx.beginPath();
             ctx.strokeStyle = this.noteToColor(string.midi);
             ctx.globalAlpha = fade;
-            ctx.lineWidth = 8;
+            ctx.lineWidth = 7;
 
             const segments = 40;
 
