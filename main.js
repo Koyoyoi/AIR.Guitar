@@ -79,7 +79,7 @@ async function main() {
         setTimeout(() => {
             loop();
         }, 300);
-    }, 500);
+    }, 700);
 }
 
 window.addEventListener("DOMContentLoaded", main);
