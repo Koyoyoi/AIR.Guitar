@@ -35,6 +35,8 @@ async function initCanvas(video) {
 
 async function loop() {
     GV.clear();
+    GV.setHand(MP.handData);
+    
     await MP.detectHand();
     GS.buildGuitarChord(MP.gesture);
     GS.plucking(MP.fingerBend);
@@ -53,7 +55,7 @@ async function main() {
     MP = new MediaPipe(await initVideo());
     await MP.init();
     GV = new GuitarVisualizer(await initCanvas(MP.video));
-
+    GV.connectSound(GS);
     loop();
 }
 

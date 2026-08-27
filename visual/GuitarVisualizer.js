@@ -1,12 +1,17 @@
 export class GuitarVisualizer {
 
     constructor(ctx) {
+        this.hand = null;
         this.ctx = ctx;
         this.strings = [];
         this.NOTE_NAMES = [
             "C", "C#", "D", "D#", "E", "F",
             "F#", "G", "G#", "A", "A#", "B"
         ];
+    }
+    
+    setHand(hand) {
+        this.hand = hand;
     }
 
     clear() {
@@ -26,8 +31,8 @@ export class GuitarVisualizer {
         ctx.fillText(`${gesture}`, pos[0], pos[1]);
     }
 
-    drawNote(note, prePluck, hand) {
-        if (!note || !hand) return;
+    drawNote(note, prePluck) {
+        if (!note || !this.hand.Right) return;
 
         const ctx = this.ctx;
         const fingertips = [4, 8, 12, 16];
@@ -37,7 +42,7 @@ export class GuitarVisualizer {
         ctx.textBaseline = "middle";
 
         for (let i = 0; i < 4; i++) {
-            const point = hand[fingertips[i]];
+            const point = this.hand.Right[fingertips[i]];
             if (!point || note[i] === undefined) continue;
 
             const x = point[0];
@@ -49,17 +54,6 @@ export class GuitarVisualizer {
 
             if (prePluck?.includes(i)) {
                 ctx.fillStyle = "#D0104C";
-
-                if (!this.prevPluck.includes(i)) {
-                    this.strings.push({
-                        y,
-                        midi,
-                        startTime: performance.now(),
-                        duration: 500,
-                        amplitude: 8,
-                        frequency: 0.08
-                    });
-                }
             } else {
                 ctx.fillStyle = "#00AA90";
             }
@@ -68,6 +62,29 @@ export class GuitarVisualizer {
         }
 
         this.prevPluck = prePluck?.slice() ?? [];
+    }
+
+    connectSound(guitarSound) {
+        guitarSound.addEventListener("noteOn", ({ detail }) => {
+            console.log("noteOn", detail);
+            const fingertips = [4, 8, 12, 16];
+            const point = this.hand.Right?.[fingertips[detail.stringIndex]];
+
+            if (!point) return;
+
+            this.addString(point[1], detail.midi);
+        });
+    }
+
+    addString(y, midi) {
+        this.strings.push({
+            y,
+            midi,
+            startTime: performance.now(),
+            duration: 500,
+            amplitude: 8,
+            frequency: 0.08
+        });
     }
 
     drawStrings() {

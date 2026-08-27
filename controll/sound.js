@@ -15,13 +15,14 @@ const CHORD_INTERVALS = {
     dim: [0, 3, 6],
 };
 
-export class GuitarSound {
+export class GuitarSound extends EventTarget {
     constructor({
         instruments = DEFAULT_INSTRUMENTS,
         instrumentID = 0,
         soundfont = "FluidR3_GM",
         tuning = [40, 45, 50, 55, 59, 64],
     } = {}) {
+        super();
         // Sound
         this.instruments = instruments;
         this.instrumentID = instrumentID;
@@ -105,9 +106,7 @@ export class GuitarSound {
 
         if (!this.soundSample || !this.prevAction) return;
 
-        const picks = fingerBend.map(
-            ([pick]) => pick
-        );
+        const picks = fingerBend.map(([pick]) => pick);
 
         // 沒有手指 → 視為全部釋放
         if (picks.length === 0) {
@@ -129,12 +128,20 @@ export class GuitarSound {
 
             if (stringIndex === 4) continue;
 
-            const note = this.pluckNotes[stringIndex];
+            const midi = this.pluckNotes[stringIndex];
 
-            if (!Number.isFinite(note)) continue;
+            if (!Number.isFinite(midi)) continue;
+
+
+            this.dispatchEvent(new CustomEvent("noteOn", {
+                detail: {
+                    stringIndex,
+                    midi,
+                }
+            }));
 
             this.soundSample.play(
-                note + this.capo,
+                midi + this.capo,
                 this.audioContext.currentTime,
                 {
                     gain: this.mapRange(
