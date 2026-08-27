@@ -1,9 +1,9 @@
 import { MediaPipe } from "./models/MediaPipe.js";
 import { GuitarSound } from "./controll/sound.js";
 import { GuitarVisualizer } from "./visual/GuitarVisualizer.js";
-export let MP;
-export let GS;
-export let GV;
+let MP;
+let GS;
+let GV;
 
 async function initVideo() {
     const video = document.querySelector("#camera");
@@ -36,7 +36,7 @@ async function initCanvas(video) {
 async function loop() {
     GV.clear();
     GV.setHand(MP.handData);
-    
+
     await MP.detectHand();
     GS.buildGuitarChord(MP.gesture);
     GS.plucking(MP.fingerBend);

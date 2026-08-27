@@ -1,4 +1,4 @@
-import { HandLandmarker, PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
+import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest";
 import { load_SVM_Model, predict } from "./SVM.js";
 import { transData, fingerBends } from "./HandFeature.js";
 
