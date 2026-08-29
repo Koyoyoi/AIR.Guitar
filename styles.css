@@ -50,12 +50,13 @@ body {
     font-size: 20px;
     white-space: nowrap;
     user-select: none;
+
 }
 
 #modeSeparator {
     width: 1px;
     height: 32px;
-
+    caret-color: transparent;
     background: #434343;
 }
 
