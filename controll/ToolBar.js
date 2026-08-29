@@ -1,12 +1,21 @@
+const mode = ["Free Play", "Number Score"]
+
 export class ToolBar {
     constructor() {
+        this.currMode = 0;
+        this.capo = 0;
+
         this.element = document.createElement("div");
         this.element.id = "toolbar";
 
         this.element.innerHTML = `
-            <button id="switchMode" title="Switch Mode">
-                <i class="fa-solid fa-repeat"></i>
-            </button>
+            <div id="modeControl">
+                <span id="modeValue">${mode[0]}</span>
+                <span id="modeSeparator"></span>
+                <button id="switchMode" title="Switch Mode">
+                    <i class="fa-solid fa-repeat"></i>
+                </button>
+            </div>
 
             <div class="capo-control">
                 <button id="capoMinus" title="Decrease Capo">
@@ -27,7 +36,7 @@ export class ToolBar {
         this.element
             .querySelector("#switchMode")
             .addEventListener("click", () => {
-                this.switchMode();
+                this.switchMode(this.currMode + 1);
             });
 
         this.element
@@ -43,9 +52,15 @@ export class ToolBar {
             });
 
     }
+    
+    setCapo(value) {
+        this.capo = Math.max(-12, Math.min(12, value));
+        this.element.querySelector("#capoValue").textContent = `Capo ${this.capo}`;
+    }
 
     switchMode() {
         console.log("Switch Mode");
-
+        this.currMode = this.currMode % mode.length;
+        this.element.querySelector("#modeValue").textContent = mode[this.currMode];
     }
 }
