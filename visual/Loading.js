@@ -16,8 +16,8 @@ export class Loading {
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "column",
-            background: "#111",
-            color: "#fff",
+            background: "#1C1C1C",
+            color: "#BDC0BA",
             font: "bold 24px Arial",
             zIndex: "9999"
         });
@@ -31,7 +31,7 @@ export class Loading {
                 width: 300px;
                 height: 10px;
                 margin-top: 15px;
-                background: #333;
+                background: #434343;
                 border-radius: 5px;
                 overflow: hidden;
             }
