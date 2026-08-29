@@ -52,15 +52,15 @@ export class ToolBar {
             });
 
     }
-    
+
     setCapo(value) {
         this.capo = Math.max(-12, Math.min(12, value));
         this.element.querySelector("#capoValue").textContent = `Capo ${this.capo}`;
     }
 
-    switchMode() {
+    switchMode(value) {
         console.log("Switch Mode");
-        this.currMode = this.currMode % mode.length;
+        this.currMode = value % mode.length;
         this.element.querySelector("#modeValue").textContent = mode[this.currMode];
     }
 }
