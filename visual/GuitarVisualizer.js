@@ -18,8 +18,14 @@ export class GuitarVisualizer {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    drawGesture(gesture, pos) {
+    drawGesture(gesture, capo, pos) {
         if (!gesture || !pos) return;
+
+        const root = gesture[0];
+        const suffix = gesture.slice(1);
+
+        const index = this.NOTE_NAMES.indexOf(root);
+        const note = this.NOTE_NAMES[(index + capo + 12) % 12];
 
         const ctx = this.ctx;
 
@@ -28,7 +34,7 @@ export class GuitarVisualizer {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        ctx.fillText(`${gesture}`, pos[0], pos[1]);
+        ctx.fillText(`${note}${suffix}`, pos[0], pos[1]);
     }
 
     drawNote(note, prePluck) {

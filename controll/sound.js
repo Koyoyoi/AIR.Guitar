@@ -33,7 +33,7 @@ export class GuitarSound extends EventTarget {
         // Guitar
         this.guitarChord = [];
         this.pluckNotes = [];
-        this.capo = 0;
+        this.prevCapo = 0;
         // Gesture
         this.prevGesture = null;
         this.prevPluck = [];
@@ -64,16 +64,17 @@ export class GuitarSound extends EventTarget {
         return this.soundSample;
     }
 
-    buildGuitarChord(gesture) {
+    buildGuitarChord(gesture, capo) {
         if (typeof gesture !== "string" || !gesture || ROOTS[gesture[0]] === undefined) {
             this.guitarChord = [];
             this.pluckNotes = [];
             return [];
         }
-        if (this.prevGesture == gesture) {
+        if (this.prevGesture == gesture && this.prevCapo == capo) {
             return;
         }
         this.prevGesture = gesture;
+        this.prevCapo = capo;
         const root = gesture[0];
         const intervals = CHORD_INTERVALS[gesture.slice(1)];
         if (!intervals) return [];
@@ -89,7 +90,7 @@ export class GuitarSound extends EventTarget {
             }));
 
             if (closest % 12 === ROOTS[root]) foundRoot = true;
-            if (foundRoot) this.guitarChord.push(closest);
+            if (foundRoot) this.guitarChord.push(closest + capo);
         }
 
         this.pluckNotes = [
@@ -142,7 +143,7 @@ export class GuitarSound extends EventTarget {
             }));
 
             this.soundSample.play(
-                midi + this.capo,
+                midi,
                 this.audioContext.currentTime,
                 {
                     gain: this.mapRange(
@@ -200,7 +201,7 @@ export class GuitarSound extends EventTarget {
         const interval = Math.max(1, Math.floor(duration * 4 / notes.length));
 
         for (let i = 0; i < notes.length; i++) {
-            const midi = notes[i] + this.capo;
+            const midi = notes[i];
 
             this.dispatchEvent(new CustomEvent("noteOn", {
                 detail: {

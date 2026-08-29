@@ -42,10 +42,10 @@ async function loop() {
 
     await MP.detectHand();
     if (TB.mode == "Free Play") {
-        GS.buildGuitarChord(MP.gesture);
+        GS.buildGuitarChord(MP.gesture, TB.capo);
         GS.plucking(MP.fingerBend);
         GS.strumming(MP.handData.Right);
-        GV.drawGesture(MP.gesture, MP.handData.Left[9]);
+        GV.drawGesture(MP.gesture, TB.capo, MP.handData.Left[9]);
         GV.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
         GV.drawStrings();
     }
