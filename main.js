@@ -54,38 +54,33 @@ async function loop() {
 
 async function main() {
     const loading = new Loading();
-    loading.setProgress(10, "Starting");
 
+    const progress = async (value, text) => {
+        loading.setProgress(value, text);
+        await new Promise(resolve => setTimeout(resolve, 500));
+    };
+    await progress(10, "Starting");
     GS = new GuitarSound();
-
-    loading.setProgress(20, "Start the AIR Guitar");
-
     await GS.loadSamples();
 
-    loading.setProgress(50, "Open Camera");
+    await progress(30, "Setup Tool Bar");
+    TB = new ToolBar();
 
-    TB = new  ToolBar();
-
-    loading.setProgress(60, "Setup Tool Bars")
-
+    await progress(60, "Open Camera");
     MP = new MediaPipe(await initVideo());
 
-    loading.setProgress(80, "Loading MediaPipe");
-
+    await progress(80, "Loading Model");
     await MP.init();
 
-
+    await progress(90, "Setup Visualizer");
     GV = new GuitarVisualizer(await initCanvas(MP.video));
     GV.connectSound(GS);
 
-    loading.setProgress(100, "Ready");
-
+    await progress(100, "Ready");
     setTimeout(() => {
         loading.hide();
-        setTimeout(() => {
-            loop();
-        }, 300);
-    }, 700);
+        loop();
+    }, 500);
 }
 
 window.addEventListener("DOMContentLoaded", main);
