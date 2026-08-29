@@ -38,8 +38,8 @@ body {
 
     height: 48px;
 
-    background: #080808;
-    color: #FFFFFB;
+    background: #1C1C1C;
+    color: #BDC0BA;
 
     border-radius: 8px;
 }
@@ -66,8 +66,8 @@ body {
     border: none;
     border-radius: 0 8px 8px 0;
 
-    background: #080808;
-    color: #FFFFFB;
+    background: #1C1C1C;
+    color: #BDC0BA;
 
     font-size: 28px;
     cursor: pointer;
@@ -100,8 +100,8 @@ body {
 #capoValue {
     height: 48px;
 
-    background: #080808;
-    color: #FFFFFB;
+    background: #1C1C1C;
+    color: #BDC0BA;
 
     border: none;
 }
