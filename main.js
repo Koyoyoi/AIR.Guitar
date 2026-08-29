@@ -1,5 +1,5 @@
 import { MediaPipe } from "./models/MediaPipe.js";
-import { GuitarSound } from "./controll/sound.js";
+import { GuitarSound } from "./controll/Sound.js";
 import { GuitarVisualizer } from "./visual/GuitarVisualizer.js";
 import { Loading } from "./visual/Loading.js";
 import { ToolBar } from "./controll/ToolBar.js";
