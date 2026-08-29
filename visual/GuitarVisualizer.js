@@ -151,18 +151,18 @@ export class GuitarVisualizer {
 
     noteToColor(midi) {
         const colors = [
-            "#FF4D4D", // C
-            "#FF8A4D", // C#
-            "#FFD24D", // D
-            "#B8D94E", // D#
-            "#4DCC66", // E
-            "#4DD9A8", // F
-            "#4DC4FF", // F#
-            "#4D79FF", // G
-            "#795CFF", // G#
-            "#B04DFF", // A
-            "#E04DFF", // A#
-            "#FF4DB8"  // B
+            "#B5495B", // C
+            "#C46243", // C#
+            "#F7C242", // D
+            "#91AD70", // D#
+            "#86C166", // E
+            "#2D6D48", // F
+            "#6699A1", // F#
+            "#58B2DC", // G
+            "#6E75A4", // G#
+            "#70649A", // A
+            "#574C57", // A#
+            "#B481BB"  // B
         ];
 
         return colors[midi % 12];
