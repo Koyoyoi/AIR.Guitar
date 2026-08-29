@@ -24,3 +24,32 @@ body {
 #canvas {
     pointer-events: none;
 }
+
+#toolbar {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1000;
+}
+
+#switchMode {
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: rgba(30, 30, 30, 0.8);
+    color: white;
+
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#switchMode:hover {
+    background: rgba(60, 60, 60, 0.9);
+}
+
+#switchMode:active {
+    transform: scale(0.9);
+}

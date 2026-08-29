@@ -2,9 +2,11 @@ import { MediaPipe } from "./models/MediaPipe.js";
 import { GuitarSound } from "./controll/sound.js";
 import { GuitarVisualizer } from "./visual/GuitarVisualizer.js";
 import { Loading } from "./visual/Loading.js";
+import { ToolBar } from "./controll/ToolBar.js";
 let MP;
 let GS;
 let GV;
+let TB;
 
 async function initVideo() {
     const video = document.querySelector("#camera");
@@ -56,11 +58,15 @@ async function main() {
 
     GS = new GuitarSound();
 
-    loading.setProgress(20, "Loading Guitar");
+    loading.setProgress(20, "Start the AIR Guitar");
 
     await GS.loadSamples();
 
-    loading.setProgress(50, "Loading Camera");
+    loading.setProgress(50, "Open Camera");
+
+    TB = new  ToolBar();
+
+    loading.setProgress(60, "Setup Tool Bars")
 
     MP = new MediaPipe(await initVideo());
 
