@@ -3,6 +3,7 @@ const mode = ["Free Play", "Number Score"]
 export class ToolBar {
     constructor() {
         this.currMode = 0;
+        this.mode = mode[this.currMode];
         this.capo = 0;
 
         this.element = document.createElement("div");
@@ -59,8 +60,14 @@ export class ToolBar {
     }
 
     switchMode(value) {
-        console.log("Switch Mode");
         this.currMode = value % mode.length;
-        this.element.querySelector("#modeValue").textContent = mode[this.currMode];
+        this.mode = mode[this.currMode];
+        this.element.querySelector("#modeValue").textContent = this.mode;
+        // Show or Hide
+        if (this.mode === "Free Play") {
+            this.element.querySelector(".capo-control").style.display = "flex";
+        } else {
+            this.element.querySelector(".capo-control").style.display = "none";
+        }
     }
 }

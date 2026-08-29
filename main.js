@@ -41,14 +41,17 @@ async function loop() {
     GV.setHand(MP.handData);
 
     await MP.detectHand();
-    GS.buildGuitarChord(MP.gesture);
-    GS.plucking(MP.fingerBend);
-    GS.strumming(MP.handData.Right);
-
-    GV.drawGesture(MP.gesture, MP.handData.Left[9]);
-    GV.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
-    GV.drawStrings();
-
+    if (TB.mode == "Free Play") {
+        GS.buildGuitarChord(MP.gesture);
+        GS.plucking(MP.fingerBend);
+        GS.strumming(MP.handData.Right);
+        GV.drawGesture(MP.gesture, MP.handData.Left[9]);
+        GV.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
+        GV.drawStrings();
+    }
+    if (TB.mode == "Number Score"){
+        
+    }
     requestAnimationFrame(loop);
 }
 
