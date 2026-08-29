@@ -54,7 +54,7 @@ body {
 }
 
 #modeSeparator {
-    width: 1px;
+    width: 2px;
     height: 32px;
     caret-color: transparent;
     background: #434343;
