@@ -75,7 +75,7 @@ body {
 }
 
 #switchMode:hover {
-    background: #1C1C1C;
+    background: #434343;
 }
 
 #switchMode:active {
@@ -136,7 +136,7 @@ body {
 
 #capoMinus:hover,
 #capoPlus:hover {
-    background: #1C1C1C;
+    background: #434343;
 }
 
 #capoMinus:active,
@@ -157,7 +157,7 @@ body {
     height: 48px;
 
     background: #1C1C1C;
-    color: #FFFFFB;
+    color: #BDC0BA;
 
     border-radius: 8px;
 
@@ -170,14 +170,14 @@ body {
 
     border: none;
     background: #1C1C1C;
-    color: #FFFFFB;
+    color: #BDC0BA;
 
     font-size: 20px;
     cursor: pointer;
 }
 
 #midiList button:hover {
-    background: #1C1C1C;
+    background: #434343;
 }
 
 #midiList button:active {
