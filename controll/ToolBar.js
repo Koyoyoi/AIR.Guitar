@@ -1,4 +1,4 @@
-import { loadMidiFiles } from "./MidiFiles.js";
+import { loadMidiFiles, setupList } from "./MidiFiles.js";
 const mode = ["Free Play", "Number Score"]
 
 export class ToolBar {
@@ -11,13 +11,16 @@ export class ToolBar {
         // element id
         this.element = document.getElementById("toolbar")
         this.modeValue = this.element.querySelector("#modeValue");
-
+        this.midiPopup = this.element.querySelector("#midiPopup");
         this.init();
     }
 
     async init() {
         this.midis = await loadMidiFiles();
-
+        setupList(this.midiPopup, this.midis, (midi) => {this.midiIdx = this.midis.indexOf(midi); this.updateMidi();});
+        this.element.querySelector("#midiName").addEventListener("click", () => {
+            this.midiPopup.style.display = this.midiPopup.style.display === "flex" ? "none" : "flex";
+        });
         this.element.querySelector("#midiPrev").addEventListener("click", () => {
             this.midiIdx = (this.midiIdx - 1 + this.midis.length) % this.midis.length;
             this.updateMidi();
@@ -45,7 +48,7 @@ export class ToolBar {
 
     updateMidi() {
         this.element.querySelector("#midiName").textContent = this.midis[this.midiIdx].title;
-        console.log(this.midis[this.midiIdx].title)
+        console.log(this.midis[this.midiIdx])
     }
 
     setCapo(value) {

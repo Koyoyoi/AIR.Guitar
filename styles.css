@@ -148,7 +148,6 @@ body {
     position: fixed;
     bottom: 24px;
     left: 50%;
-
     transform: translateX(-50%);
 
     display: flex;
@@ -165,7 +164,7 @@ body {
 }
 
 #midiList button {
-    width: 48px;
+    width: max-content;
     height: 48px;
 
     border: none;
@@ -173,6 +172,20 @@ body {
     color: #BDC0BA;
 
     font-size: 20px;
+    cursor: pointer;
+}
+
+#midiList button:not(#midiName) {
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    background: transparent;
+    color: #BDC0BA;
+
     cursor: pointer;
 }
 
@@ -193,17 +206,110 @@ body {
 }
 
 #midiName {
-    min-width: 120px;
+    width: max-content;
+    min-width: 0;
+
+    height: 48px;
     padding: 0 16px;
 
+    box-sizing: border-box;
+
+    border: none;
+    border-left: 1px solid #434343;
+    border-right: 1px solid #434343;
+
+    background: transparent;
+    color: #BDC0BA;
+
+    font-size: 20px;
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+
+#midiPopup {
+    position: fixed;
+    bottom: 84px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: min(500px, 80vw);
+    max-height: 60vh;
+
+    padding: 8px;
+
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+
+    background: #1C1C1C;
+    border-radius: 8px;
+
+    box-sizing: border-box;
+}
+
+#midiItems {
+    overflow-y: auto;
+}
+
+.midi-item {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
 
-    font-size: 18px;
+    padding: 10px 12px;
+    gap: 4px;
 
-    border-left: 1px solid #1C1C1C;
-    border-right: 1px solid #1C1C1C;
+    border-radius: 6px;
 
-    user-select: none;
+    cursor: pointer;
+}
+
+.midi-item:hover {
+    background: #787878;
+}
+
+.midi-title {
+    font-size: 20px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.midi-composer {
+    font-size: 17px;
+
+    color: #434343;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#midiSearch {
+    width: 100%;
+    height: 50px;
+
+    padding: 0 6px;
+    box-sizing: border-box;
+
+    border: none;
+    border-radius: 3px;
+
+    background: #080808;
+    color: #FFFFFB;
+
+    font-size: 25px;
+    font-family: inherit;
+
+    outline: none;
+}
+
+#midiSearch::placeholder {
+    color: #787878;
+}
+
+#midiSearch:focus {
+    background: #434343;
 }

@@ -22,6 +22,46 @@ export async function loadMidiFiles() {
         await new Promise(resolve => setTimeout(resolve, 250));
     }
 
-    console.log(`Total ${midiList.length} are loaded.`);
     return midiList
+}
+
+export function setupList(midiPopup, midis, onSelect) {
+    const search = midiPopup.querySelector("#midiSearch");
+    const items = midiPopup.querySelector("#midiItems");
+
+    const render = (keyword = "") => {
+        items.innerHTML = "";
+
+        keyword = keyword.toLowerCase();
+
+        midis
+            .filter(midi =>
+                (midi.title || "").toLowerCase().includes(keyword) ||
+                (midi.composer || "").toLowerCase().includes(keyword)
+            )
+            .forEach((midi, index) => {
+                const item = document.createElement("div");
+
+                item.className = "midi-item";
+
+                item.innerHTML = `
+                    <div class="midi-title">${midi.title}</div>
+                    <div class="midi-composer">
+                        ${midi.composer || "Unknown"}
+                    </div>
+                `;
+
+                item.addEventListener("click", () => {
+                    onSelect(midi);
+                });
+
+                items.appendChild(item);
+            });
+    };
+
+    search.addEventListener("input", () => {
+        render(search.value);
+    });
+
+    render();
 }
