@@ -149,7 +149,7 @@ body {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-
+    caret-color: transparent;
     display: flex;
     align-items: center;
 
@@ -199,7 +199,7 @@ body {
     padding: 0 16px;
 
     box-sizing: border-box;
-    
+
     background: transparent;
     color: #BDC0BA;
 
