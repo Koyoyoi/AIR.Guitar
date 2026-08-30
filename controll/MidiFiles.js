@@ -5,6 +5,7 @@ export class MidiLibrary {
         this.midiIdx = 0;
         this.midis = [];
         this.currMidi = [];
+        this.events = [];
     }
 
     async loadMidiFiles() {
@@ -36,11 +37,11 @@ export class MidiLibrary {
         this.currMidi = this.midis[0];
     }
 
-    updateMidi() {
+    async updateMidi() {
         this.currMidi = this.midis[(this.midiIdx + this.midis.length) % this.midis.length];
         this.element.querySelector("#midiName").textContent = this.currMidi.title;
         console.log(this.currMidi.title);
-        this.getMidiEvent(this.currMidi.id);
+        await this.getMidiEvent(this.currMidi.id);
     }
 
     setupList(midiPopup) {
@@ -101,6 +102,45 @@ export class MidiLibrary {
 
         const json = await res.json();
 
-        console.log(json);
+        await this.transEvent(json);
     }
+
+    transEvent(json) {
+        const events = json.events || [];
+        const lyrics = json.lyrics || [];
+
+        const map = new Map();
+        events.forEach(event => {
+            const time = Number(event.time).toFixed(4);
+
+            if (!map.has(time)) {
+                map.set(time, {
+                    time: Number(time),
+                    midis: [],
+                    lyric: null,
+                    velocity: Number(event.velocity).toFixed(4)
+                });
+            }
+
+            map.get(time).midis.push(event.midi);
+            map.get(time).midis.sort((a, b) => a - b);
+        });
+        lyrics.forEach(lyric => {
+            const time = Number(lyric.time).toFixed(4);
+
+            if (!map.has(time)) {
+                map.set(time, {
+                    time: Number(time),
+                    events: [],
+                    lyric: null
+                });
+            }
+
+            map.get(time).lyric = lyric.text;
+
+        });
+
+        this.events = map;
+    }
+
 }

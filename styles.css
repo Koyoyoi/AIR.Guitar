@@ -149,7 +149,7 @@ body {
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    caret-color: transparent;
+
     display: flex;
     align-items: center;
 
@@ -184,10 +184,12 @@ body {
 }
 
 #midiPrev {
+    caret-color: transparent;
     border-radius: 8px 0 0 8px !important;
 }
 
 #midiNext {
+    caret-color: transparent;
     border-radius: 0 8px 8px 0 !important;
 }
 
@@ -197,7 +199,7 @@ body {
 
     height: 48px;
     padding: 0 16px;
-
+    caret-color: transparent;
     box-sizing: border-box;
 
     background: transparent;
