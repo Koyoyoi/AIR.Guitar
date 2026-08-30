@@ -68,7 +68,9 @@ export class DrawScore {
 
             event.midis.forEach(midi => {
                 const y = this.canvas.height / 2 - (midi - 60) * this.scaleY;
-                ctx.fillRect(x, y, 40, 20);
+                ctx.beginPath();
+                ctx.arc(x + 10, y + 10, 10, 0, Math.PI * 2);
+                ctx.fill();
             });
         });
     }
