@@ -1,7 +1,9 @@
+import { loadMidiFiles } from "./MidiFiles.js";
 const mode = ["Free Play", "Number Score"]
 
 export class ToolBar {
     constructor() {
+        this.midi = [];
         this.currMode = 0;
         this.mode = mode[this.currMode];
         this.capo = 0;
@@ -10,6 +12,10 @@ export class ToolBar {
     }
 
     init() {
+        this.midi = loadMidiFiles();
+
+        this.element.querySelector("#modeValue").textContent = this.mode;
+        
         this.element
             .querySelector("#switchMode")
             .addEventListener("click", () => {
