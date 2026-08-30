@@ -16,6 +16,7 @@ export class ToolBar {
     }
 
     async init() {
+        // load and build list of midi songs
         this.midis = await loadMidiFiles();
         setupList(this.midiPopup, this.midis, (midi) => {this.midiIdx = this.midis.indexOf(midi); this.updateMidi();});
         this.element.querySelector("#midiName").addEventListener("click", () => {
@@ -29,17 +30,15 @@ export class ToolBar {
             this.midiIdx = (this.midiIdx + 1 + this.midis.length) % this.midis.length;
             this.updateMidi();
         });
-
+        // set mode
         this.modeValue.textContent = this.mode;
-
         this.element.querySelector("#switchMode").addEventListener("click", () => {
             this.switchMode();
         });
-
+        // set capo
         this.element.querySelector("#capoMinus").addEventListener("click", () => {
             this.setCapo(this.capo - 1);
         });
-
         this.element.querySelector("#capoPlus").addEventListener("click", () => {
             this.setCapo(this.capo + 1);
         });
