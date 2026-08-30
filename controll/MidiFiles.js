@@ -8,6 +8,7 @@ export class MidiLibrary {
         this.midiIdx = 0;
         this.midis = [];
         this.currMidi = [];
+        this.events = [];
     }
 
     async loadMidiFiles() {
@@ -143,9 +144,8 @@ export class MidiLibrary {
             map[time].lyric = lyric.text;
         });
 
-        this.drawScore.events = Object.values(map).sort(
-            (a, b) => a.time - b.time
-        );
+        this.events = Object.values(map).sort((a, b) => a.time - b.time);
+        this.drawScore.setEvents(this.events);
     }
 
 }
