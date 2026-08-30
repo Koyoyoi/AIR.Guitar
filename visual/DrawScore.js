@@ -4,6 +4,8 @@ export class DrawScore {
         this.ctx = this.canvas.getContext("2d");
         this.events = [];
         this.positions = [];
+        this.startPositions = [];
+        this.targetPositions = [];
         this.startX = 80;
         this.scaleX = 100;
         this.scaleY = 8;
@@ -12,6 +14,7 @@ export class DrawScore {
         this.isRunning = false;
         this.animating = false;
         this.minBeat = 0.125;
+        this.beatDuration = 300;
 
         this.resize();
         window.addEventListener("resize", () => this.resize());
@@ -29,37 +32,49 @@ export class DrawScore {
         this.positions = [];
 
         let x = this.startX;
-        this.minBeat = this.events.length ? Math.min(...this.events.map(event => event.beats || 0).filter(beats => beats > 0)) : 0.125;
+        const beats = this.events.map(event => Number(event.beats)).filter(beats => beats > 0);
+
+        this.minBeat = beats.length ? Math.min(...beats) : 0.125;
 
         this.events.forEach(event => {
             this.positions.push(x);
-            x += (event.beats / this.minBeat) * 50;
+            x += (Number(event.beats) / this.minBeat) * 80;
         });
 
+        this.startPositions = [...this.positions];
+        this.targetPositions = [...this.positions];
         this.animating = false;
         this.draw();
     }
 
     nextEvent() {
-        if (!this.events.length || this.animating) return;
+        if (!this.events.length) return;
+
+        const removedEvent = this.events[0];
+        const moveBeats = Number(removedEvent.beats) || this.minBeat;
 
         this.events.shift();
         this.positions.shift();
 
         if (!this.events.length) {
+            this.animating = false;
             this.draw();
             return;
         }
 
         this.startPositions = [...this.positions];
+        this.targetPositions = [];
 
         let targetX = this.startX;
-        this.targetPositions = [];
 
         this.events.forEach(event => {
             this.targetPositions.push(targetX);
-            targetX += (event.beats / this.minBeat) * 50;
+            targetX += (Number(event.beats) / this.minBeat) * 80;
         });
+
+        // 根據被移除音符的 beats 決定動畫時間
+        this.animationDuration = moveBeats * this.beatDuration;
+        this.animationDuration = Math.max(50, this.animationDuration);
 
         this.animationStart = performance.now();
         this.animating = true;
@@ -76,10 +91,8 @@ export class DrawScore {
 
             const eased = 1 - Math.pow(1 - progress, 3);
 
-            this.positions = this.positions.map((x, index) => {
-                const startX = this.startPositions[index];
+            this.positions = this.startPositions.map((startX, index) => {
                 const targetX = this.targetPositions[index];
-
                 return startX + (targetX - startX) * eased;
             });
 
@@ -146,21 +159,12 @@ export class DrawScore {
 
     noteToColor(midi) {
         const colors = [
-            "#B5495B", // C
-            "#C46243", // C#
-            "#F7C242", // D
-            "#91AD70", // D#
-            "#86C166", // E
-            "#2D6D48", // F
-            "#6699A1", // F#
-            "#58B2DC", // G
-            "#6E75A4", // G#
-            "#70649A", // A
-            "#574C57", // A#
-            "#B481BB"  // B
+            "#B5495B", "#C46243", "#F7C242", "#91AD70",
+            "#86C166", "#2D6D48", "#6699A1", "#58B2DC",
+            "#6E75A4", "#70649A", "#574C57", "#B481BB"
         ];
 
-        return colors[midi % 12];
+        return colors[((midi % 12) + 12) % 12];
     }
 
     velocityToRadius(velocity) {
