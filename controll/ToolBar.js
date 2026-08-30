@@ -3,37 +3,49 @@ const mode = ["Free Play", "Number Score"]
 
 export class ToolBar {
     constructor() {
-        this.midi = [];
+        this.capo = 0;
+        this.midis = [];
+        this.midiIdx = 0;
         this.currMode = 0;
         this.mode = mode[this.currMode];
-        this.capo = 0;
+        // element id
         this.element = document.getElementById("toolbar")
+        this.modeValue = this.element.querySelector("#modeValue");
+
         this.init();
     }
 
-    init() {
-        this.midi = loadMidiFiles();
+    async init() {
+        this.midis = await loadMidiFiles();
 
-        this.element.querySelector("#modeValue").textContent = this.mode;
-        
-        this.element
-            .querySelector("#switchMode")
-            .addEventListener("click", () => {
-                this.switchMode(this.currMode + 1);
-            });
+        this.element.querySelector("#midiPrev").addEventListener("click", () => {
+            this.midiIdx = (this.midiIdx - 1 + this.midis.length) % this.midis.length;
+            this.updateMidi();
+        });
+        this.element.querySelector("#midiNext").addEventListener("click", () => {
+            this.midiIdx = (this.midiIdx + 1 + this.midis.length) % this.midis.length;
+            this.updateMidi();
+        });
 
-        this.element
-            .querySelector("#capoMinus")
-            .addEventListener("click", () => {
-                this.setCapo(this.capo - 1);
-            });
+        this.modeValue.textContent = this.mode;
 
-        this.element
-            .querySelector("#capoPlus")
-            .addEventListener("click", () => {
-                this.setCapo(this.capo + 1);
-            });
+        this.element.querySelector("#switchMode").addEventListener("click", () => {
+            this.switchMode();
+        });
 
+        this.element.querySelector("#capoMinus").addEventListener("click", () => {
+            this.setCapo(this.capo - 1);
+        });
+
+        this.element.querySelector("#capoPlus").addEventListener("click", () => {
+            this.setCapo(this.capo + 1);
+        });
+
+    }
+
+    updateMidi() {
+        this.element.querySelector("#midiName").textContent = this.midis[this.midiIdx].title;
+        console.log(this.midis[this.midiIdx].title)
     }
 
     setCapo(value) {
@@ -41,10 +53,10 @@ export class ToolBar {
         this.element.querySelector("#capoValue").textContent = `Capo ${this.capo}`;
     }
 
-    switchMode(value) {
-        this.currMode = value % mode.length;
+    switchMode() {
+        this.currMode = (this.currMode + 1) % mode.length;
         this.mode = mode[this.currMode];
-        this.element.querySelector("#modeValue").textContent = this.mode;
+        this.modeValue.textContent = this.mode;
         // Show or Hide
         if (this.mode === "Free Play") {
             this.element.querySelector(".capo-control").style.display = "flex";
