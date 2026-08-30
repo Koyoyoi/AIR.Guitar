@@ -15,6 +15,37 @@
 <body>
     <video id="camera" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
+    <div id="toolbar">
+        <div id="modeControl">
+            <span id="modeValue">${mode[0]}</span>
+            <span id="modeSeparator"></span>
+            <button id="switchMode" title="Switch Mode">
+                <i class="fa-solid fa-repeat"></i>
+            </button>
+        </div>
+
+        <div class="capo-control">
+            <button id="capoMinus" title="Decrease Capo">
+                <i class="fa-solid fa-minus"></i>
+            </button>
+            <span id="capoValue">Capo 0</span>
+            <button id="capoPlus" title="Increase Capo">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+
+        <div id="midiList">
+            <button id="midiPrev">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <span id="midiName">MIDI</span>
+
+            <button id="midiNext">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
     <script type="module" src="./main.js"></script>
 </body>
 

@@ -57,7 +57,7 @@ body {
     width: 2px;
     height: 32px;
     caret-color: transparent;
-    background: #434343;
+    background: #1C1C1C;
 }
 
 #switchMode {
@@ -75,7 +75,7 @@ body {
 }
 
 #switchMode:hover {
-    background: #434343;
+    background: #1C1C1C;
 }
 
 #switchMode:active {
@@ -136,10 +136,74 @@ body {
 
 #capoMinus:hover,
 #capoPlus:hover {
-    background: #434343;
+    background: #1C1C1C;
 }
 
 #capoMinus:active,
 #capoPlus:active {
     transform: scale(0.9);
+}
+
+#midiList {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+
+    height: 48px;
+
+    background: #1C1C1C;
+    color: #FFFFFB;
+
+    border-radius: 8px;
+
+    z-index: 1000;
+}
+
+#midiList button {
+    width: 48px;
+    height: 48px;
+
+    border: none;
+    background: #1C1C1C;
+    color: #FFFFFB;
+
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#midiList button:hover {
+    background: #1C1C1C;
+}
+
+#midiList button:active {
+    transform: scale(0.9);
+}
+
+#midiPrev {
+    border-radius: 8px 0 0 8px !important;
+}
+
+#midiNext {
+    border-radius: 0 8px 8px 0 !important;
+}
+
+#midiName {
+    min-width: 120px;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+
+    border-left: 1px solid #1C1C1C;
+    border-right: 1px solid #1C1C1C;
+
+    user-select: none;
 }

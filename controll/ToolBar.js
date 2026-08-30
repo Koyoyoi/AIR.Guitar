@@ -5,31 +5,7 @@ export class ToolBar {
         this.currMode = 0;
         this.mode = mode[this.currMode];
         this.capo = 0;
-
-        this.element = document.createElement("div");
-        this.element.id = "toolbar";
-
-        this.element.innerHTML = `
-            <div id="modeControl">
-                <span id="modeValue">${mode[0]}</span>
-                <span id="modeSeparator"></span>
-                <button id="switchMode" title="Switch Mode">
-                    <i class="fa-solid fa-repeat"></i>
-                </button>
-            </div>
-
-            <div class="capo-control">
-                <button id="capoMinus" title="Decrease Capo">
-                    <i class="fa-solid fa-minus"></i>
-                </button>
-                <span id="capoValue">Capo 0</span>
-                <button id="capoPlus" title="Increase Capo">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-        `;
-        document.body.appendChild(this.element);
-
+        this.element = document.getElementById("toolbar")
         this.init();
     }
 
