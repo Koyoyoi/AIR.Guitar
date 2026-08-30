@@ -11,6 +11,7 @@ export class DrawScore {
         this.animationStart = 0;
         this.isRunning = false;
         this.animating = false;
+        this.minBeat = 0.125;
 
         this.resize();
         window.addEventListener("resize", () => this.resize());
@@ -24,26 +25,40 @@ export class DrawScore {
     }
 
     setEvents(events) {
-        this.events = Array.isArray(events) ? events : Array.from(events.values());
-        this.positions = this.events.map((_, index) => this.startX + index * this.scaleX);
+        this.events = Array.isArray(events) ? events : [];
+        this.positions = [];
+
+        let x = this.startX;
+        this.minBeat = this.events.length ? Math.min(...this.events.map(event => event.beats || 0).filter(beats => beats > 0)) : 0.125;
+
+        this.events.forEach(event => {
+            this.positions.push(x);
+            x += (event.beats / this.minBeat) * 50;
+        });
+
         this.animating = false;
         this.draw();
     }
 
     nextEvent() {
-        if (!this.events.length) return;
+        if (!this.events.length || this.animating) return;
 
         this.events.shift();
+        this.positions.shift();
 
-        this.startPositions = this.positions.slice(1);
-        this.positions = this.startPositions.slice();
+        if (!this.events.length) {
+            this.draw();
+            return;
+        }
 
-        this.events.forEach((event, index) => {
-            const targetX = this.startX + index * this.scaleX;
+        this.startPositions = [...this.positions];
 
-            if (this.positions[index] === undefined) {
-                this.positions[index] = targetX + this.scaleX;
-            }
+        let targetX = this.startX;
+        this.targetPositions = [];
+
+        this.events.forEach(event => {
+            this.targetPositions.push(targetX);
+            targetX += (event.beats / this.minBeat) * 50;
         });
 
         this.animationStart = performance.now();
@@ -54,17 +69,22 @@ export class DrawScore {
         if (!this.isRunning) return;
 
         if (this.animating) {
-            const progress = Math.min((performance.now() - this.animationStart) / this.animationDuration, 1);
+            const progress = Math.min(
+                (performance.now() - this.animationStart) / this.animationDuration,
+                1
+            );
+
             const eased = 1 - Math.pow(1 - progress, 3);
 
-            this.positions.forEach((x, index) => {
-                const targetX = this.startX + index * this.scaleX;
-                const currentX = x;
-                this.positions[index] = currentX + (targetX - currentX) * eased;
+            this.positions = this.positions.map((x, index) => {
+                const startX = this.startPositions[index];
+                const targetX = this.targetPositions[index];
+
+                return startX + (targetX - startX) * eased;
             });
 
             if (progress >= 1) {
-                this.positions = this.events.map((_, index) => this.startX + index * this.scaleX);
+                this.positions = [...this.targetPositions];
                 this.animating = false;
             }
         }

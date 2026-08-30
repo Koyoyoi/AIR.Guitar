@@ -156,7 +156,7 @@ export class MidiLibrary {
                     noteType: noteType.name
                 };
             });
-        console.log(this.events)
+        
         this.drawScore.setEvents(this.events);
     }
 
