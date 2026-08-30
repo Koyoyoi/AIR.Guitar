@@ -1,11 +1,13 @@
+import { DrawScore } from "../visual/DrawScore.js";
+
 export class MidiLibrary {
 
     constructor(element) {
         this.element = element;
+        this.drawScore = new DrawScore();
         this.midiIdx = 0;
         this.midis = [];
         this.currMidi = [];
-        this.events = [];
     }
 
     async loadMidiFiles() {
@@ -105,42 +107,45 @@ export class MidiLibrary {
         await this.transEvent(json);
     }
 
-    transEvent(json) {
+    async transEvent(json) {
         const events = json.events || [];
         const lyrics = json.lyrics || [];
+        const map = {};
 
-        const map = new Map();
         events.forEach(event => {
             const time = Number(event.time).toFixed(4);
 
-            if (!map.has(time)) {
-                map.set(time, {
+            if (!map[time]) {
+                map[time] = {
                     time: Number(time),
                     midis: [],
                     lyric: null,
                     velocity: Number(event.velocity).toFixed(4)
-                });
+                };
             }
 
-            map.get(time).midis.push(event.midi);
-            map.get(time).midis.sort((a, b) => a - b);
+            map[time].midis.push(event.midi);
+            map[time].midis.sort((a, b) => a - b);
         });
+
         lyrics.forEach(lyric => {
             const time = Number(lyric.time).toFixed(4);
 
-            if (!map.has(time)) {
-                map.set(time, {
+            if (!map[time]) {
+                map[time] = {
                     time: Number(time),
-                    events: [],
-                    lyric: null
-                });
+                    midis: [],
+                    lyric: null,
+                    velocity: null
+                };
             }
 
-            map.get(time).lyric = lyric.text;
-
+            map[time].lyric = lyric.text;
         });
 
-        this.events = map;
+        this.drawScore.events = Object.values(map).sort(
+            (a, b) => a.time - b.time
+        );
     }
 
 }
