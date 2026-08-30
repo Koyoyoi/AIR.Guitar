@@ -77,10 +77,13 @@ export class DrawScore {
         const ctx = this.ctx;
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.events.forEach((event, index) => {
-            if (!event || !Array.isArray(event.midis) || !event.midis.length) return;
+        for (let index = 0; index < this.events.length; index++) {
+            const event = this.events[index];
+            if (!event || !Array.isArray(event.midis) || !event.midis.length) continue;
 
             const x = this.positions[index];
+            if (x > window.innerWidth) break;
+
             const radius = this.velocityToRadius(event.velocity);
             const firstMidi = event.midis[0];
             const lastMidi = event.midis[event.midis.length - 1];
@@ -100,8 +103,8 @@ export class DrawScore {
             const firstY = this.canvas.height / 2 - (firstMidi - 60) * this.scaleY;
             const lastY = this.canvas.height / 2 - (lastMidi - 60) * this.scaleY;
 
-            ctx.fillStyle = "#BDC0BA";
-            ctx.font = "32px Arial";
+            ctx.fillStyle = index === 0 ? "#FEBB24" : "#BDC0BA";
+            ctx.font = "bold 40px Arial";
             ctx.textAlign = "center";
 
             if (event.lyric) {
@@ -109,7 +112,7 @@ export class DrawScore {
             }
 
             ctx.fillText(this.midiToNumber(firstMidi), x, lastY - radius - 20);
-        });
+        }
     }
 
     midiToNumber(midi) {
