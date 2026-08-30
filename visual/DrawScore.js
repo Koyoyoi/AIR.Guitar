@@ -6,7 +6,7 @@ export class DrawScore {
         this.positions = [];
         this.startPositions = [];
         this.targetPositions = [];
-        this.startX = 80;
+        this.startX = 150;
         this.scaleX = 100;
         this.scaleY = 8;
         this.animationDuration = 300;
