@@ -144,7 +144,7 @@ body {
     transform: scale(0.9);
 }
 
-#midiList {
+.midiList {
     position: fixed;
     bottom: 24px;
     left: 50%;
@@ -163,8 +163,8 @@ body {
     z-index: 1000;
 }
 
-#midiList button {
-    width: max-content;
+.midiList button {
+    width: 48px;
     height: 48px;
 
     border: none;
@@ -175,25 +175,11 @@ body {
     cursor: pointer;
 }
 
-#midiList button:not(#midiName) {
-    width: 48px;
-    height: 48px;
-
-    flex-shrink: 0;
-
-    border: none;
-
-    background: transparent;
-    color: #BDC0BA;
-
-    cursor: pointer;
-}
-
-#midiList button:hover {
+.midiList button:hover {
     background: #434343;
 }
 
-#midiList button:active {
+.midiList button:active {
     transform: scale(0.9);
 }
 
@@ -213,11 +199,7 @@ body {
     padding: 0 16px;
 
     box-sizing: border-box;
-
-    border: none;
-    border-left: 1px solid #434343;
-    border-right: 1px solid #434343;
-
+    
     background: transparent;
     color: #BDC0BA;
 

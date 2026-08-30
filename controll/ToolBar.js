@@ -62,8 +62,10 @@ export class ToolBar {
         // Show or Hide
         if (this.mode === "Free Play") {
             this.element.querySelector(".capo-control").style.display = "flex";
+            this.element.querySelector(".midiList").style.display = "none";
         } else {
             this.element.querySelector(".capo-control").style.display = "none";
+            this.element.querySelector(".midiList").style.display = "flex";
         }
     }
 }
