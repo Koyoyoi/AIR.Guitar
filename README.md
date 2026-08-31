@@ -20,13 +20,13 @@
 AIR.Guitar
 │
 ├── models/
-│   └── MediaPipe、Hand Feature、Guitar Sound 等核心資料與功能模型
+│   └── MediaPipe、Hand Feature等核心資料與功能模型
 │
 ├── visual/
 │   └── Hand Visualizer、Canvas、Score Roll 等視覺化相關功能
 │
 ├── controll/
-│   └── ToolBar、MIDI Library 等使用者操作與流程控制
+│   └── ToolBar、MIDI Library、Guitar Sound 等使用者操作與流程控制
 │
 ├── main.js
 ├── index.html
