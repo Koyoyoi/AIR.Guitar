@@ -40,8 +40,7 @@ AIR.Guitar
 * MediaPipe Hand / Pose Landmarker
 * Hand Feature
 * Finger Angle
-* Guitar Sound
-* MIDI / 音符相關資料
+
 
 此層主要負責取得、分析與處理演奏所需的資料。
 
@@ -68,6 +67,8 @@ AIR.Guitar
 * Score Mode
 * Capo Control
 * MIDI Song Selection
+* Guitar Sound
+* MIDI / 音符相關資料
 
 此層主要負責 UI 操作以及控制不同模型與視覺元件之間的互動。
 
@@ -93,7 +94,7 @@ HandVisualizer   ToolBar
    │              └── Capo
    │
    ▼
-models/
+controll/
 GuitarSound
    │
    ▼
