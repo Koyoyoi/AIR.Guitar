@@ -1,5 +1,5 @@
 import { MediaPipe } from "./models/MediaPipe.js";
-import { Sound } from "./controll/Sound.js";
+import { Sound } from "./models/Sound.js";
 import { ToolBar } from "./controll/ToolBar.js";
 import { HandVisualizer, ScoreVisualizer, Loading } from "./visual/index.js";
 let MP;
