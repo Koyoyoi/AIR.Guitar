@@ -21,13 +21,13 @@
 AIR.Guitar
 │
 ├── models/   負責 MediaPipe 手部追蹤、手部特徵分析與 Gesture 辨識。
-│   └── MediaPipe、Hand Feature、SVM
+│   └── MediaPipe、Hand Feature、SVM、Sound
 │
 ├── visual/   負責手部、音符、琴弦與 Score 的視覺化。
 │   └── Hand Visualizer、Score Visualizer
 │
 ├── controll/ 負責 Toolbar、Play Mode、MIDI、音效與各模組之間的控制流程。
-│   └── ToolBar、MIDI Library、Sound
+│   └── ToolBar、MIDI Library
 │
 ├── main.js
 ├── index.html
