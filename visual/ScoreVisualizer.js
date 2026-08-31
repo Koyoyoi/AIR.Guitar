@@ -2,7 +2,8 @@ export class ScoreVisualizer {
     constructor() {
         this.canvas = document.querySelector("#scoreRoll");
         this.ctx = this.canvas.getContext("2d");
-        this.events = [];
+        this.prevEevents = [];
+        this.currEevents = [];
         this.positions = [];
         this.startPositions = [];
         this.targetPositions = [];
@@ -27,15 +28,17 @@ export class ScoreVisualizer {
     }
 
     setEvents(events) {
-        this.events = Array.isArray(events) ? events : [];
+        if (events === this.prevEevents) return;
+        this.currEevents = Array.isArray(events) ? events : [];
+        this.prevEevents = this.currEevents;
         this.positions = [];
 
         let x = this.startX;
-        const beats = this.events.map(event => Number(event.beats)).filter(beats => beats > 0);
+        const beats = this.currEevents.map(event => Number(event.beats)).filter(beats => beats > 0);
 
         this.minBeat = beats.length ? Math.min(...beats) : 0.125;
 
-        this.events.forEach(event => {
+        this.currEevents.forEach(event => {
             this.positions.push(x);
             x += (Number(event.beats) / this.minBeat) * 80;
         });
@@ -47,15 +50,15 @@ export class ScoreVisualizer {
     }
 
     nextEvent() {
-        if (!this.events.length) return;
+        if (!this.currEevents.length) return;
 
-        const removedEvent = this.events[0];
+        const removedEvent = this.currEevents[0];
         const moveBeats = Number(removedEvent.beats) || this.minBeat;
 
-        this.events.shift();
+        this.currEevents.shift();
         this.positions.shift();
 
-        if (!this.events.length) {
+        if (!this.currEevents.length) {
             this.animating = false;
             this.draw();
             return;
@@ -66,7 +69,7 @@ export class ScoreVisualizer {
 
         let targetX = this.startX;
 
-        this.events.forEach(event => {
+        this.currEevents.forEach(event => {
             this.targetPositions.push(targetX);
             targetX += (Number(event.beats) / this.minBeat) * 80;
         });
@@ -109,8 +112,8 @@ export class ScoreVisualizer {
         const ctx = this.ctx;
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        for (let index = 0; index < this.events.length; index++) {
-            const event = this.events[index];
+        for (let index = 0; index < this.currEevents.length; index++) {
+            const event = this.currEevents[index];
             if (!event || !Array.isArray(event.midis) || !event.midis.length) continue;
 
             const x = this.positions[index];

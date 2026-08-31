@@ -48,9 +48,11 @@ async function loop() {
         handVisual.drawGesture(MP.gesture, toolBar.capo, MP.handData.Left[9]);
         handVisual.drawNote(sound.pluckNotes, sound.prevPluck, MP.handData.Right);
         handVisual.drawStrings();
+        scoreVisual.stop();
     }
     if (toolBar.mode == "Number Score") {
-
+        scoreVisual.setEvents(toolBar.midiLib.events);
+        scoreVisual.start();
     }
     requestAnimationFrame(loop);
 }
