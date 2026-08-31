@@ -77,16 +77,17 @@ export class ToolBar {
         this.modeValue.textContent = this.mode;
         const capoControl = this.element.querySelector(".capo-control");
         const midiList = this.element.querySelector(".midiList");
+        const playMethod = this.element.querySelector(".playMode")
 
         if (this.mode === "Free Play") {
             capoControl.style.display = "flex";
             midiList.style.display = "none";
             this.midiPopup.style.display = "none";
-            this.playControl.style.display = "none";
+            playMethod.style.display = "none";
         } else {
             capoControl.style.display = "none";
             midiList.style.display = "flex";
-             this.playControl.style.display = "flex";
+            playMethod.style.display = "flex";
         }
     }
 }
