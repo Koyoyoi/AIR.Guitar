@@ -82,9 +82,11 @@ export class ToolBar {
             capoControl.style.display = "flex";
             midiList.style.display = "none";
             this.midiPopup.style.display = "none";
+            this.playControl.style.display = "none";
         } else {
             capoControl.style.display = "none";
             midiList.style.display = "flex";
+             this.playControl.style.display = "flex";
         }
     }
 }
