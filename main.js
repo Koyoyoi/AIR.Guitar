@@ -41,7 +41,7 @@ async function loop() {
 
         scoreVisual.stop();
     }
-    if (toolBar.mode == "Number Score") {
+    if (toolBar.mode == "Score Play") {
         switch (toolBar.playMode) {
             case "Pinch": handVisual.pinching(MP.handData); break;
             case "Wave": handVisual.waving(MP.handData); break;

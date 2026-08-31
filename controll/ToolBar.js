@@ -1,6 +1,6 @@
 import { MidiLibrary } from "./MidiFiles.js";
 
-const mode = ["Free Play", "Number Score"];
+const mode = ["Free Play", "Score Play"];
 const play = ["Pinch", "Wave", "Bend"];
 
 export class ToolBar {
@@ -84,7 +84,7 @@ export class ToolBar {
             midiList.style.display = "none";
             this.midiPopup.style.display = "none";
             playMethod.style.display = "none";
-        } else {
+        } else if(this.mode === "Score Play") {
             capoControl.style.display = "none";
             midiList.style.display = "flex";
             playMethod.style.display = "flex";
