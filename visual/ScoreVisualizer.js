@@ -1,5 +1,7 @@
-export class ScoreVisualizer {
+export class ScoreVisualizer extends EventTarget {
     constructor() {
+        super();
+        
         this.canvas = document.querySelector("#scoreRoll");
         this.ctx = this.canvas.getContext("2d");
         this.prevEevents = [];
@@ -58,6 +60,8 @@ export class ScoreVisualizer {
         this.currEevents.shift();
         this.positions.shift();
 
+        this.dispatchEvent(new CustomEvent("eventPlay", { detail: removedEvent }));
+
         if (!this.currEevents.length) {
             this.animating = false;
             this.draw();
@@ -74,9 +78,7 @@ export class ScoreVisualizer {
             targetX += (Number(event.beats) / this.minBeat) * 80;
         });
 
-        // 根據被移除音符的 beats 決定動畫時間
-        this.animationDuration = moveBeats * this.beatDuration;
-        this.animationDuration = Math.max(50, this.animationDuration);
+        this.animationDuration = Math.max(50, moveBeats * this.beatDuration);
 
         this.animationStart = performance.now();
         this.animating = true;

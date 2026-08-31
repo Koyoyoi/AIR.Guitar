@@ -232,4 +232,25 @@ export class Sound extends EventTarget {
         const clamped = Math.max(inputMin, Math.min(value, inputMax));
         return outputMin + (clamped - inputMin) / (inputMax - inputMin) * (outputMax - outputMin);
     }
+
+    eventPlay(event) {
+        if (!event) return;
+
+        for (const midi of event.midis || []) {
+            this.soundSample.play(
+                midi,
+                this.audioContext.currentTime,
+                {
+                    gain: this.mapRange(
+                        event.velocity,
+                        0,
+                        127,
+                        2,
+                        4
+                    ),
+                    duration: Number(event.duration) || 1
+                }
+            );
+        }
+    }
 }

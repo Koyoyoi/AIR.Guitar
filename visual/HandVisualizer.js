@@ -203,7 +203,7 @@ export class HandVisualizer {
             }
 
             const angles = fingerAngle(hand);
-            const isBent = angles[1] > 60;
+            const isBent = angles[1] > 40;
             const tip = hand[8];
 
             ctx.fillStyle = isBent ? "#FEBB24" : "#BDC0BA";

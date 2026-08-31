@@ -45,8 +45,8 @@ async function loop() {
         handVisual.bending(MP.handData);
         //handVisual.pinching(MP.handData);
         //handVisual.waving(MP.handData);
-        
-        if(handVisual.triggered){
+
+        if (handVisual.triggered) {
             scoreVisual.nextEvent();
         }
         scoreVisual.setEvents(toolBar.midiLib.events);
@@ -79,6 +79,7 @@ async function main() {
     handVisual = new HandVisualizer(document.querySelector("#camera"));
     handVisual.connectSound(sound);
     scoreVisual = new ScoreVisualizer();
+    scoreVisual.addEventListener("eventPlay", event => { sound.eventPlay(event.detail); });
 
     await progress(100, "Ready");
     setTimeout(() => {
