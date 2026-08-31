@@ -1,11 +1,11 @@
 import { MediaPipe } from "./models/MediaPipe.js";
 import { Sound } from "./controll/Sound.js";
-import { HandVisualizer } from "./visual/HandVisualizer.js";
-import { Loading } from "./visual/Loading.js";
 import { ToolBar } from "./controll/ToolBar.js";
+import { HandVisualizer, ScoreVisualizer, Loading } from "./visual/index.js";
 let MP;
 let sound;
 let handVisual;
+let scoreVisual;
 let toolBar;
 
 async function initVideo() {
@@ -49,8 +49,8 @@ async function loop() {
         handVisual.drawNote(sound.pluckNotes, sound.prevPluck, MP.handData.Right);
         handVisual.drawStrings();
     }
-    if (toolBar.mode == "Number Score"){
-        
+    if (toolBar.mode == "Number Score") {
+
     }
     requestAnimationFrame(loop);
 }
@@ -78,6 +78,7 @@ async function main() {
     await progress(90, "Setup Visualizer");
     handVisual = new HandVisualizer(await initCanvas(MP.video));
     handVisual.connectSound(sound);
+    scoreVisual = new ScoreVisualizer();
 
     await progress(100, "Ready");
     setTimeout(() => {

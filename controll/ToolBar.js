@@ -62,11 +62,9 @@ export class ToolBar {
         if (this.mode === "Free Play") {
             this.element.querySelector(".capo-control").style.display = "flex";
             this.element.querySelector(".midiList").style.display = "none";
-            this.midiLib.scoreVisual.stop();
         } else {
             this.element.querySelector(".capo-control").style.display = "none";
             this.element.querySelector(".midiList").style.display = "flex";
-            this.midiLib.scoreVisual.start();
         }
     }
 }

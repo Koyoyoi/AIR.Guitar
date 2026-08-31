@@ -4,7 +4,6 @@ export class MidiLibrary {
 
     constructor(element) {
         this.element = element;
-        this.scoreVisual = new ScoreVisualizer();
         this.midiIdx = 0;
         this.midis = [];
         this.currMidi = [];
@@ -156,8 +155,6 @@ export class MidiLibrary {
                     noteType: noteType.name
                 };
             });
-        
-        this.scoreVisual.setEvents(this.events);
     }
 
     getNoteType(beats) {
