@@ -1,10 +1,10 @@
-import { DrawScore } from "../visual/DrawScore.js";
+import { ScoreVisualizer } from "../visual/ScoreVisualizer.js";
 
 export class MidiLibrary {
 
     constructor(element) {
         this.element = element;
-        this.drawScore = new DrawScore();
+        this.scoreVisual = new ScoreVisualizer();
         this.midiIdx = 0;
         this.midis = [];
         this.currMidi = [];
@@ -157,7 +157,7 @@ export class MidiLibrary {
                 };
             });
         
-        this.drawScore.setEvents(this.events);
+        this.scoreVisual.setEvents(this.events);
     }
 
     getNoteType(beats) {

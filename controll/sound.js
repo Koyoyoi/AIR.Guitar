@@ -15,7 +15,7 @@ const CHORD_INTERVALS = {
     dim: [0, 3, 6],
 };
 
-export class GuitarSound extends EventTarget {
+export class Sound extends EventTarget {
     constructor({
         instruments = DEFAULT_INSTRUMENTS,
         instrumentID = 0,

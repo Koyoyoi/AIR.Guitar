@@ -1,12 +1,12 @@
 import { MediaPipe } from "./models/MediaPipe.js";
-import { GuitarSound } from "./controll/Sound.js";
-import { GuitarVisualizer } from "./visual/GuitarVisualizer.js";
+import { Sound } from "./controll/Sound.js";
+import { HandVisualizer } from "./visual/HandVisualizer.js";
 import { Loading } from "./visual/Loading.js";
 import { ToolBar } from "./controll/ToolBar.js";
 let MP;
-let GS;
-let GV;
-let TB;
+let sound;
+let handVisual;
+let toolBar;
 
 async function initVideo() {
     const video = document.querySelector("#camera");
@@ -37,19 +37,19 @@ async function initCanvas(video) {
 }
 
 async function loop() {
-    GV.clear();
-    GV.setHand(MP.handData);
+    handVisual.clear();
+    handVisual.setHand(MP.handData);
 
     await MP.detectHand();
-    if (TB.mode == "Free Play") {
-        GS.buildGuitarChord(MP.gesture, TB.capo);
-        GS.plucking(MP.fingerBend);
-        GS.strumming(MP.handData.Right);
-        GV.drawGesture(MP.gesture, TB.capo, MP.handData.Left[9]);
-        GV.drawNote(GS.pluckNotes, GS.prevPluck, MP.handData.Right);
-        GV.drawStrings();
+    if (toolBar.mode == "Free Play") {
+        sound.buildGuitarChord(MP.gesture, toolBar.capo);
+        sound.plucking(MP.fingerBend);
+        sound.strumming(MP.handData.Right);
+        handVisual.drawGesture(MP.gesture, toolBar.capo, MP.handData.Left[9]);
+        handVisual.drawNote(sound.pluckNotes, sound.prevPluck, MP.handData.Right);
+        handVisual.drawStrings();
     }
-    if (TB.mode == "Number Score"){
+    if (toolBar.mode == "Number Score"){
         
     }
     requestAnimationFrame(loop);
@@ -63,11 +63,11 @@ async function main() {
         await new Promise(resolve => setTimeout(resolve, 500));
     };
     await progress(10, "Starting");
-    GS = new GuitarSound();
-    await GS.loadSamples();
+    sound = new Sound();
+    await sound.loadSamples();
 
     await progress(30, "Setup Tool Bar");
-    TB = new ToolBar();
+    toolBar = new ToolBar();
 
     await progress(60, "Open Camera");
     MP = new MediaPipe(await initVideo());
@@ -76,8 +76,8 @@ async function main() {
     await MP.init();
 
     await progress(90, "Setup Visualizer");
-    GV = new GuitarVisualizer(await initCanvas(MP.video));
-    GV.connectSound(GS);
+    handVisual = new HandVisualizer(await initCanvas(MP.video));
+    handVisual.connectSound(sound);
 
     await progress(100, "Ready");
     setTimeout(() => {

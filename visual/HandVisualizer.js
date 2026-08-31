@@ -1,4 +1,4 @@
-export class GuitarVisualizer {
+export class HandVisualizer {
 
     constructor(ctx) {
         this.hand = null;

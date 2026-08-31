@@ -1,4 +1,4 @@
-export class DrawScore {
+export class ScoreVisualizer {
     constructor() {
         this.canvas = document.querySelector("#scoreRoll");
         this.ctx = this.canvas.getContext("2d");
