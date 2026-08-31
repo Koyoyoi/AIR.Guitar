@@ -1,13 +1,28 @@
+import { fingerAngle } from "../models/HandFeature.js"
+
 export class HandVisualizer {
 
-    constructor(ctx) {
+    constructor(video) {
         this.hand = null;
-        this.ctx = ctx;
+        this.canvas = document.querySelector("#canvas");
+        this.ctx = this.canvas.getContext("2d");
         this.strings = [];
+
+        this.prevPinch = { Left: false, Right: false };
+        this.prevBend = { Left: false, Right: false };
+        this.prevWave = { Left: false, Right: false };
+
         this.NOTE_NAMES = [
             "C", "C#", "D", "D#", "E", "F",
             "F#", "G", "G#", "A", "A#", "B"
         ];
+
+        this.resize(video);
+    }
+
+    resize(video) {
+        this.canvas.width = video.videoWidth;
+        this.canvas.height = video.videoHeight;
     }
 
     setHand(hand) {
@@ -174,4 +189,138 @@ export class HandVisualizer {
         return colors[midi % 12];
     }
 
+    bending(hands) {
+        const ctx = this.ctx;
+        let triggered = false;
+
+        for (const side of ["Left", "Right"]) {
+            const hand = hands?.[side];
+
+            if (!hand || hand.length < 21) {
+                this.prevBend[side] = false;
+                continue;
+            }
+
+            const angles = fingerAngle(hand);
+            const isBent = angles[1] > 60;
+            const tip = hand[8];
+
+            ctx.fillStyle = isBent ? "#FEBB24" : "#BDC0BA";
+            ctx.globalAlpha = 0.75;
+            ctx.beginPath();
+            ctx.arc(tip[0], tip[1], 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 伸直 → 彎曲
+            if (isBent && !this.prevBend[side] && !triggered) {
+                console.log("noteOn");
+                triggered = true;
+            }
+
+            this.prevBend[side] = isBent;
+        }
+
+        ctx.globalAlpha = 1;
+    }
+
+    pinching(hands) {
+        const ctx = this.ctx;
+        const offsetX = 0;
+
+        for (const side of ["Left", "Right"]) {
+            const hand = hands?.[side];
+            if (!hand || hand.length < 21) continue;
+
+            const thumb = hand[4];
+            const index = hand[8];
+
+            const distance = Math.hypot(thumb[0] - index[0], thumb[1] - index[1]);
+
+            const isPinching = distance < 50;
+
+            // Pinch 狀態改變
+            if (isPinching !== this.prevPinch[side]) {
+                this.prevPinch[side] = isPinching;
+
+                if (isPinching) {
+                    console.log("noteOn");
+                }
+            }
+
+            ctx.globalAlpha = 0.75;
+            ctx.fillStyle = this.prevPinch[side] ? "#FEBB24" : "#BDC0BA";
+
+            ctx.beginPath();
+            ctx.arc(thumb[0] + offsetX, thumb[1] - offsetX, 15, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(index[0] + offsetX, index[1] - offsetX, 15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+    }
+
+    waving(hands) {
+        const ctx = this.ctx;
+        const palmPoints = [0, 5, 9, 13, 17];
+
+        const centerX = this.canvas.width / 2;
+        const fadeDistance = this.canvas.width * 0.25;
+
+        for (const side of ["Left", "Right"]) {
+            const hand = hands?.[side];
+            if (!hand || hand.length < 21) continue;
+
+            let palmX = 0;
+            let palmY = 0;
+
+            for (const index of palmPoints) {
+                palmX += hand[index][0];
+                palmY += hand[index][1];
+            }
+
+            palmX /= palmPoints.length;
+            palmY /= palmPoints.length;
+
+            // 第一次偵測
+            if (this.prevWave[side] === undefined) {
+                this.prevWave[side] = palmX;
+            }
+
+            const prevX = this.prevWave[side];
+
+            // 跨過中線
+            const crossCenter = (prevX < centerX && palmX >= centerX) || (prevX > centerX && palmX <= centerX);
+
+            if (crossCenter) {
+                console.log("noteOn");
+            }
+
+            this.prevWave[side] = palmX;
+
+            // 距離中線
+            const distance = Math.abs(palmX - centerX);
+
+            // 漸變
+            const progress = Math.min(distance / fadeDistance, 1);
+
+            const start = [189, 192, 186];
+            const end = [254, 187, 36];
+
+            const r = Math.round(start[0] + (end[0] - start[0]) * progress);
+            const g = Math.round(start[1] + (end[1] - start[1]) * progress);
+            const b = Math.round(start[2] + (end[2] - start[2]) * progress);
+
+            ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+            ctx.globalAlpha = 0.75;
+
+            ctx.beginPath();
+            ctx.arc(palmX, palmY, 30, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+    }
 }

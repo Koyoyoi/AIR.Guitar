@@ -25,17 +25,6 @@ async function initVideo() {
     return video;
 }
 
-async function initCanvas(video) {
-    const canvas = document.querySelector("#canvas");
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext("2d");
-    return ctx;
-
-}
-
 async function loop() {
     handVisual.clear();
     handVisual.setHand(MP.handData);
@@ -45,12 +34,18 @@ async function loop() {
         sound.buildGuitarChord(MP.gesture, toolBar.capo);
         sound.plucking(MP.fingerBend);
         sound.strumming(MP.handData.Right);
+
         handVisual.drawGesture(MP.gesture, toolBar.capo, MP.handData.Left[9]);
         handVisual.drawNote(sound.pluckNotes, sound.prevPluck, MP.handData.Right);
         handVisual.drawStrings();
+
         scoreVisual.stop();
     }
     if (toolBar.mode == "Number Score") {
+        handVisual.bending(MP.handData);
+        //handVisual.pinching(MP.handData);
+        //handVisual.waving(MP.handData);
+
         scoreVisual.setEvents(toolBar.midiLib.events);
         scoreVisual.start();
     }
@@ -78,7 +73,7 @@ async function main() {
     await MP.init();
 
     await progress(90, "Setup Visualizer");
-    handVisual = new HandVisualizer(await initCanvas(MP.video));
+    handVisual = new HandVisualizer(document.querySelector("#camera"));
     handVisual.connectSound(sound);
     scoreVisual = new ScoreVisualizer();
 
@@ -86,7 +81,7 @@ async function main() {
     setTimeout(() => {
         loading.hide();
         loop();
-    }, 500);
+    }, 300);
 }
 
 window.addEventListener("DOMContentLoaded", main);

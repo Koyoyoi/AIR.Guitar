@@ -10,7 +10,7 @@ export class ToolBar {
         // tool bar var
         this.midiLib = new MidiLibrary(this.element);
         this.capo = 0;
-        this.currMode = 0;
+        this.currMode = 1;
         this.mode = mode[this.currMode];
         
         this.init();

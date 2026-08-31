@@ -1,4 +1,4 @@
-export function vectorCompute(p1, p2) {
+function vectorCompute(p1, p2) {
     if (!Array.isArray(p1) || !Array.isArray(p2) || p1.length < 3 || p2.length < 3) {
         console.warn("Invalid input to vectorCompute, returning [0, 0, 0]:", { p1, p2 });
         return [0, 0, 0];
@@ -7,7 +7,7 @@ export function vectorCompute(p1, p2) {
     return [p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]];
 }
 
-export function vectorAngle(v1, v2) {
+function vectorAngle(v1, v2) {
     const dotProduct = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
     const mag1 = Math.hypot(v1[0], v1[1], v1[2]);
     const mag2 = Math.hypot(v2[0], v2[1], v2[2]);
@@ -18,7 +18,7 @@ export function vectorAngle(v1, v2) {
     return Math.acos(cosine) * (180 / Math.PI);
 }
 
-function fingerAngle(hand) {
+export function fingerAngle(hand) {
     return [
         vectorAngle(vectorCompute(hand[0], hand[2]), vectorCompute(hand[2], hand[4])),
         vectorAngle(vectorCompute(hand[5], hand[6]), vectorCompute(hand[6], hand[8])),
@@ -58,7 +58,7 @@ export function transData(landmarks) {
     return [...distances, ...fingerAngle(landmarks)];
 }
 
-export function mapRange(value, inputMin, inputMax, outputMin, outputMax) {
+function mapRange(value, inputMin, inputMax, outputMin, outputMax) {
     const ratio = (value - inputMin) / (inputMax - inputMin);
     const clampedRatio = Math.max(0, Math.min(1, ratio));
     return Math.round(outputMin + clampedRatio * (outputMax - outputMin));
