@@ -17,6 +17,7 @@ export class HandVisualizer {
             "F#", "G", "G#", "A", "A#", "B"
         ];
 
+        this.triggered = "";
         this.resize(video);
     }
 
@@ -191,7 +192,7 @@ export class HandVisualizer {
 
     bending(hands) {
         const ctx = this.ctx;
-        let triggered = false;
+        this.triggered = false;
 
         for (const side of ["Left", "Right"]) {
             const hand = hands?.[side];
@@ -212,9 +213,8 @@ export class HandVisualizer {
             ctx.fill();
 
             // 伸直 → 彎曲
-            if (isBent && !this.prevBend[side] && !triggered) {
-                console.log("noteOn");
-                triggered = true;
+            if (isBent && !this.prevBend[side] && !this.triggered) {
+                this.triggered = true;
             }
 
             this.prevBend[side] = isBent;
@@ -226,6 +226,7 @@ export class HandVisualizer {
     pinching(hands) {
         const ctx = this.ctx;
         const offsetX = 0;
+        this.triggered = false;
 
         for (const side of ["Left", "Right"]) {
             const hand = hands?.[side];
@@ -243,7 +244,7 @@ export class HandVisualizer {
                 this.prevPinch[side] = isPinching;
 
                 if (isPinching) {
-                    console.log("noteOn");
+                    this.triggered = true
                 }
             }
 
@@ -269,6 +270,7 @@ export class HandVisualizer {
         const centerX = this.canvas.width / 2;
         const fadeDistance = this.canvas.width * 0.25;
 
+        this.triggered = false;
         for (const side of ["Left", "Right"]) {
             const hand = hands?.[side];
             if (!hand || hand.length < 21) continue;
@@ -295,7 +297,7 @@ export class HandVisualizer {
             const crossCenter = (prevX < centerX && palmX >= centerX) || (prevX > centerX && palmX <= centerX);
 
             if (crossCenter) {
-                console.log("noteOn");
+                this.triggered = true;
             }
 
             this.prevWave[side] = palmX;

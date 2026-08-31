@@ -45,7 +45,10 @@ async function loop() {
         handVisual.bending(MP.handData);
         //handVisual.pinching(MP.handData);
         //handVisual.waving(MP.handData);
-
+        
+        if(handVisual.triggered){
+            scoreVisual.nextEvent();
+        }
         scoreVisual.setEvents(toolBar.midiLib.events);
         scoreVisual.start();
     }
