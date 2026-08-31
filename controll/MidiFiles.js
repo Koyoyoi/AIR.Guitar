@@ -119,7 +119,7 @@ export class MidiLibrary {
                     time: Number(time),
                     midis: [],
                     lyric: null,
-                    velocity: Number(event.velocity).toFixed(4),
+                    velocity: Number(event.velocity) || 0,
                     duration: 0,
                     beats: 0,
                     noteType: ""
@@ -133,26 +133,40 @@ export class MidiLibrary {
             map[time].duration = Math.max(map[time].duration, duration);
         });
 
-        lyrics.forEach(lyric => {
-            const time = Number(lyric.time).toFixed(4);
+        const eventList = Object.values(map).sort((a, b) => a.time - b.time);
 
-            if (map[time]) {
-                map[time].lyric = lyric.text;
+        lyrics.forEach(lyric => {
+            const lyricTime = Number(lyric.time);
+            let closest = null;
+            let minDiff = Infinity;
+
+            eventList.forEach(event => {
+                const diff = Math.abs(event.time - lyricTime);
+
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closest = event;
+                }
+            });
+
+            if (!closest) {
+                console.log("Lyric not found:", lyric);
+                return;
             }
+
+            closest.lyric = lyric.text;
         });
 
-        this.events = Object.values(map)
-            .sort((a, b) => a.time - b.time)
-            .map(event => {
-                const beats = event.duration * bpm / 60;
-                const noteType = this.getNoteType(beats);
+        this.events = eventList.map(event => {
+            const beats = event.duration * bpm / 60;
+            const noteType = this.getNoteType(beats);
 
-                return {
-                    ...event,
-                    beats: noteType.beats,
-                    noteType: noteType.name
-                };
-            });
+            return {
+                ...event,
+                beats: noteType.beats,
+                noteType: noteType.name
+            };
+        });
     }
 
     getNoteType(beats) {
