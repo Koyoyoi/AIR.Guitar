@@ -42,10 +42,12 @@ async function loop() {
         scoreVisual.stop();
     }
     if (toolBar.mode == "Number Score") {
-        handVisual.bending(MP.handData);
-        //handVisual.pinching(MP.handData);
-        //handVisual.waving(MP.handData);
-
+        switch (toolBar.playMode) {
+            case "Pinch": handVisual.pinching(MP.handData); break;
+            case "Wave": handVisual.waving(MP.handData); break;
+            case "Bend": handVisual.bending(MP.handData); break;
+            default: break;
+        }
         if (handVisual.triggered) {
             scoreVisual.nextEvent();
         }

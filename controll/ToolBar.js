@@ -1,53 +1,70 @@
 import { MidiLibrary } from "./MidiFiles.js";
-const mode = ["Free Play", "Number Score"]
+
+const mode = ["Free Play", "Number Score"];
+const play = ["Pinch", "Wave", "Bend"];
 
 export class ToolBar {
     constructor() {
-        // element id
-        this.element = document.getElementById("toolbar")
+        this.element = document.getElementById("toolbar");
         this.modeValue = this.element.querySelector("#modeValue");
         this.midiPopup = this.element.querySelector("#midiPopup");
-        // tool bar var
+        this.playModeValue = this.element.querySelector("#playModeValue");
+        this.playControl = this.element.querySelector("#play-control");
         this.midiLib = new MidiLibrary(this.element);
         this.capo = 0;
         this.currMode = 1;
         this.mode = mode[this.currMode];
-        
+        this.playIdx = 0;
+        this.playMode = play[this.playIdx];
         this.init();
     }
 
     async init() {
-        // load and build list of midi songs
         await this.midiLib.loadMidiFiles();
         this.midiLib.setupList(this.midiPopup);
+
         this.element.querySelector("#midiName").addEventListener("click", () => {
-            this.midiPopup.style.display = this.midiPopup.style.display === "flex" ? "none" : "flex";
+            const isOpen = this.midiPopup.style.display === "flex";
+            this.midiPopup.style.display = isOpen ? "none" : "flex";
         });
+
         this.element.querySelector("#midiPrev").addEventListener("click", () => {
             this.midiLib.midiIdx -= 1;
             this.midiLib.updateMidi(this.element);
         });
+
         this.element.querySelector("#midiNext").addEventListener("click", () => {
             this.midiLib.midiIdx += 1;
             this.midiLib.updateMidi(this.element);
         });
-        // set mode
-        this.modeValue.textContent = this.mode;
+
         this.element.querySelector("#switchMode").addEventListener("click", () => {
             this.currMode += 1;
             this.switchMode();
         });
-        // set capo
+
         this.element.querySelector("#capoMinus").addEventListener("click", () => {
             this.setCapo(this.capo - 1);
         });
+
         this.element.querySelector("#capoPlus").addEventListener("click", () => {
             this.setCapo(this.capo + 1);
         });
-         
+
+        this.setPlayMode(0);
+
+        this.playControl.addEventListener("click", () => {
+            this.setPlayMode();
+        });
+
         this.switchMode();
     }
 
+    setPlayMode(index = null) {
+        this.playIdx = index === null ? (this.playIdx + 1) % play.length : ((index % play.length) + play.length) % play.length;
+        this.playMode = play[this.playIdx];
+        this.playModeValue.textContent = this.playMode;
+    }
 
     setCapo(value) {
         this.capo = Math.max(-12, Math.min(12, value));
@@ -55,16 +72,19 @@ export class ToolBar {
     }
 
     switchMode() {
-        this.currMode = this.currMode % mode.length;
+        this.currMode %= mode.length;
         this.mode = mode[this.currMode];
         this.modeValue.textContent = this.mode;
-        // Show or Hide
+        const capoControl = this.element.querySelector(".capo-control");
+        const midiList = this.element.querySelector(".midiList");
+
         if (this.mode === "Free Play") {
-            this.element.querySelector(".capo-control").style.display = "flex";
-            this.element.querySelector(".midiList").style.display = "none";
+            capoControl.style.display = "flex";
+            midiList.style.display = "none";
+            this.midiPopup.style.display = "none";
         } else {
-            this.element.querySelector(".capo-control").style.display = "none";
-            this.element.querySelector(".midiList").style.display = "flex";
+            capoControl.style.display = "none";
+            midiList.style.display = "flex";
         }
     }
 }
