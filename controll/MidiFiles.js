@@ -1,5 +1,3 @@
-import { ScoreVisualizer } from "../visual/ScoreVisualizer.js";
-
 export class MidiLibrary {
 
     constructor(element) {
