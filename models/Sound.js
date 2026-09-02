@@ -181,7 +181,7 @@ export class Sound extends EventTarget {
         const movement = wristX - this.prevWristX;
         this.prevWristX = wristX;
 
-        const threshold = 10;
+        const threshold = 15;
         let action = null;
 
         if (movement > threshold) {
